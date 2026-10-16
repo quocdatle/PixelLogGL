@@ -53,12 +53,12 @@ export default function LoginPage() {
           required
         />
 
-        {error && <p className="mb-5 text-[14px] text-[#2D5FEA]">{error}</p>}
+        {error && <p className="mb-5 text-[14px] text-[#2D5FEA] dark:text-[#3DA9FC]">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-[#2D5FEA] text-[#FFFFFF] border-0 rounded-sm font-mono font-bold text-[15px] cursor-pointer disabled:opacity-60"
+          className="w-full py-3.5 bg-[#2D5FEA] dark:bg-[#3DA9FC] text-[#FFFFFF] dark:text-[#0B1220] border-0 rounded-sm font-mono font-bold text-[15px] cursor-pointer disabled:opacity-60"
         >
           {loading ? 'Đang đăng nhập...' : 'Log in'}
         </button>
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => navigate('/register')}
-          className="bg-transparent border-0 p-0 text-[#2D5FEA] underline cursor-pointer font-inherit"
+          className="bg-transparent border-0 p-0 text-[#2D5FEA] dark:text-[#3DA9FC] underline cursor-pointer font-inherit"
         >
           Create an account
         </button>

@@ -3,3 +3,4 @@
   --font-mono: 'Courier Prime', ui-monospace, monospace;
   --font-serif: 'IBM Plex Serif', ui-serif, serif;
 }
+@custom-variant dark (&:where(.dark, .dark *));
