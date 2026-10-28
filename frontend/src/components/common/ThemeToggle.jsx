@@ -1,6 +1,6 @@
 import useTheme from "../../hooks/useTheme";
 
-// Nút chuyển giao diện sáng/tối — chỉ hiển thị biểu tượng Sun/Moon minh họa
+// Nút chuyển đổi chế độ sáng và tối
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
@@ -15,7 +15,7 @@ export default function ThemeToggle() {
       title={
         isDark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"
       }
-      className="w-10 h-10 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-500/40 shadow-xs backdrop-blur-md transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+      className="w-10 h-10 rounded-xl flex items-center justify-center bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-zinc-300/80 dark:hover:bg-zinc-700 transition-colors duration-150 cursor-pointer"
     >
       {isDark ? <MoonIcon /> : <SunIcon />}
     </button>
@@ -25,7 +25,7 @@ export default function ThemeToggle() {
 function SunIcon() {
   return (
     <svg
-      className="w-5 h-5 text-amber-400 animate-spin-slow"
+      className="w-5 h-5 text-amber-500"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -42,7 +42,7 @@ function SunIcon() {
 function MoonIcon() {
   return (
     <svg
-      className="w-5 h-5 text-indigo-600"
+      className="w-5 h-5 text-zinc-300"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

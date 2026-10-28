@@ -1,4 +1,4 @@
-// Input dùng chung cho form trong module auth — hỗ trợ cả Light Mode và Dark Gaming Mode
+// Input dung chung cho form trong module auth
 export default function FormField({
   label,
   id,
@@ -15,7 +15,7 @@ export default function FormField({
           {label && (
             <label
               htmlFor={id}
-              className="block text-xs font-semibold text-slate-700 dark:text-slate-300"
+              className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300"
             >
               {label}
             </label>
@@ -26,16 +26,16 @@ export default function FormField({
 
       <div className="relative">
         {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
             {icon}
           </div>
         )}
 
         <input
           id={id}
-          className={`w-full ${icon ? 'pl-10' : 'pl-3.5'} ${
-            rightElement ? 'pr-10' : 'pr-3.5'
-          } py-2.5 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 focus:ring-3 focus:ring-indigo-100 dark:focus:ring-indigo-500/20 transition-all duration-200`}
+          className={`w-full ${icon ? "pl-10" : "pl-3.5"} ${
+            rightElement ? "pr-10" : "pr-3.5"
+          } py-2.5 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-300 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors duration-150`} /* taste-skill-ignore: real form field input border */
           {...inputProps}
         />
 

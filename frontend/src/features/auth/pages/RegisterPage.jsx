@@ -17,9 +17,9 @@ export default function RegisterPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // Tính toán độ bảo mật mật khẩu
+  // Tinh toan do bao mat mat khau
   function getPasswordStrength(val) {
-    if (!val) return { percent: 0, text: 'Chưa nhập', colorClass: 'bg-slate-300 dark:bg-slate-700', textClass: 'text-slate-500' };
+    if (!val) return { percent: 0, text: 'Chưa nhập', colorClass: 'bg-zinc-300 dark:bg-zinc-700', textClass: 'text-zinc-500' };
     if (val.length < 6) {
       return { percent: 25, text: 'Yếu (Quá ngắn)', colorClass: 'bg-rose-500', textClass: 'text-rose-600 dark:text-rose-400' };
     }
@@ -29,9 +29,9 @@ export default function RegisterPage() {
       return { percent: 50, text: 'Trung bình', colorClass: 'bg-amber-500', textClass: 'text-amber-600 dark:text-amber-400' };
     }
     if (val.length >= 8 && (hasNumber || hasSpecial)) {
-      return { percent: 100, text: 'Mạnh & An toàn', colorClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-400' };
+      return { percent: 100, text: 'Mạnh và an toàn', colorClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-400' };
     }
-    return { percent: 75, text: 'Khá tốt', colorClass: 'bg-indigo-500', textClass: 'text-indigo-600 dark:text-indigo-400' };
+    return { percent: 75, text: 'Khá tốt', colorClass: 'bg-teal-500', textClass: 'text-teal-600 dark:text-teal-400' };
   }
 
   const pwdStrength = getPasswordStrength(form.password);
@@ -121,7 +121,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors duration-150 cursor-pointer"
                 aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               >
                 {showPassword ? (
@@ -138,15 +138,15 @@ export default function RegisterPage() {
             }
           />
 
-          {/* Thanh đo độ mạnh mật khẩu */}
+          {/* Thanh do do manh mat khau */}
           <div className="-mt-2 mb-4 space-y-1">
-            <div className="flex h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="flex h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all duration-300 ${pwdStrength.colorClass}`}
+                className={`h-full transition-colors duration-200 ${pwdStrength.colorClass}`}
                 style={{ width: `${pwdStrength.percent}%` }}
               />
             </div>
-            <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="flex justify-between items-center text-[11px] text-zinc-500 dark:text-zinc-400">
               <span>
                 Độ bảo mật: <b className={pwdStrength.textClass}>{pwdStrength.text}</b>
               </span>
@@ -155,39 +155,39 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Đồng ý điều khoản */}
+        {/* Dong y dieu khoan */}
         <div className="flex items-start">
           <input
             id="reg-terms"
             type="checkbox"
             checked={agreeTerms}
             onChange={(e) => setAgreeTerms(e.target.checked)}
-            className="w-4 h-4 mt-0.5 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            className="w-4 h-4 mt-0.5 rounded border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
           />
-          <label htmlFor="reg-terms" className="ml-2 block text-xs text-slate-600 dark:text-slate-400 leading-relaxed cursor-pointer">
+          <label htmlFor="reg-terms" className="ml-2 block text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed cursor-pointer">
             Tôi đồng ý với{' '}
-            <span className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">
               Điều khoản dịch vụ
             </span>{' '}
             và{' '}
-            <span className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium hover:underline">
               Chính sách bảo mật
             </span>.
           </label>
         </div>
 
-        {/* Thông báo lỗi */}
+        {/* Thong bao loi */}
         {error && (
-          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-xs font-semibold text-rose-600 dark:text-rose-400">
+          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400">
             {error}
           </div>
         )}
 
-        {/* Nút Tạo tài khoản */}
+        {/* Nut Tao tai khoan */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-500/25 dark:shadow-indigo-600/30 hover:shadow-lg hover:shadow-indigo-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-sm transition-colors duration-150 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -198,18 +198,18 @@ export default function RegisterPage() {
               <span>Đang tạo tài khoản...</span>
             </>
           ) : (
-            'Khởi tạo Vault cá nhân'
+            'Khởi tạo tài khoản PixelLog'
           )}
         </button>
       </form>
 
       {/* Switch to Login footer */}
-      <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-5 text-center text-xs text-zinc-500 dark:text-zinc-400">
         Đã có tài khoản?{' '}
         <button
           type="button"
           onClick={() => navigate('/login')}
-          className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer"
+          className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
         >
           Đăng nhập
         </button>

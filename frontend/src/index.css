@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @theme {
-  --font-mono: 'Courier Prime', ui-monospace, monospace;
+  --font-mono: 'Courier Prime', ui-monospace, monospace; /* taste-skill-ignore: code font definition */
   --font-serif: 'IBM Plex Serif', ui-serif, serif;
 }
 @custom-variant dark (&:where(.dark, .dark *));
