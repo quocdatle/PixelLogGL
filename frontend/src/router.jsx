@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
+const LibraryPage = lazy(() => import('./features/library/pages/LibraryPage'));
 
 function RouteLoadingFallback() {
   return (
@@ -36,7 +37,11 @@ function RouteLoadingFallback() {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/library" replace />,
+  },
+  {
+    path: '/index.html',
+    element: <Navigate to="/library" replace />,
   },
   {
     path: '/login',
@@ -53,6 +58,18 @@ const router = createBrowserRouter([
         <RegisterPage />
       </Suspense>
     ),
+  },
+  {
+    path: '/library',
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <LibraryPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '*',
+    element: <Navigate to="/library" replace />,
   },
 ]);
 
