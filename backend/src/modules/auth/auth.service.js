@@ -22,7 +22,10 @@ async function register({ username, email, password }) {
 }
 
 async function login({ email, password }) {
-  const user = await User.findOne({ email });
+  const identifier = email ? email.trim() : '';
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { username: identifier }],
+  });
   if (!user) {
     throw unauthorized();
   }

@@ -25,49 +25,67 @@ export default function LibraryPage() {
     try {
       const data = await libraryService.getGames();
       setGames(data);
+    } catch (err) {
+      console.error("Lỗi tải danh sách game:", err);
     } finally {
       setLoading(false);
     }
   }
 
   async function handleQuickAddPlaytime(id) {
-    const updated = await libraryService.addPlaytime(id, 1);
-    if (updated) {
-      setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+    try {
+      const updated = await libraryService.addPlaytime(id, 1);
+      if (updated) {
+        setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Không thể cập nhật giờ chơi");
     }
   }
 
   async function handleStatusChange(id, newStatus) {
-    const updated = await libraryService.updateGame(id, { status: newStatus });
-    if (updated) {
-      setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+    try {
+      const updated = await libraryService.updateGame(id, { status: newStatus });
+      if (updated) {
+        setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Không thể thay đổi trạng thái");
     }
   }
 
   async function handleSaveEdit(id, updatedFields) {
-    const updated = await libraryService.updateGame(id, updatedFields);
-    if (updated) {
-      setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+    try {
+      const updated = await libraryService.updateGame(id, updatedFields);
+      if (updated) {
+        setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Không thể lưu cập nhật");
     }
   }
 
-  function handleAddSampleGame() {
-    const title = window.prompt("Nhập tên game muốn thêm vào thư viện:");
+  async function handleAddSampleGame() {
+    const title = window.prompt(
+      "Nhập tên game muốn thêm vào thư viện (ví dụ: Elden Ring, Cyberpunk 2077, GTA V, Hades...):"
+    );
     if (!title?.trim()) return;
 
-    libraryService
-      .addGame({
-        title: title.trim(),
-        developer: "Indie Studio",
-        genre: "Adventure",
-        releaseYear: 2024,
-        status: "backlog",
-        coverUrl:
-          "https://media.rawg.io/media/games/20a/20aa527e0a1b245d15029e70fbe32c36.jpg",
-      })
-      .then((newGame) => {
+    setLoading(true);
+    try {
+      const isRawgId = /^\d+$/.test(title.trim());
+      const payload = isRawgId
+        ? { rawgId: Number(title.trim()), status: "backlog" }
+        : { title: title.trim(), status: "backlog" };
+      const newGame = await libraryService.addGame(payload);
+      if (newGame) {
         setGames((prev) => [newGame, ...prev]);
-      });
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || "Thêm game thất bại");
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Filter & Sort calculation

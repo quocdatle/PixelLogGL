@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
@@ -63,7 +64,9 @@ const router = createBrowserRouter([
     path: '/library',
     element: (
       <Suspense fallback={<RouteLoadingFallback />}>
-        <LibraryPage />
+        <ProtectedRoute>
+          <LibraryPage />
+        </ProtectedRoute>
       </Suspense>
     ),
   },

@@ -46,7 +46,7 @@ export default function LoginPage() {
           label="Email hoặc Username"
           id="login-email"
           name="email"
-          type="email"
+          type="text"
           placeholder="gamer@example.com"
           value={form.email}
           onChange={handleChange}
