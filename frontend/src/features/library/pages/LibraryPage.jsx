@@ -5,6 +5,7 @@ import LibraryFilters from "../components/LibraryFilters";
 import GameCard from "../components/GameCard";
 import LibraryItem from "../components/LibraryItem";
 import QuickEditModal from "../components/QuickEditModal";
+import AddGameModal from "../components/AddGameModal";
 import libraryService from "../libraryService";
 
 export default function LibraryPage() {
@@ -15,22 +16,32 @@ export default function LibraryPage() {
   const [sortBy, setSortBy] = useState("playtimeDesc");
   const [viewMode, setViewMode] = useState("grid");
   const [editingGame, setEditingGame] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
-    loadGames();
-  }, []);
-
-  async function loadGames() {
-    setLoading(true);
-    try {
-      const data = await libraryService.getGames();
-      setGames(data);
-    } catch (err) {
-      console.error("Lỗi tải danh sách game:", err);
-    } finally {
-      setLoading(false);
+    let ignore = false;
+    async function fetchGames() {
+      try {
+        const data = await libraryService.getGames();
+        if (!ignore) {
+          setGames(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          console.error("Lỗi tải danh sách game:", err);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
     }
-  }
+
+    fetchGames();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function handleQuickAddPlaytime(id) {
     try {
@@ -65,26 +76,9 @@ export default function LibraryPage() {
     }
   }
 
-  async function handleAddSampleGame() {
-    const title = window.prompt(
-      "Nhập tên game muốn thêm vào thư viện (ví dụ: Elden Ring, Cyberpunk 2077, GTA V, Hades...):"
-    );
-    if (!title?.trim()) return;
-
-    setLoading(true);
-    try {
-      const isRawgId = /^\d+$/.test(title.trim());
-      const payload = isRawgId
-        ? { rawgId: Number(title.trim()), status: "backlog" }
-        : { title: title.trim(), status: "backlog" };
-      const newGame = await libraryService.addGame(payload);
-      if (newGame) {
-        setGames((prev) => [newGame, ...prev]);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || "Thêm game thất bại");
-    } finally {
-      setLoading(false);
+  function handleGameAdded(newGame) {
+    if (newGame) {
+      setGames((prev) => [newGame, ...prev]);
     }
   }
 
@@ -138,7 +132,7 @@ export default function LibraryPage() {
 
             <button
               type="button"
-              onClick={handleAddSampleGame}
+              onClick={() => setIsAddModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white font-bold text-sm cursor-pointer transition-colors duration-150"
             >
               <svg
@@ -262,6 +256,16 @@ export default function LibraryPage() {
         onClose={() => setEditingGame(null)}
         onSave={handleSaveEdit}
       />
+
+      {/* Add Game Search & Autocomplete Modal */}
+      {isAddModalOpen && (
+        <AddGameModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          existingGames={games}
+          onGameAdded={handleGameAdded}
+        />
+      )}
     </div>
   );
 }

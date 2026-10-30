@@ -24,6 +24,20 @@ function mapBackendToUi(entry) {
 }
 
 export const libraryService = {
+  // Tìm kiếm game từ RAWG thông qua backend
+  async searchGames(query, options = {}) {
+    if (!query || !query.trim()) return [];
+    const res = await api.get("/games/search", {
+      params: {
+        search: query.trim(),
+        pageSize: options.pageSize || 10,
+        ...options.params,
+      },
+      signal: options.signal,
+    });
+    return res.data?.data?.results || [];
+  },
+
   // Lấy danh sách game của người dùng đăng nhập hiện tại từ Backend
   async getGames(params = {}) {
     const res = await api.get("/user-games", { params });
