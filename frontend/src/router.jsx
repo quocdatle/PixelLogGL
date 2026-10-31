@@ -5,6 +5,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
 const LibraryPage = lazy(() => import('./features/library/pages/LibraryPage'));
+const AnalyticsPage = lazy(() => import('./features/analytics/pages/AnalyticsPage'));
 
 function RouteLoadingFallback() {
   return (
@@ -70,6 +71,16 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  {
+  path: '/analytics',
+  element: (
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <ProtectedRoute>
+        <AnalyticsPage />
+      </ProtectedRoute>
+    </Suspense>
+  ),
+},
   {
     path: '*',
     element: <Navigate to="/library" replace />,

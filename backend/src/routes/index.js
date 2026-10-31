@@ -3,6 +3,7 @@ const authRoutes = require('../modules/auth/auth.routes');
 const userRoutes = require('../modules/users/user.routes');
 const gameRoutes = require('../modules/games/game.routes');
 const libraryRoutes = require('../modules/library/library.routes');
+const analyticsRoutes = require('../modules/analytics/analytics.routes');
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/games', gameRoutes);
 router.use('/user-games', libraryRoutes);
+router.use('/analytics', analyticsRoutes);
 
 module.exports = router;
