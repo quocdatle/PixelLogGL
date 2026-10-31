@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import ThemeToggle from '../../../components/common/ThemeToggle';
+import AppNavbar from '../../../components/layout/AppNavbar';
 import GenreChart from '../components/GenreChart';
 import PlaytimeChart from '../components/PlaytimeChart';
 import { getGenreStats, getOverview, getPlaytimeStats, getTopGames } from '../analyticsService';
@@ -199,89 +199,97 @@ export default function AnalyticsPage() {
   const isEmptyLibrary = overview.data && overview.data.totalGames === 0;
 
   return (
-    <div className="min-h-[100dvh] w-full bg-zinc-100 dark:bg-zinc-950">
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-8">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Thống kê</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Thói quen chơi game của bạn, tính từ thư viện cá nhân.
-        </p>
-        </div>
-        <ThemeToggle />
-      </header>
+    <div className="min-h-[100dvh] w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-150">
+      <div>
+        <AppNavbar />
 
-      {overview.error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-          {overview.error}
-        </p>
-      )}
+        <main className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6 lg:px-8 py-8">
+          <header className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Thống kê
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+              Thói quen chơi game của bạn, tính từ thư viện cá nhân.
+            </p>
+          </header>
 
-      {overview.loading && !overview.data && (
-        <div className="h-36 rounded-xl bg-zinc-100 motion-safe:animate-pulse dark:bg-zinc-800" aria-busy="true" />
-      )}
+          {overview.error && (
+            <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+              {overview.error}
+            </p>
+          )}
 
-      {isEmptyLibrary && (
-        <div className="rounded-xl border border-dashed border-zinc-300 px-6 py-12 text-center dark:border-zinc-700">
-          <p className="font-medium text-zinc-900 dark:text-zinc-100">Thư viện của bạn chưa có game nào</p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Thêm game vào thư viện và ghi lại giờ chơi để xem thống kê tại đây.
-          </p>
-        </div>
-      )}
+          {overview.loading && !overview.data && (
+            <div className="h-36 rounded-xl bg-zinc-100 motion-safe:animate-pulse dark:bg-zinc-800" aria-busy="true" />
+          )}
 
-      {overview.data && !isEmptyLibrary && (
-        <>
-          <OverviewStrip overview={overview.data} />
+          {isEmptyLibrary && (
+            <div className="rounded-xl border border-dashed border-zinc-300 px-6 py-12 text-center dark:border-zinc-700">
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">Thư viện của bạn chưa có game nào</p>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Thêm game vào thư viện và ghi lại giờ chơi để xem thống kê tại đây.
+              </p>
+            </div>
+          )}
 
-          <Panel
-            title="Giờ chơi theo thời gian"
-            action={
-              <Toggle
-                label="Khoảng thời gian"
-                value={range}
-                onChange={setRange}
-                options={[
-                  { value: 'week', label: 'Theo tuần' },
-                  { value: 'month', label: 'Theo tháng' },
-                ]}
-              />
-            }
-          >
-            <PanelState loading={playtime.loading && !playtime.data} error={playtime.error} height="h-72">
-              {playtime.data && <PlaytimeChart data={playtime.data.items} range={range} />}
-            </PanelState>
-          </Panel>
+          {overview.data && !isEmptyLibrary && (
+            <>
+              <OverviewStrip overview={overview.data} />
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Panel
-              title="Thể loại yêu thích"
-              action={
-                <Toggle
-                  label="Tiêu chí thể loại"
-                  value={genreMetric}
-                  onChange={setGenreMetric}
-                  options={[
-                    { value: 'games', label: 'Số game' },
-                    { value: 'hours', label: 'Giờ chơi' },
-                  ]}
-                />
-              }
-            >
-              <PanelState loading={genres.loading && !genres.data} error={genres.error}>
-                {genres.data && <GenreChart data={genres.data} metric={genreMetric} />}
-              </PanelState>
-            </Panel>
+              <Panel
+                title="Giờ chơi theo thời gian"
+                action={
+                  <Toggle
+                    label="Khoảng thời gian"
+                    value={range}
+                    onChange={setRange}
+                    options={[
+                      { value: 'week', label: 'Theo tuần' },
+                      { value: 'month', label: 'Theo tháng' },
+                    ]}
+                  />
+                }
+              >
+                <PanelState loading={playtime.loading && !playtime.data} error={playtime.error} height="h-72">
+                  {playtime.data && <PlaytimeChart data={playtime.data.items} range={range} />}
+                </PanelState>
+              </Panel>
 
-            <Panel title="Game chơi nhiều nhất">
-              <PanelState loading={topGames.loading && !topGames.data} error={topGames.error}>
-                {topGames.data && <TopGamesList games={topGames.data} />}
-              </PanelState>
-            </Panel>
-          </div>
-        </>
-      )}
-    </main>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Panel
+                  title="Thể loại yêu thích"
+                  action={
+                    <Toggle
+                      label="Tiêu chí thể loại"
+                      value={genreMetric}
+                      onChange={setGenreMetric}
+                      options={[
+                        { value: 'games', label: 'Số game' },
+                        { value: 'hours', label: 'Giờ chơi' },
+                      ]}
+                    />
+                  }
+                >
+                  <PanelState loading={genres.loading && !genres.data} error={genres.error}>
+                    {genres.data && <GenreChart data={genres.data} metric={genreMetric} />}
+                  </PanelState>
+                </Panel>
+
+                <Panel title="Game chơi nhiều nhất">
+                  <PanelState loading={topGames.loading && !topGames.data} error={topGames.error}>
+                    {topGames.data && <TopGamesList games={topGames.data} />}
+                  </PanelState>
+                </Panel>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+
+      {/* Footer */}
+      <footer className="py-8 px-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+        PixelLog GL © 2026. Nền tảng quản lý game và trợ lý AI thông minh.
+      </footer>
     </div>
   );
 }
