@@ -175,7 +175,127 @@ GET /api/health
 Dùng để kiểm tra server có chạy không — trả `{ "success": true, "message": "Server đang chạy OK" }`.
 
 ---
+## Module: Analytics
 
+> Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`. Dữ liệu luôn là của người dùng đang đăng nhập.
+
+**Lỗi chung của module (ngoài các mã lỗi dùng chung ở cuối file):**
+| Status | code | Trường hợp |
+|---|---|---|
+| 400 | `VALIDATION_ERROR` | Tham số query không hợp lệ (`range`, `sortBy`) |
+| 401 | `NO_TOKEN` | Không gửi header Authorization |
+| 401 | `INVALID_TOKEN` | Token sai hoặc hết hạn |
+
+---
+
+### Tổng quan thư viện
+```
+GET /api/analytics/overview
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalGames": 24,
+    "totalHours": 312.5,
+    "avgRating": 8.3,
+    "byStatus": { "backlog": 8, "playing": 3, "completed": 10, "dropped": 2, "wishlist": 1 }
+  }
+}
+```
+
+- `totalHours` lấy từ `hoursPlayed` của từng game (cùng nguồn với `/user-games/summary`).
+- `avgRating` là `null` nếu chưa có game nào được chấm điểm.
+- `byStatus` luôn đủ 5 trạng thái, giá trị 0 nếu chưa có.
+
+---
+
+### Phân bổ thể loại
+```
+GET /api/analytics/genres?sortBy=games
+```
+
+| Query | Mặc định | Giá trị |
+|---|---|---|
+| `sortBy` | `games` | `games` (theo số game) hoặc `hours` (theo giờ chơi) |
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": [
+    { "genre": "Action", "games": 9, "hours": 120.5 },
+    { "genre": "RPG", "games": 6, "hours": 98 },
+    { "genre": "Khác", "games": 3, "hours": 12.5 }
+  ]
+}
+```
+
+- Tối đa 8 mục; thể loại xếp sau được gộp vào `Khác`.
+- Một game có nhiều thể loại được tính vào từng thể loại, nên tổng `games` có thể lớn hơn tổng số game.
+
+---
+
+### Giờ chơi theo tuần / tháng
+```
+GET /api/analytics/playtime?range=week&periods=8
+```
+
+| Query | Mặc định | Ghi chú |
+|---|---|---|
+| `range` | `week` | `week` (tuần bắt đầu thứ Hai) hoặc `month` |
+| `periods` | 8 (week) / 6 (month) | Số kỳ gần nhất, tối đa 26 (week) / 24 (month) |
+
+Múi giờ tính theo `Asia/Ho_Chi_Minh`. Dữ liệu lấy từ `playSessions` (`playedAt`, `minutes`). Kỳ không có phiên chơi vẫn được trả về với giá trị 0. Phần tử cuối cùng là kỳ hiện tại.
+
+> Số giờ ở đây chỉ gồm các phiên chơi đã ghi qua `POST .../play-sessions`, nên có thể nhỏ hơn `totalHours` nếu người dùng từng sửa tay `hoursPlayed`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "range": "week",
+    "periods": 8,
+    "items": [
+      { "periodStart": "2026-09-07", "label": "07/09", "minutes": 270, "hours": 4.5 },
+      { "periodStart": "2026-09-14", "label": "14/09", "minutes": 0, "hours": 0 }
+    ]
+  }
+}
+```
+
+---
+
+### Game chơi nhiều nhất
+```
+GET /api/analytics/top-games?limit=5
+```
+
+| Query | Mặc định | Ghi chú |
+|---|---|---|
+| `limit` | 5 | Từ 1 đến 20 |
+
+Chỉ trả về game có `hoursPlayed` lớn hơn 0, sắp xếp giảm dần.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "userGameId": "66f1a2b3c4d5e6f7890abcde",
+      "gameId": "66e1a2b3c4d5e6f7890abcdf",
+      "name": "The Witcher 3",
+      "status": "completed",
+      "rating": 10,
+      "hours": 142.5
+    }
+  ]
+}
+```
 ## Mã lỗi dùng chung (toàn hệ thống)
 
 | code | Status | Ý nghĩa |
