@@ -3,6 +3,8 @@ const { geminiApiKey, geminiModel } = require('../../config/env');
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const REQUEST_TIMEOUT_MS = 25000;
 const MAX_RETRIES = 2;
+// finishReason khiến Gemini không trả nội dung vì lý do an toàn / chính sách
+const BLOCKED_FINISH_REASONS = ['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII'];
 
 function createHttpError(message, statusCode, code) {
   const err = new Error(message);
@@ -18,7 +20,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * @param {Object} options
  * @param {Array<{role: string, parts: Array<{text: string}>}>} options.contents Lịch sử tin nhắn
  * @param {string} options.systemInstruction Hướng dẫn hệ thống
- * @returns {Promise<string>}
+ * @returns {Promise<{text: string, truncated: boolean}>} text: câu trả lời; truncated: true nếu bị cắt do hết MAX_TOKENS
  */
 async function generateContent({ contents, systemInstruction }) {
   if (!geminiApiKey) {
@@ -89,7 +91,12 @@ async function generateContent({ contents, systemInstruction }) {
       // Kiểm tra chặn ở cấp độ Prompt (Safety / Policy)
       if (data.promptFeedback?.blockReason) {
         console.warn('[GEMINI] Prompt bị chặn do chính sách:', data.promptFeedback.blockReason);
-        return 'Nội dung câu hỏi chạm đến chính sách an toàn của hệ thống. Vui lòng đặt câu hỏi khác liên quan đến game!';
+        // Ném lỗi (thay vì trả về như một câu trả lời) để service không lưu tin nhắn bị chặn vào lịch sử
+        throw createHttpError(
+          'Nội dung câu hỏi chạm đến chính sách an toàn của hệ thống. Vui lòng đặt câu hỏi khác liên quan đến game!',
+          422,
+          'AI_CONTENT_BLOCKED'
+        );
       }
 
       const candidate = data.candidates?.[0];
@@ -105,18 +112,22 @@ async function generateContent({ contents, systemInstruction }) {
         .join('');
 
       if (!textParts) {
-        if (candidate.finishReason === 'SAFETY') {
-          return 'Câu trả lời bị ẩn do tiêu chuẩn an toàn nội dung. Bạn có thể hỏi theo cách khác nhé!';
+        if (BLOCKED_FINISH_REASONS.includes(candidate.finishReason)) {
+          console.warn('[GEMINI] Câu trả lời bị chặn:', candidate.finishReason);
+          throw createHttpError(
+            'Câu trả lời bị ẩn do tiêu chuẩn an toàn nội dung. Bạn có thể hỏi theo cách khác nhé!',
+            422,
+            'AI_CONTENT_BLOCKED'
+          );
         }
         throw createHttpError('Nội dung phản hồi từ AI bị rỗng.', 502, 'EMPTY_AI_RESPONSE');
       }
 
-      let finalReply = textParts.trim();
-      if (candidate.finishReason === 'MAX_TOKENS') {
-        finalReply += '\n\n*(Câu trả lời dài hơn giới hạn một lượt, bạn có thể gõ "tiếp tục" để xem thêm).*';
-      }
-
-      return finalReply;
+      // Trả nguyên văn câu trả lời của model; ghi chú "bị cắt" do service thêm khi hiển thị, không lưu vào lịch sử
+      return {
+        text: textParts.trim(),
+        truncated: candidate.finishReason === 'MAX_TOKENS',
+      };
     } catch (err) {
       if (err.name === 'TimeoutError') {
         console.error('[GEMINI] Yêu cầu bị timeout sau', REQUEST_TIMEOUT_MS, 'ms');

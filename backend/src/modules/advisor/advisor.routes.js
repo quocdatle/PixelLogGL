@@ -13,7 +13,8 @@ router.use(requireAuth);
 const chatRateLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 15,
-  keyGenerator: (req) => req.userId || req.ip,
+  // requireAuth chạy trước nên luôn có userId; không dùng req.ip để tránh cảnh báo IPv6 của express-rate-limit
+  keyGenerator: (req) => String(req.userId),
   handler: (req, res) => {
     return error(
       res,

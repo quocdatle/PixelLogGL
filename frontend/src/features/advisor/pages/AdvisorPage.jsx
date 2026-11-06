@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import AppNavbar from '../../../components/layout/AppNavbar';
 import {
@@ -20,6 +20,44 @@ const INITIAL_GREETING = {
   role: 'assistant',
   content:
     'Chào bạn! Tôi là Cố vấn AI Game của PixelLog. Tôi có thể phân tích kho game của bạn để gợi ý game chuẩn gu, giải đáp cốt truyện hay cấu hình chơi game. Hôm nay bạn muốn tìm tựa game thế nào?',
+};
+
+// react-markdown truyền thêm prop `node` (cây AST) vào mọi component — bỏ đi để không bị đẩy xuống thẻ DOM.
+const withoutNode = (props) => {
+  const rest = { ...props };
+  delete rest.node;
+  return rest;
+};
+
+// Tạo component Markdown gắn class Tailwind cho một thẻ HTML.
+const styledTag = (Tag, className) => (props) => <Tag className={className} {...withoutNode(props)} />;
+
+// Lưu ý: react-markdown v9+ không còn truyền prop `inline` cho `code`, nên code khối / inline
+// được phân biệt bằng className (khối có `language-xxx`) hoặc ký tự xuống dòng ở cuối nội dung khối.
+const MARKDOWN_COMPONENTS = {
+  h1: styledTag('h1', 'text-base font-bold my-2 text-zinc-900 dark:text-white'),
+  h2: styledTag('h2', 'text-sm font-bold my-1.5 text-zinc-900 dark:text-white'),
+  h3: styledTag('h3', 'text-xs font-bold my-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400'),
+  p: styledTag('p', 'mb-2 last:mb-0 leading-relaxed'),
+  ul: styledTag('ul', 'list-disc pl-4 mb-2 space-y-1'),
+  ol: styledTag('ol', 'list-decimal pl-4 mb-2 space-y-1'),
+  li: styledTag('li', 'pl-0.5'),
+  strong: styledTag('strong', 'font-semibold text-zinc-900 dark:text-white'),
+  pre: styledTag('pre', 'p-2.5 rounded-lg bg-zinc-900 text-zinc-100 overflow-x-auto text-xs my-2 font-mono'),
+  code: ({ className, children, ...props }) => {
+    const isBlock = Boolean(className) || String(children).includes('\n');
+    const rest = withoutNode(props);
+    return isBlock ? (
+      <code className={className} {...rest}>
+        {children}
+      </code>
+    ) : (
+      <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-xs font-mono" {...rest}>
+        {children}
+      </code>
+    );
+  },
+  hr: () => <hr className="my-3 border-zinc-200 dark:border-zinc-800" />,
 };
 
 export default function AdvisorPage() {
@@ -192,27 +230,7 @@ export default function AdvisorPage() {
                     {isUser ? (
                       <p className="whitespace-pre-wrap">{msg.content}</p>
                     ) : (
-                      <ReactMarkdown
-                        components={{
-                          h1: ({ ...props }) => <h1 className="text-base font-bold my-2 text-zinc-900 dark:text-white" {...props} />,
-                          h2: ({ ...props }) => <h2 className="text-sm font-bold my-1.5 text-zinc-900 dark:text-white" {...props} />,
-                          h3: ({ ...props }) => <h3 className="text-xs font-bold my-1.5 uppercase tracking-wider text-emerald-700 dark:text-emerald-400" {...props} />,
-                          p: ({ ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
-                          ul: ({ ...props }) => <ul className="list-disc pl-4 mb-2 space-y-1" {...props} />,
-                          ol: ({ ...props }) => <ol className="list-decimal pl-4 mb-2 space-y-1" {...props} />,
-                          li: ({ ...props }) => <li className="pl-0.5" {...props} />,
-                          strong: ({ ...props }) => <strong className="font-semibold text-zinc-900 dark:text-white" {...props} />,
-                          code: ({ inline, ...props }) =>
-                            inline ? (
-                              <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-xs font-mono" {...props} />
-                            ) : (
-                              <pre className="p-2.5 rounded-lg bg-zinc-900 text-zinc-100 overflow-x-auto text-xs my-2 font-mono">
-                                <code {...props} />
-                              </pre>
-                            ),
-                          hr: () => <hr className="my-3 border-zinc-200 dark:border-zinc-800" />,
-                        }}
-                      >
+                      <ReactMarkdown components={MARKDOWN_COMPONENTS}>
                         {msg.content}
                       </ReactMarkdown>
                     )}

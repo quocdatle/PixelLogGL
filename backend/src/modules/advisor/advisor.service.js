@@ -3,7 +3,12 @@ const geminiApi = require('./geminiApi.service');
 const libraryService = require('../library/library.service');
 
 const MAX_MESSAGE_LENGTH = 1500;
-const HISTORY_CONTEXT_LIMIT = 6; // Lấy 6 lượt gần nhất (3 cặp user-model) để giữ ngữ cảnh
+const HISTORY_CONTEXT_LIMIT = 6; // Lấy 6 lượt gần nhất (mỗi lượt gồm 1 câu hỏi + 1 câu trả lời) để giữ ngữ cảnh
+const LIBRARY_CONTEXT_LIMIT = 100; // Số game tối đa nạp vào prompt (bằng MAX_LIMIT của library.service.list)
+const WISHLIST_CONTEXT_LIMIT = 15;
+const DEFAULT_SESSION_ID = 'default';
+const SESSION_ID_PATTERN = /^[\w-]{1,64}$/;
+const TRUNCATED_NOTE = '\n\n*(Câu trả lời dài hơn giới hạn một lượt, bạn có thể gõ "tiếp tục" để xem thêm).*';
 
 function validationError(message) {
   const err = new Error(message);
@@ -12,33 +17,53 @@ function validationError(message) {
   return err;
 }
 
+// sessionId đi thẳng vào filter Mongoose nên chỉ nhận chuỗi đơn giản,
+// chặn các giá trị dạng object/mảng (vd: ?sessionId[$ne]=x).
+function normalizeSessionId(value) {
+  if (value === undefined || value === null) return DEFAULT_SESSION_ID;
+  if (typeof value !== 'string' || !SESSION_ID_PATTERN.test(value)) {
+    throw validationError('sessionId không hợp lệ (chỉ gồm chữ, số, "_" hoặc "-", tối đa 64 ký tự).');
+  }
+  return value;
+}
+
 /**
  * Tạo bản tóm tắt thư viện game của người dùng để đưa vào System Prompt
  */
 async function buildUserLibraryContext(userId) {
   try {
-    const libraryData = await libraryService.list(userId, { limit: 50 });
+    const [libraryData, stats] = await Promise.all([
+      libraryService.list(userId, { sort: 'hours', limit: LIBRARY_CONTEXT_LIMIT }),
+      libraryService.summary(userId),
+    ]);
     const items = libraryData.items || [];
 
-    if (items.length === 0) {
+    // wishlist = game người dùng muốn chơi nhưng CHƯA sở hữu -> tách riêng khỏi danh sách đã sở hữu
+    const owned = items.filter((i) => i.status !== 'wishlist');
+    const wishlist = items.filter((i) => i.status === 'wishlist');
+    const totalOwned = stats.total - (stats.byStatus?.wishlist || 0);
+
+    if (totalOwned === 0 && wishlist.length === 0) {
       return 'Người dùng hiện chưa có tựa game nào trong thư viện PixelLog.';
     }
 
-    const ownedTitles = items.map((i) => i.game?.name).filter(Boolean);
-    const topPlayed = [...items]
+    const ownedTitles = owned.map((i) => i.game?.name).filter(Boolean);
+    const hiddenOwned = Math.max(totalOwned - owned.length, 0);
+
+    const topPlayed = owned
       .filter((i) => (i.hoursPlayed || 0) > 0)
       .sort((a, b) => (b.hoursPlayed || 0) - (a.hoursPlayed || 0))
       .slice(0, 5)
       .map((i) => `${i.game?.name} (${i.hoursPlayed}h)`);
 
-    const topRated = [...items]
+    const topRated = owned
       .filter((i) => i.rating && i.rating >= 8)
       .sort((a, b) => b.rating - a.rating)
       .slice(0, 5)
       .map((i) => `${i.game?.name} (${i.rating}/10)`);
 
     const genreCounts = {};
-    items.forEach((i) => {
+    owned.forEach((i) => {
       (i.game?.genres || []).forEach((g) => {
         genreCounts[g] = (genreCounts[g] || 0) + 1;
       });
@@ -48,18 +73,31 @@ async function buildUserLibraryContext(userId) {
       .slice(0, 4)
       .map(([genre]) => genre);
 
-    let context = `Danh sách game người dùng ĐÃ SỞ HỮU (${ownedTitles.length} game): ${ownedTitles.slice(0, 30).join(', ')}.`;
+    const lines = [];
+    if (owned.length === 0) {
+      lines.push('Người dùng chưa sở hữu game nào trong thư viện PixelLog.');
+    } else {
+      const extra = hiddenOwned > 0 ? ` và ${hiddenOwned} game khác (không liệt kê tên)` : '';
+      lines.push(`Danh sách game người dùng ĐÃ SỞ HỮU (${totalOwned} game): ${ownedTitles.join(', ')}${extra}.`);
+    }
     if (topPlayed.length > 0) {
-      context += `\nTop game chơi nhiều nhất: ${topPlayed.join(', ')}.`;
+      lines.push(`Top game chơi nhiều nhất: ${topPlayed.join(', ')}.`);
     }
     if (topRated.length > 0) {
-      context += `\nGame đánh giá cao nhất: ${topRated.join(', ')}.`;
+      lines.push(`Game đánh giá cao nhất: ${topRated.join(', ')}.`);
     }
     if (favoriteGenres.length > 0) {
-      context += `\nThể loại thường chơi: ${favoriteGenres.join(', ')}.`;
+      lines.push(`Thể loại thường chơi: ${favoriteGenres.join(', ')}.`);
+    }
+    if (wishlist.length > 0) {
+      const wishlistTitles = wishlist
+        .slice(0, WISHLIST_CONTEXT_LIMIT)
+        .map((i) => i.game?.name)
+        .filter(Boolean);
+      lines.push(`Game người dùng ĐANG MUỐN CHƠI (wishlist, chưa sở hữu): ${wishlistTitles.join(', ')}.`);
     }
 
-    return context;
+    return lines.join('\n');
   } catch (err) {
     console.warn('[ADVISOR] Không thể nạp ngữ cảnh thư viện của user:', err.message);
     return 'Không có thông tin thư viện.';
@@ -81,6 +119,8 @@ THÔNG TIN VỀ THƯ VIỆN GAME CỦA NGƯỜI DÙNG HIỆN TẠI:
 ${libraryContext}
 - Hướng dẫn áp dụng: Hãy ưu tiên gợi ý các game phù hợp với gu thể loại và chất lượng mà người dùng yêu thích.
 - ĐẶC BIỆT: TUYỆT ĐỐI KHÔNG gợi ý lại những game người dùng ĐÃ SỞ HỮU ở danh sách trên, trừ khi người dùng chủ động yêu cầu giải đáp hoặc tư vấn về chính tựa game đó.
+- Game trong mục "ĐANG MUỐN CHƠI (wishlist)" là game chưa sở hữu, bạn được phép nhắc tới hoặc gợi ý.
+- Nếu danh sách ghi "và N game khác (không liệt kê tên)", hãy nhắc người dùng kiểm tra lại thư viện của mình để tránh trùng lặp khi bạn gợi ý một tựa game phổ biến.
 
 PHONG CÁCH PHẢN HỒI:
 - Sử dụng tiếng Việt tự nhiên, thân thiện, mang văn phong của một người bạn game thủ hiểu biết sâu sắc.
@@ -90,7 +130,7 @@ PHONG CÁCH PHẢN HỒI:
 /**
  * Xử lý cuộc trò chuyện có nhớ ngữ cảnh
  */
-async function chat(userId, { message, sessionId = 'default' }) {
+async function chat(userId, { message, sessionId } = {}) {
   if (!message || typeof message !== 'string' || message.trim() === '') {
     throw validationError('Nội dung tin nhắn không được để trống.');
   }
@@ -100,8 +140,10 @@ async function chat(userId, { message, sessionId = 'default' }) {
     throw validationError(`Tin nhắn quá dài (tối đa ${MAX_MESSAGE_LENGTH} ký tự).`);
   }
 
+  const session = normalizeSessionId(sessionId);
+
   // 1. Tải lịch sử tin nhắn gần nhất để tạo ngữ cảnh hội thoại
-  const recentLogs = await AdvisorLog.find({ userId, sessionId })
+  const recentLogs = await AdvisorLog.find({ userId, sessionId: session })
     .sort({ createdAt: -1 })
     .limit(HISTORY_CONTEXT_LIMIT);
 
@@ -123,39 +165,35 @@ async function chat(userId, { message, sessionId = 'default' }) {
   const libraryContext = await buildUserLibraryContext(userId);
   const systemInstruction = buildSystemInstruction(libraryContext);
 
-  // 3. Gọi Gemini API
-  const reply = await geminiApi.generateContent({
+  // 3. Gọi Gemini API (nếu prompt/câu trả lời bị chặn sẽ ném lỗi AI_CONTENT_BLOCKED -> không lưu log)
+  const { text, truncated } = await geminiApi.generateContent({
     contents,
     systemInstruction,
   });
 
-  // 4. Lưu hội thoại vào MongoDB
+  // 4. Lưu hội thoại vào MongoDB (chỉ lưu nguyên văn câu trả lời của model, không kèm ghi chú hiển thị)
   try {
     await AdvisorLog.create({
       userId,
-      sessionId,
+      sessionId: session,
       userMessage: cleanMessage,
-      botReply: reply,
+      botReply: text,
     });
   } catch (dbErr) {
     console.error('[ADVISOR] Lỗi lưu lịch sử chat vào DB:', dbErr.message);
   }
 
-  return { reply };
+  return { reply: truncated ? `${text}${TRUNCATED_NOTE}` : text };
 }
 
 /**
  * Lấy lịch sử trò chuyện của người dùng hiện tại
  */
-async function getHistory(userId, { sessionId = 'default', limit = 30 } = {}) {
+async function getHistory(userId, { sessionId, limit = 30 } = {}) {
+  const session = normalizeSessionId(sessionId);
   const limitNum = Math.min(Math.max(parseInt(limit, 10) || 30, 1), 100);
 
-  const query = { userId };
-  if (sessionId) {
-    query.sessionId = sessionId;
-  }
-
-  const logs = await AdvisorLog.find(query)
+  const logs = await AdvisorLog.find({ userId, sessionId: session })
     .sort({ createdAt: -1 })
     .limit(limitNum);
 
@@ -165,8 +203,9 @@ async function getHistory(userId, { sessionId = 'default', limit = 30 } = {}) {
 /**
  * Xóa hoặc bắt đầu phiên chat mới
  */
-async function clearHistory(userId, { sessionId = 'default' } = {}) {
-  await AdvisorLog.deleteMany({ userId, sessionId });
+async function clearHistory(userId, { sessionId } = {}) {
+  const session = normalizeSessionId(sessionId);
+  await AdvisorLog.deleteMany({ userId, sessionId: session });
   return { message: 'Đã làm mới cuộc trò chuyện' };
 }
 
