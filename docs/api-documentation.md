@@ -300,50 +300,61 @@ Chỉ trả về game có `hoursPlayed` lớn hơn 0, sắp xếp giảm dần.
 
 ---
 
-## Module: Advisor (Trợ lý AI Gemini)
+## Module: Advisor (Trợ lý AI Game)
+
+> Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`. Dữ liệu chat được cô lập tuyệt đối theo từng tài khoản.
 
 ### Gửi tin nhắn tư vấn game
 ```
 POST /api/advisor/chat
 ```
 
-**Header (tùy chọn):**
+**Header (bắt buộc):**
 ```
 Authorization: Bearer <token>
 ```
-*(Nếu có token, tin nhắn sẽ được gắn với tài khoản của người dùng. Nếu không có, tin nhắn được xử lý dạng khách).*
 
 **Body:**
 ```json
 {
-  "message": "Gợi ý cho mình một số game nhập vai cốt truyện sâu sắc giống The Witcher 3"
+  "message": "Gợi ý cho mình một số game nhập vai cốt truyện sâu sắc giống The Witcher 3",
+  "sessionId": "default"
 }
 ```
+
+*Lưu ý: `message` tối đa 1500 ký tự. Hệ thống tự động kèm theo lịch sử trò chuyện gần nhất và dữ liệu thư viện game của bạn để Gemini đưa ra gợi ý chuẩn gu nhất.*
 
 **Response 200 (thành công):**
 ```json
 {
   "success": true,
-  "reply": "Dưới đây là một số tựa game nhập vai thế giới mở với cốt truyện có chiều sâu tương tự The Witcher 3: 1. Cyberpunk 2077... 2. Baldur's Gate 3..."
+  "data": {
+    "reply": "Dưới đây là một số tựa game nhập vai thế giới mở với cốt truyện có chiều sâu tương tự The Witcher 3: 1. Cyberpunk 2077... 2. Baldur's Gate 3..."
+  }
 }
 ```
 
 **Lỗi có thể gặp:**
 | Status | code | Ý nghĩa |
 |---|---|---|
-| 400 | - | Nội dung tin nhắn rỗng (`message` bắt buộc) |
-| 401 | `INVALID_GEMINI_KEY` | Khóa `GEMINI_API_KEY` cấu hình sai hoặc bị từ chối |
-| 500 | `GEMINI_NOT_CONFIGURED` | Server chưa cấu hình biến `GEMINI_API_KEY` |
-| 502 | `GEMINI_UNREACHABLE` / `GEMINI_ERROR` | Không kết nối được đến máy chủ Google AI |
+| 400 | `VALIDATION_ERROR` | Nội dung tin nhắn rỗng hoặc vượt quá 1500 ký tự |
+| 401 | `NO_TOKEN` / `INVALID_TOKEN` | Thiếu token hoặc token không hợp lệ / hết hạn |
+| 429 | `RATE_LIMIT_EXCEEDED` | Gửi quá 15 tin nhắn/phút theo tài khoản người dùng |
+| 429 | `AI_RATE_LIMITED` | Dịch vụ AI thượng nguồn đang quá tải yêu cầu |
+| 502 | `AI_SERVICE_UNAVAILABLE` | Lỗi dịch vụ từ phía máy chủ Google Gemini |
+| 502 | `EMPTY_AI_RESPONSE` | Không nhận được phản hồi nội dung hợp lệ từ AI |
+| 502 | `GEMINI_UNREACHABLE` | Không thể kết nối mạng tới dịch vụ AI |
+| 503 | `AI_NOT_CONFIGURED` | Server chưa cấu hình `GEMINI_API_KEY` |
+| 504 | `GEMINI_TIMEOUT` | Yêu cầu tới AI quá thời gian chờ (timeout) |
 
 ---
 
 ### Lấy lịch sử tư vấn
 ```
-GET /api/advisor/history
+GET /api/advisor/history?sessionId=default&limit=30
 ```
 
-**Header (tùy chọn):**
+**Header (bắt buộc):**
 ```
 Authorization: Bearer <token>
 ```
@@ -356,12 +367,35 @@ Authorization: Bearer <token>
     {
       "_id": "672b1234abcd5678ef901234",
       "userId": "650f1a2b3c4d5e6f7890abcd",
+      "sessionId": "default",
       "userMessage": "Gợi ý game souls-like",
       "botReply": "Bạn có thể thử Elden Ring, Lies of P hoặc Sekiro...",
       "createdAt": "2026-11-06T04:50:00.000Z",
       "updatedAt": "2026-11-06T04:50:00.000Z"
     }
   ]
+}
+```
+
+---
+
+### Xóa lịch sử trò chuyện
+```
+DELETE /api/advisor/history?sessionId=default
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Đã làm mới cuộc trò chuyện"
+  }
 }
 ```
 
