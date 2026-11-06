@@ -17,7 +17,7 @@
 
 - **Frontend:** React 19, Vite, React Router v7, Tailwind CSS v4, Axios.
 - **Backend:** Node.js, Express 4, MongoDB + Mongoose 9, JWT, Bcrypt.
-- **Dịch vụ tích hợp:** RAWG API (Dữ liệu game), Claude API (AI Chatbot gợi ý).
+- **Dịch vụ tích hợp:** RAWG API (Dữ liệu game), Google Gemini API (AI Chatbot gợi ý).
 
 ---
 

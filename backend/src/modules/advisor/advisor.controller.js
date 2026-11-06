@@ -1,9 +1,9 @@
-const { sendMessageToClaude } = require('./claudeApi.service');
+const { sendMessageToGemini } = require('./geminiApi.service');
 const AdvisorLog = require('./advisorLog.model');
 
 /**
  * POST /api/advisor/chat
- * Xử lý trò chuyện với Cố vấn AI
+ * Xử lý trò chuyện với Cố vấn AI Gemini
  */
 exports.handleChat = async (req, res) => {
   try {
@@ -16,14 +16,14 @@ exports.handleChat = async (req, res) => {
       });
     }
 
-    // 1. Gọi service gửi tin nhắn tới Claude API
-    const reply = await sendMessageToClaude(message);
+    // 1. Gọi service gửi tin nhắn tới Google Gemini API
+    const reply = await sendMessageToGemini(message.trim());
 
     // 2. Lưu lại lịch sử hội thoại vào MongoDB
     try {
       await AdvisorLog.create({
-        userId: req.user ? req.user._id : null,
-        userMessage: message,
+        userId: req.userId || null,
+        userMessage: message.trim(),
         botReply: reply,
       });
     } catch (dbError) {
@@ -39,18 +39,11 @@ exports.handleChat = async (req, res) => {
   } catch (error) {
     console.error('Lỗi tại advisor.controller.js:', error);
 
-    // Xử lý các loại lỗi từ Anthropic SDK
-    if (error.status === 401 || error.message?.includes('x-api-key')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Khóa ANTHROPIC_API_KEY không hợp lệ hoặc hết hạn.',
-      });
-    }
-
-    return res.status(500).json({
+    const statusCode = error.statusCode || 500;
+    return res.status(statusCode).json({
       success: false,
-      message: 'Xin lỗi, không thể kết nối tới dịch vụ AI lúc này. Hãy kiểm tra lại backend nhé!',
-      error: error.message,
+      message: error.message || 'Xin lỗi, không thể kết nối tới dịch vụ AI lúc này. Hãy kiểm tra lại backend nhé!',
+      code: error.code || 'AI_SERVICE_ERROR',
     });
   }
 };
@@ -61,9 +54,9 @@ exports.handleChat = async (req, res) => {
  */
 exports.getHistory = async (req, res) => {
   try {
-    const userId = req.user ? req.user._id : null;
-    
-    // Tìm các đoạn chat tương ứng (nếu chưa đăng nhập thì lấy 20 bản ghi gần nhất)
+    const userId = req.userId || null;
+
+    // Tìm các đoạn chat tương ứng (nếu chưa đăng nhập thì lấy các tin nhắn gần nhất)
     const query = userId ? { userId } : {};
     const history = await AdvisorLog.find(query)
       .sort({ createdAt: -1 })

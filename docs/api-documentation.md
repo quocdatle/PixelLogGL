@@ -175,6 +175,7 @@ GET /api/health
 Dùng để kiểm tra server có chạy không — trả `{ "success": true, "message": "Server đang chạy OK" }`.
 
 ---
+
 ## Module: Analytics
 
 > Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`. Dữ liệu luôn là của người dùng đang đăng nhập.
@@ -296,6 +297,76 @@ Chỉ trả về game có `hoursPlayed` lớn hơn 0, sắp xếp giảm dần.
   ]
 }
 ```
+
+---
+
+## Module: Advisor (Trợ lý AI Gemini)
+
+### Gửi tin nhắn tư vấn game
+```
+POST /api/advisor/chat
+```
+
+**Header (tùy chọn):**
+```
+Authorization: Bearer <token>
+```
+*(Nếu có token, tin nhắn sẽ được gắn với tài khoản của người dùng. Nếu không có, tin nhắn được xử lý dạng khách).*
+
+**Body:**
+```json
+{
+  "message": "Gợi ý cho mình một số game nhập vai cốt truyện sâu sắc giống The Witcher 3"
+}
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "reply": "Dưới đây là một số tựa game nhập vai thế giới mở với cốt truyện có chiều sâu tương tự The Witcher 3: 1. Cyberpunk 2077... 2. Baldur's Gate 3..."
+}
+```
+
+**Lỗi có thể gặp:**
+| Status | code | Ý nghĩa |
+|---|---|---|
+| 400 | - | Nội dung tin nhắn rỗng (`message` bắt buộc) |
+| 401 | `INVALID_GEMINI_KEY` | Khóa `GEMINI_API_KEY` cấu hình sai hoặc bị từ chối |
+| 500 | `GEMINI_NOT_CONFIGURED` | Server chưa cấu hình biến `GEMINI_API_KEY` |
+| 502 | `GEMINI_UNREACHABLE` / `GEMINI_ERROR` | Không kết nối được đến máy chủ Google AI |
+
+---
+
+### Lấy lịch sử tư vấn
+```
+GET /api/advisor/history
+```
+
+**Header (tùy chọn):**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "672b1234abcd5678ef901234",
+      "userId": "650f1a2b3c4d5e6f7890abcd",
+      "userMessage": "Gợi ý game souls-like",
+      "botReply": "Bạn có thể thử Elden Ring, Lies of P hoặc Sekiro...",
+      "createdAt": "2026-11-06T04:50:00.000Z",
+      "updatedAt": "2026-11-06T04:50:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
 ## Mã lỗi dùng chung (toàn hệ thống)
 
 | code | Status | Ý nghĩa |
