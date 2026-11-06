@@ -34,7 +34,7 @@ async function generateContent({ contents, systemInstruction }) {
   const payload = {
     contents,
     generationConfig: {
-      maxOutputTokens: 1200,
+      maxOutputTokens: 4000,
       temperature: 0.7,
     },
   };
