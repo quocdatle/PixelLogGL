@@ -7,8 +7,9 @@ const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
 const AuthCallbackPage = lazy(() => import('./features/auth/pages/AuthCallbackPage'));
 const LibraryPage = lazy(() => import('./features/library/pages/LibraryPage'));
 const AnalyticsPage = lazy(() => import('./features/analytics/pages/AnalyticsPage'));
-// Thêm import cho trang Cố vấn AI
 const AdvisorPage = lazy(() => import('./features/advisor/pages/AdvisorPage'));
+const CaseOpeningPage = lazy(() => import('./features/economy/pages/CaseOpeningPage'));
+const CollectionPage = lazy(() => import('./features/economy/pages/CollectionPage'));
 
 function RouteLoadingFallback() {
   return (
@@ -92,13 +93,33 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
-  // Bổ sung route cho Cố vấn AI
   {
     path: '/advisor',
     element: (
       <Suspense fallback={<RouteLoadingFallback />}>
         <ProtectedRoute>
           <AdvisorPage />
+        </ProtectedRoute>
+      </Suspense>
+    ),
+  },
+  // Minigame mở hòm & Bộ sưu tập
+  {
+    path: '/economy',
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <ProtectedRoute>
+          <CaseOpeningPage />
+        </ProtectedRoute>
+      </Suspense>
+    ),
+  },
+  {
+    path: '/economy/collection',
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <ProtectedRoute>
+          <CollectionPage />
         </ProtectedRoute>
       </Suspense>
     ),

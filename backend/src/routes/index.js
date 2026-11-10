@@ -4,8 +4,8 @@ const userRoutes = require('../modules/users/user.routes');
 const gameRoutes = require('../modules/games/game.routes');
 const libraryRoutes = require('../modules/library/library.routes');
 const analyticsRoutes = require('../modules/analytics/analytics.routes');
-// 1. Thêm import route của Advisor
 const advisorRoutes = require('../modules/advisor/advisor.routes');
+const economyRoutes = require('../modules/economy/economy.routes');
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.use('/users', userRoutes);
 router.use('/games', gameRoutes);
 router.use('/user-games', libraryRoutes);
 router.use('/analytics', analyticsRoutes);
-// 2. Đăng ký endpoint /api/advisor
 router.use('/advisor', advisorRoutes);
+router.use('/economy', economyRoutes);
 
 module.exports = router;

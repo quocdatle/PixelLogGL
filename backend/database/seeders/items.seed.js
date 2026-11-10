@@ -1,0 +1,268 @@
+const mongoose = require('mongoose');
+const Item = require('../../src/modules/economy/item.model');
+
+const SEED_ITEMS = [
+  // COMMON (Xám)
+  {
+    name: 'Bình Máu Tân Thủ',
+    description: 'Hồi phục năng lượng tức thì, vật phẩm quen thuộc không thể thiếu của mọi game thủ.',
+    rarity: 'common',
+    type: 'collectible',
+    icon: '🧪',
+    coinValue: 25,
+    caseType: 'all',
+    dropRate: 100,
+  },
+  {
+    name: 'Kiếm Gỗ Tập Sự',
+    description: 'Vũ khí khởi đầu mộc mạc của mọi hiệp sĩ dấn thân vào hành trình phiêu lưu.',
+    rarity: 'common',
+    type: 'weapon',
+    icon: '🗡️',
+    coinValue: 20,
+    caseType: 'all',
+    dropRate: 100,
+  },
+  {
+    name: 'Đồng Xu Pixel Cũ',
+    description: 'Đồng tiền xu hoen rỉ mang đậm dấu ấn hoài niệm của kỷ nguyên arcade 8-bit.',
+    rarity: 'common',
+    type: 'collectible',
+    icon: '🪙',
+    coinValue: 30,
+    caseType: 'all',
+    dropRate: 90,
+  },
+  {
+    name: 'Khiên Gỗ Thô',
+    description: 'Chiếc khiên đơn giản ghép từ gỗ sồi, đỡ được những đòn tấn công cơ bản ban đầu.',
+    rarity: 'common',
+    type: 'weapon',
+    icon: '🛡️',
+    coinValue: 25,
+    caseType: 'all',
+    dropRate: 95,
+  },
+  {
+    name: 'Thẻ Bài Quái Vật Slime',
+    description: 'Thẻ sưu tập quái vật cấp 1 phổ biến trong mọi thế giới nhập vai thế giới mở.',
+    rarity: 'common',
+    type: 'badge',
+    icon: '🃏',
+    coinValue: 20,
+    caseType: 'all',
+    dropRate: 100,
+  },
+
+  // UNCOMMON (Lục)
+  {
+    name: 'Nấm Siêu Cấp',
+    description: 'Ăn vào giúp nhân vật tăng gấp đôi kích thước và tự tin húc vỡ gạch đá chướng ngại vật.',
+    rarity: 'uncommon',
+    type: 'collectible',
+    icon: '🍄',
+    coinValue: 60,
+    caseType: 'all',
+    dropRate: 70,
+  },
+  {
+    name: 'Cúp Đồng Speedrun',
+    description: 'Kỷ niệm chương ghi nhận thành tích phá đảo game với thời gian thần tốc.',
+    rarity: 'uncommon',
+    type: 'badge',
+    icon: '🥉',
+    coinValue: 70,
+    caseType: 'all',
+    dropRate: 65,
+  },
+  {
+    name: 'Móc Đu Dây Ninja',
+    description: 'Dụng cụ đu bám cơ động giúp vượt qua hẻm núi sâu và leo tường thẳng đứng.',
+    rarity: 'uncommon',
+    type: 'weapon',
+    icon: '🪝',
+    coinValue: 65,
+    caseType: 'all',
+    dropRate: 70,
+  },
+  {
+    name: 'Cung Băng Sương',
+    description: 'Cung tên bắn ra các mũi tên băng làm chậm đối thủ tức thì.',
+    rarity: 'uncommon',
+    type: 'weapon',
+    icon: '🏹',
+    coinValue: 80,
+    caseType: 'all',
+    dropRate: 60,
+  },
+  {
+    name: 'Bùa May Mắn Thần Rừng',
+    description: 'Mặt dây chuyền chạm khắc hình lá cỏ 4 lá mang lại vận đỏ khi quay gacha.',
+    rarity: 'uncommon',
+    type: 'badge',
+    icon: '🍀',
+    coinValue: 75,
+    caseType: 'all',
+    dropRate: 60,
+  },
+
+  // RARE (Lam)
+  {
+    name: 'Súng Cổng Không Gian (Portal Gun)',
+    description: 'Thiết bị dịch chuyển tức thời tạo 2 cổng xanh - cam, thách thức mọi định luật vật lý.',
+    rarity: 'rare',
+    type: 'weapon',
+    icon: '🌀',
+    coinValue: 150,
+    caseType: 'all',
+    dropRate: 40,
+  },
+  {
+    name: 'Kiếm Bạc Thợ Săn Quái Vật',
+    description: 'Lưỡi kiếm rèn từ bạc nguyên chất, khắc cổ ngữ Rune chuyên trị ma thú bóng đêm.',
+    rarity: 'rare',
+    type: 'weapon',
+    icon: '⚔️',
+    coinValue: 180,
+    caseType: 'all',
+    dropRate: 35,
+  },
+  {
+    name: 'Mặt Nạ Hiệp Sĩ Rỗng (Hollow Knight)',
+    description: 'Vỏ sọ kiên cường của hiệp sĩ tí hon chu du dưới vương quốc côn trùng Hallownest.',
+    rarity: 'rare',
+    type: 'avatar_frame',
+    icon: '🎭',
+    coinValue: 160,
+    caseType: 'all',
+    dropRate: 35,
+  },
+  {
+    name: 'Cuốc Kim Cương Tinh Xảo',
+    description: 'Độ bền phi thường, có thể khai thác khối Hắc Diện Thạch sâu nhất lòng đất.',
+    rarity: 'rare',
+    type: 'collectible',
+    icon: '⛏️',
+    coinValue: 170,
+    caseType: 'all',
+    dropRate: 35,
+  },
+  {
+    name: 'Mũ Bảo Hộ Praetor (Doom)',
+    description: 'Mũ giáp chiến binh của Đồ Tể Địa Ngục, toát ra sát khí áp đảo bầy quỷ dữ.',
+    rarity: 'rare',
+    type: 'avatar_frame',
+    icon: '⛑️',
+    coinValue: 190,
+    caseType: 'all',
+    dropRate: 30,
+  },
+
+  // EPIC (Tím)
+  {
+    name: 'Master Sword - Thanh Kiếm Huyền Thoại',
+    description: 'Lưỡi gươm phong ấn tà ác ngàn năm, tỏa ánh lam quang thức tỉnh người hùng Link.',
+    rarity: 'epic',
+    type: 'weapon',
+    icon: '🗡️✨',
+    coinValue: 380,
+    caseType: 'all',
+    dropRate: 18,
+  },
+  {
+    name: 'Katana Lửa Nhiệt Cyberpunk',
+    description: 'Thanh katana lưỡi plasma rực đỏ chém xuyên qua lớp giáp composite và máy bay không người lái.',
+    rarity: 'epic',
+    type: 'weapon',
+    icon: '⚡⚔️',
+    coinValue: 400,
+    caseType: 'all',
+    dropRate: 15,
+  },
+  {
+    name: 'Đại Cổ Tự Elden (Great Rune)',
+    description: 'Mảnh vỡ trung tâm của Chiếc Nhẫn Elden, ban tặng sức mạnh vô biên cho người thừa kế.',
+    rarity: 'epic',
+    type: 'badge',
+    icon: '✨💍',
+    coinValue: 420,
+    caseType: 'all',
+    dropRate: 15,
+  },
+  {
+    name: 'Khung Avatar Neon Cyberpunk 2077',
+    description: 'Hiệu ứng viền phát sáng glitch độc quyền từ thành phố đêm rực rỡ Night City.',
+    rarity: 'epic',
+    type: 'avatar_frame',
+    icon: '🌆',
+    coinValue: 350,
+    caseType: 'all',
+    dropRate: 18,
+  },
+  {
+    name: 'Danh Hiệu: Bậc Thầy Souls-Like',
+    description: 'Danh hiệu tối thượng dành cho những chiến thần không bao giờ gục ngã trước màn hình You Died.',
+    rarity: 'epic',
+    type: 'title',
+    icon: '🔥👑',
+    coinValue: 450,
+    caseType: 'all',
+    dropRate: 12,
+  },
+
+  // LEGENDARY (Vàng / Cam)
+  {
+    name: 'Găng Tay Vô Cực Pixel',
+    description: 'Đính 6 viên đá vô cực phiên bản 16-bit, một cái búng tay có thể xóa sạch mọi bug game.',
+    rarity: 'legendary',
+    type: 'collectible',
+    icon: '🧤💎',
+    coinValue: 1000,
+    caseType: 'all',
+    dropRate: 5,
+  },
+  {
+    name: 'Khiên Thần Aegis Bất Diệt (Immortal)',
+    description: 'Biểu tượng tối thượng của nhà vô địch The International, ban sự bất tử trường tồn.',
+    rarity: 'legendary',
+    type: 'weapon',
+    icon: '🛡️🌟',
+    coinValue: 1200,
+    caseType: 'all',
+    dropRate: 4,
+  },
+  {
+    name: 'Trái Tim Rồng Nguyên Thủy',
+    description: 'Ngưng tụ tinh hoa của loài Rồng Cổ Đại thống trị bầu trời từ thuở khai thiên lập địa.',
+    rarity: 'legendary',
+    type: 'collectible',
+    icon: '❤️‍🔥🐉',
+    coinValue: 1100,
+    caseType: 'all',
+    dropRate: 5,
+  },
+  {
+    name: 'Danh Hiệu: PixelLog Immortal God',
+    description: 'Danh hiệu huyền thoại rực ánh hào quang vàng kim chỉ có thể sở hữu bởi 0.1% người may mắn nhất.',
+    rarity: 'legendary',
+    type: 'title',
+    icon: '👑⚡',
+    coinValue: 1500,
+    caseType: 'all',
+    dropRate: 3,
+  },
+];
+
+async function seedItems() {
+  const count = await Item.countDocuments();
+  if (count > 0) {
+    console.log(`[SEEDER] Đã có ${count} vật phẩm trong database, bỏ qua seed.`);
+    return;
+  }
+
+  console.log('[SEEDER] Đang nạp dữ liệu vật phẩm ban đầu...');
+  await Item.insertMany(SEED_ITEMS);
+  console.log(`[SEEDER] Đã nạp thành công ${SEED_ITEMS.length} vật phẩm gacha!`);
+}
+
+module.exports = { seedItems, SEED_ITEMS };
