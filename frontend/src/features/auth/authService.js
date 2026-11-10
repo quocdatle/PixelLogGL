@@ -11,4 +11,13 @@ async function login({ email, password }) {
   return res.data.data; // { token, user }
 }
 
-export default { register, login };
+/**
+ * Trả về URL chuyển hướng để đăng nhập với mạng xã hội (Google, Discord, Steam)
+ */
+function getSocialLoginUrl(provider) {
+  const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const cleanApiUrl = rawApiUrl.replace(/\/$/, '');
+  return `${cleanApiUrl}/auth/${provider.toLowerCase()}`;
+}
+
+export default { register, login, getSocialLoginUrl };

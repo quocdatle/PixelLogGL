@@ -33,6 +33,13 @@ async function changePassword(userId, { oldPassword, newPassword }) {
     throw err;
   }
 
+  if (!user.passwordHash) {
+    const err = new Error('Tài khoản liên kết mạng xã hội chưa có mật khẩu');
+    err.statusCode = 400;
+    err.code = 'NO_PASSWORD_SET';
+    throw err;
+  }
+
   const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
   if (!isMatch) {
     const err = new Error('Mật khẩu cũ không đúng');

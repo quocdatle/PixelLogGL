@@ -35,6 +35,19 @@ export function AuthProvider({ children }) {
     return loggedInUser;
   }
 
+  async function loginWithToken(token) {
+    localStorage.setItem('token', token);
+    try {
+      const res = await api.get('/users/me');
+      setUser(res.data.data);
+      return res.data.data;
+    } catch (err) {
+      localStorage.removeItem('token');
+      setUser(null);
+      throw err;
+    }
+  }
+
   async function register(data) {
     const { token, user: newUser } = await authService.register(data);
     localStorage.setItem('token', token);
@@ -52,6 +65,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     loading,
     login,
+    loginWithToken,
     register,
     logout,
   };

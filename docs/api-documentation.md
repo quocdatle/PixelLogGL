@@ -96,6 +96,87 @@ POST /api/auth/login
 
 ---
 
+### Đăng nhập qua Google (OAuth 2.0)
+
+- **Chuyển hướng xác thực:**
+```
+GET /api/auth/google
+```
+Server tự động chuyển hướng trình duyệt đến trang đồng thuận của Google (`accounts.google.com`).
+
+- **Callback Google:**
+```
+GET /api/auth/google/callback?code=...
+```
+Sau khi xác thực thành công, server xử lý lưu/liên kết tài khoản và redirect về Frontend (`/login?token=<jwt_token>`). Nếu lỗi, redirect về (`/login?error=<thong_bao_loi>`).
+
+- **Đăng nhập bằng Code trực tiếp (API JSON):**
+```
+POST /api/auth/google
+```
+Body:
+```json
+{
+  "code": "4/0A..."
+}
+```
+Response 200: Trả về `{ success: true, data: { token, user } }`.
+
+---
+
+### Đăng nhập qua Discord (OAuth 2.0)
+
+- **Chuyển hướng xác thực:**
+```
+GET /api/auth/discord
+```
+Server tự động chuyển hướng trình duyệt đến trang cấp quyền của Discord (`discord.com/api/oauth2/authorize`).
+
+- **Callback Discord:**
+```
+GET /api/auth/discord/callback?code=...
+```
+Sau khi xác thực thành công, redirect về Frontend (`/login?token=<jwt_token>`).
+
+- **Đăng nhập bằng Code trực tiếp (API JSON):**
+```
+POST /api/auth/discord
+```
+Body:
+```json
+{
+  "code": "discord_auth_code_here"
+}
+```
+Response 200: Trả về `{ success: true, data: { token, user } }`.
+
+---
+
+### Đăng nhập qua Steam (OpenID 2.0)
+
+- **Chuyển hướng xác thực:**
+```
+GET /api/auth/steam
+```
+Server tự động chuyển hướng trình duyệt đến cổng OpenID của Valve Steam (`steamcommunity.com/openid/login`).
+
+- **Callback Steam:**
+```
+GET /api/auth/steam/callback?openid.ns=...&openid.claimed_id=...
+```
+Server xác thực chữ ký số với Steam server (`check_authentication`). Nếu hợp lệ, lấy SteamID 64-bit và thông tin hồ sơ (thông qua Steam Web API nếu có `STEAM_API_KEY`), sau đó redirect về Frontend (`/login?token=<jwt_token>`).
+
+- **Xác thực Steam trực tiếp (API JSON):**
+```
+POST /api/auth/steam
+```
+Body: các tham số OpenID trả về từ Steam.
+Response 200: Trả về `{ success: true, data: { token, user } }`.
+
+---
+
+---
+
 ## Module: Users
 
 > Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`.

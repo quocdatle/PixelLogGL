@@ -1,17 +1,39 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AuthLayout from '../components/AuthLayout';
 import FormField from '../components/FormField';
 import useAuth from '../../../hooks/useAuth';
+import authService from '../authService';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { login, loginWithToken } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Xử lý callback sau khi đăng nhập qua OAuth (Google, Discord, Steam)
+  useEffect(() => {
+    const oauthToken = searchParams.get('token');
+    const oauthError = searchParams.get('error');
+
+    if (oauthToken) {
+      setLoading(true);
+      loginWithToken(oauthToken)
+        .then(() => {
+          navigate('/library', { replace: true });
+        })
+        .catch((err) => {
+          setError(err.response?.data?.message || 'Đăng nhập mạng xã hội thất bại.');
+          setLoading(false);
+        });
+    } else if (oauthError) {
+      setError(oauthError);
+    }
+  }, [searchParams, loginWithToken, navigate]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,7 +54,7 @@ export default function LoginPage() {
   }
 
   function handleSocialLogin(provider) {
-    alert(`Đăng nhập bằng ${provider} sẽ sớm ra mắt ở bản cập nhật tiếp theo.`);
+    window.location.href = authService.getSocialLoginUrl(provider);
   }
 
   return (
@@ -157,7 +179,7 @@ export default function LoginPage() {
             className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition-colors duration-150 cursor-pointer"
           >
             <svg className="w-4 h-4 fill-current text-zinc-900 dark:text-zinc-100" viewBox="0 0 24 24">
-              <path d="M12 2a10 10 0 0 0-10 9.87c0 4.95 3.65 9.04 8.43 9.87l2.84-4.14a3.3 3.3 0 0 1-1.27-.67l-3.95 1.63a5.55 5.55 0 0 1-.05-.83c0-3.07 2.49-5.55 5.55-5.55s5.55 2.48 5.55 5.55a5.55 5.55 0 0 1-5.55 5.55c-.29 0-.58-.02-.85-.07l-2.88 4.2A10 10 0 0 0 22 12 10 10 0 0 0 12 2Z" />
+              <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.005.105.005.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 12-5.373 12-12s-5.372-12-12-12zM7.557 15.422l-1.427-.59c.277-.923 1.109-1.589 2.096-1.611l1.458.604c-.267.926-1.114 1.597-2.127 1.597zm8.384-8.777c1.391 0 2.52 1.131 2.52 2.524 0 1.391-1.129 2.524-2.52 2.524-1.393 0-2.523-1.133-2.523-2.524 0-1.393 1.13-2.524 2.523-2.524zm0 .84c-.93 0-1.684.754-1.684 1.684 0 .93.754 1.684 1.684 1.684.93 0 1.684-.754 1.684-1.684 0-.93-.754-1.684-1.684-1.684zm-7.669 9.176c-.927 0-1.683-.755-1.683-1.684 0-.177.03-.348.082-.507l1.791.74c.058.82-.44 1.451-1.19 1.451z" />
             </svg>
             <span>Steam</span>
           </button>

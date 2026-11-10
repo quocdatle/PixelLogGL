@@ -30,6 +30,14 @@ async function login({ email, password }) {
     throw unauthorized();
   }
 
+  if (!user.passwordHash) {
+    const providerName = user.authProvider === 'google' ? 'Google' : user.authProvider === 'discord' ? 'Discord' : user.authProvider === 'steam' ? 'Steam' : 'mạng xã hội';
+    const err = new Error(`Tài khoản này được đăng ký qua ${providerName}. Vui lòng đăng nhập bằng ${providerName}.`);
+    err.statusCode = 400;
+    err.code = 'OAUTH_ACCOUNT';
+    throw err;
+  }
+
   const isMatch = await bcrypt.compare(password, user.passwordHash);
   if (!isMatch) {
     throw unauthorized();
@@ -53,6 +61,7 @@ function toPublicUser(user) {
     username: user.username,
     email: user.email,
     avatarUrl: user.avatarUrl,
+    authProvider: user.authProvider || 'local',
   };
 }
 
