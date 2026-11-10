@@ -401,6 +401,276 @@ Authorization: Bearer <token>
 
 ---
 
+---
+
+## Module: Economy (Minigame Mở Hòm & Vật Phẩm)
+
+> Tất cả thuật toán xác suất rơi vật phẩm, trừ xu ví và sinh dải roulette được tính toán 100% tại Backend để chống gian lận.
+
+### Lấy danh sách rương mở hòm (công khai)
+```
+GET /api/economy/cases
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "standard",
+      "name": "Rương Tân Thủ",
+      "englishName": "Standard Case",
+      "description": "Rương nhập môn dành cho mọi game thủ. Chi phí vừa phải, cơ hội mở được nhiều bảo bối kinh điển.",
+      "cost": 100,
+      "icon": "📦",
+      "themeColor": "emerald",
+      "displayChances": {
+        "common": "60%",
+        "uncommon": "30%",
+        "rare": "8.5%",
+        "epic": "1.4%",
+        "legendary": "0.1%"
+      },
+      "itemCount": 24
+    }
+  ]
+}
+```
+
+---
+
+### Lấy thông tin ví và trạng thái điểm danh
+```
+GET /api/economy/wallet
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "balance": 500,
+    "totalEarned": 500,
+    "totalSpent": 0,
+    "canClaimDaily": true,
+    "nextDailyAt": null,
+    "dailyRewardAmount": 150
+  }
+}
+```
+
+---
+
+### Điểm danh nhận Xu hàng ngày
+```
+POST /api/economy/daily-reward
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "balance": 650,
+    "claimedAmount": 150,
+    "nextDailyAt": "2026-11-11T18:00:00.000Z",
+    "message": "Điểm danh thành công! Bạn nhận được +150 Xu."
+  }
+}
+```
+
+**Lỗi có thể gặp:**
+| Status | code | Trường hợp |
+|---|---|---|
+| 400 | `ALREADY_CLAIMED` | Chưa đủ thời gian chờ 24h giữa 2 lần điểm danh |
+| 401 | `NO_TOKEN` / `INVALID_TOKEN` | Thiếu hoặc token không hợp lệ |
+
+---
+
+### Mở hòm gacha (Case Opening)
+```
+POST /api/economy/open
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Body:**
+```json
+{
+  "caseId": "standard"
+}
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "wonItem": {
+      "_id": "67301a2b3c4d5e6f7890abc1",
+      "name": "Kiếm Bạc Thợ Săn Quái Vật",
+      "description": "Lưỡi kiếm rèn từ bạc nguyên chất, khắc cổ ngữ Rune chuyên trị ma thú bóng đêm.",
+      "rarity": "rare",
+      "type": "weapon",
+      "icon": "⚔️",
+      "coinValue": 180
+    },
+    "isNew": true,
+    "caseId": "standard",
+    "cost": 100,
+    "remainingBalance": 400,
+    "targetIndex": 36,
+    "reelItems": [ ... ]
+  }
+}
+```
+
+**Lỗi có thể gặp:**
+| Status | code | Trường hợp |
+|---|---|---|
+| 400 | `INVALID_CASE` | Mã rương `caseId` không tồn tại |
+| 400 | `INSUFFICIENT_FUNDS` | Số dư Xu không đủ để mở hòm |
+| 401 | `NO_TOKEN` / `INVALID_TOKEN` | Chưa đăng nhập hoặc token hết hạn |
+
+---
+
+### Xem túi đồ / bộ sưu tập
+```
+GET /api/economy/inventory?rarity=all&type=all&sort=recent&page=1&limit=24
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Query params:**
+| Param | Mặc định | Ý nghĩa |
+|---|---|---|
+| `rarity` | `all` | `all`, `common`, `uncommon`, `rare`, `epic`, `legendary` |
+| `type` | `all` | `all`, `weapon`, `badge`, `avatar_frame`, `title`, `collectible` |
+| `search` | `""` | Từ khóa tìm kiếm theo tên hoặc mô tả |
+| `sort` | `recent` | `recent`, `rarityDesc`, `nameAsc`, `quantityDesc` |
+| `page` | `1` | Số trang |
+| `limit` | `24` | Số mục mỗi trang |
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "67302a2b3c4d5e6f7890abcd",
+        "quantity": 2,
+        "isEquipped": false,
+        "acquiredAt": "2026-11-10T11:00:00.000Z",
+        "item": {
+          "_id": "67301a2b3c4d5e6f7890abc1",
+          "name": "Kiếm Bạc Thợ Săn Quái Vật",
+          "rarity": "rare",
+          "type": "weapon",
+          "icon": "⚔️",
+          "coinValue": 180
+        }
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "page": 1,
+      "limit": 24,
+      "totalPages": 1,
+      "hasNext": false
+    },
+    "summary": {
+      "uniqueOwned": 1,
+      "totalCatalog": 24,
+      "completionRate": 4,
+      "totalQuantity": 2,
+      "totalValue": 360
+    }
+  }
+}
+```
+
+---
+
+### Bán vật phẩm trong túi đồ đổi lấy Xu
+```
+POST /api/economy/sell
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Body:**
+```json
+{
+  "inventoryId": "67302a2b3c4d5e6f7890abcd",
+  "quantity": 1
+}
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "soldItem": {
+      "name": "Kiếm Bạc Thợ Săn Quái Vật",
+      "rarity": "rare",
+      "icon": "⚔️",
+      "soldQuantity": 1
+    },
+    "refundedCoins": 180,
+    "remainingBalance": 580,
+    "remainingQuantity": 1,
+    "message": "Đã bán thành công x1 Kiếm Bạc Thợ Săn Quái Vật và nhận lại +180 Xu!"
+  }
+}
+```
+
+---
+
+### Lịch sử mở hòm cá nhân
+```
+GET /api/economy/history?limit=20
+```
+
+**Header (bắt buộc):**
+```
+Authorization: Bearer <token>
+```
+
+**Response 200:** danh sách các lượt mở hòm đã ghi nhận của người dùng.
+
+---
+
+### Bảng tin trúng thưởng gần nhất (toàn server)
+```
+GET /api/economy/recent-drops?limit=10
+```
+
+**Response 200:** danh sách 10 vật phẩm mở được mới nhất trên toàn hệ thống kèm tên người chơi đã ẩn danh một phần (`Gam***`).
+
+---
+
 ## Mã lỗi dùng chung (toàn hệ thống)
 
 | code | Status | Ý nghĩa |
