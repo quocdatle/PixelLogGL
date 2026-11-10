@@ -1,7 +1,7 @@
 const { geminiApiKey, geminiModel } = require('../../config/env');
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const REQUEST_TIMEOUT_MS = 25000;
+const REQUEST_TIMEOUT_MS = 60000; // Nâng timeout lên 60s để đáp ứng sinh tối đa 4000 tokens
 const MAX_RETRIES = 2;
 // finishReason khiến Gemini không trả nội dung vì lý do an toàn / chính sách
 const BLOCKED_FINISH_REASONS = ['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII'];

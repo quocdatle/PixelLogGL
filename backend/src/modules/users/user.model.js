@@ -11,9 +11,9 @@ const userSchema = new mongoose.Schema(
       enum: ['local', 'google', 'discord', 'steam'],
       default: 'local',
     },
-    googleId: { type: String, default: null, sparse: true, index: true },
-    discordId: { type: String, default: null, sparse: true, index: true },
-    steamId: { type: String, default: null, sparse: true, index: true },
+    googleId: { type: String, index: { unique: true, sparse: true } },
+    discordId: { type: String, index: { unique: true, sparse: true } },
+    steamId: { type: String, index: { unique: true, sparse: true } },
   },
   { timestamps: true } // tự có createdAt/updatedAt, không tự thêm field ngày giờ thủ công
 );

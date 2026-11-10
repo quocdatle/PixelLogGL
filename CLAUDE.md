@@ -106,6 +106,25 @@ RAWG_API_KEY=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash
 
+# Base URLs
+CLIENT_URL=http://localhost:5173
+BACKEND_URL=http://localhost:5000
+
+# Google OAuth 2.0
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+
+# Discord OAuth 2.0
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_CALLBACK_URL=http://localhost:5000/api/auth/discord/callback
+
+# Steam OpenID 2.0
+STEAM_API_KEY=
+STEAM_CALLBACK_URL=http://localhost:5000/api/auth/steam/callback
+STEAM_REALM=http://localhost:5000/
+
 # Frontend
 VITE_API_URL=
 ```

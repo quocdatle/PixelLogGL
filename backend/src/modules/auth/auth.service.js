@@ -4,10 +4,20 @@ const { signToken } = require('../../utils/jwt');
 
 const SALT_ROUNDS = 10;
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function register({ username, email, password }) {
-  const existing = await User.findOne({ $or: [{ email }, { username }] });
+  const normalizedEmail = (email || '').trim().toLowerCase();
+  if (!EMAIL_REGEX.test(normalizedEmail) || normalizedEmail.endsWith('.pixellog.local')) {
+    const err = new Error('Email không hợp lệ');
+    err.statusCode = 400;
+    err.code = 'INVALID_EMAIL';
+    throw err;
+  }
+
+  const existing = await User.findOne({ $or: [{ email: normalizedEmail }, { username }] });
   if (existing) {
-    const field = existing.email === email ? 'Email' : 'Username';
+    const field = existing.email === normalizedEmail ? 'Email' : 'Username';
     const err = new Error(`${field} đã được sử dụng`);
     err.statusCode = 409;
     err.code = 'ALREADY_EXISTS';
@@ -15,7 +25,7 @@ async function register({ username, email, password }) {
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ username, email, passwordHash });
+  const user = await User.create({ username, email: normalizedEmail, passwordHash });
 
   const token = signToken({ userId: user._id });
   return { token, user: toPublicUser(user) };
@@ -24,18 +34,10 @@ async function register({ username, email, password }) {
 async function login({ email, password }) {
   const identifier = email ? email.trim() : '';
   const user = await User.findOne({
-    $or: [{ email: identifier }, { username: identifier }],
+    $or: [{ email: identifier.toLowerCase() }, { username: identifier }],
   });
-  if (!user) {
+  if (!user || !user.passwordHash) {
     throw unauthorized();
-  }
-
-  if (!user.passwordHash) {
-    const providerName = user.authProvider === 'google' ? 'Google' : user.authProvider === 'discord' ? 'Discord' : user.authProvider === 'steam' ? 'Steam' : 'mạng xã hội';
-    const err = new Error(`Tài khoản này được đăng ký qua ${providerName}. Vui lòng đăng nhập bằng ${providerName}.`);
-    err.statusCode = 400;
-    err.code = 'OAUTH_ACCOUNT';
-    throw err;
   }
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);

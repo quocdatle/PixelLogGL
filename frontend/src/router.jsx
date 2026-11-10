@@ -4,6 +4,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
+const AuthCallbackPage = lazy(() => import('./features/auth/pages/AuthCallbackPage'));
 const LibraryPage = lazy(() => import('./features/library/pages/LibraryPage'));
 const AnalyticsPage = lazy(() => import('./features/analytics/pages/AnalyticsPage'));
 // Thêm import cho trang Cố vấn AI
@@ -60,6 +61,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<RouteLoadingFallback />}>
         <RegisterPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/auth/callback',
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <AuthCallbackPage />
       </Suspense>
     ),
   },

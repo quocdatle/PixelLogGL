@@ -12,6 +12,14 @@ async function login({ email, password }) {
 }
 
 /**
+ * Đổi mã xác thực tạm thời dùng 1 lần (exchange code) lấy JWT token
+ */
+async function exchangeToken(code) {
+  const res = await api.post('/auth/exchange', { code });
+  return res.data.data; // { token, user }
+}
+
+/**
  * Trả về URL chuyển hướng để đăng nhập với mạng xã hội (Google, Discord, Steam)
  */
 function getSocialLoginUrl(provider) {
@@ -20,4 +28,4 @@ function getSocialLoginUrl(provider) {
   return `${cleanApiUrl}/auth/${provider.toLowerCase()}`;
 }
 
-export default { register, login, getSocialLoginUrl };
+export default { register, login, exchangeToken, getSocialLoginUrl };

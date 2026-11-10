@@ -59,7 +59,8 @@ POST /api/auth/register
       "id": "650f1a2b3c4d5e6f7890abcd",
       "username": "test",
       "email": "test@test.com",
-      "avatarUrl": null
+      "avatarUrl": null,
+      "authProvider": "local"
     }
   }
 }
@@ -69,6 +70,7 @@ POST /api/auth/register
 | Status | code | Trường hợp |
 |---|---|---|
 | 400 | `MISSING_FIELDS` | Thiếu `username`/`email`/`password` |
+| 400 | `INVALID_EMAIL` | Email sai định dạng hoặc dùng email nội bộ `.pixellog.local` |
 | 409 | `ALREADY_EXISTS` | Email hoặc username đã tồn tại |
 
 ---
@@ -92,7 +94,46 @@ POST /api/auth/login
 | Status | code | Trường hợp |
 |---|---|---|
 | 400 | `MISSING_FIELDS` | Thiếu `email`/`password` |
-| 401 | `INVALID_CREDENTIALS` | Sai email hoặc mật khẩu |
+| 401 | `INVALID_CREDENTIALS` | Sai email hoặc mật khẩu (hoặc tài khoản OAuth chưa có mật khẩu) |
+
+---
+
+### Đổi mã một lần lấy Token JWT
+```
+POST /api/auth/exchange
+```
+Sử dụng sau khi hoàn tất xác thực OAuth để nhận JWT an toàn, bảo vệ JWT không xuất hiện trên URL.
+
+**Body:**
+```json
+{
+  "code": "d7a4b8..."
+}
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOi...",
+    "user": {
+      "id": "650f1a2b3c4d5e6f7890abcd",
+      "username": "gamer_123",
+      "email": "gamer@gmail.com",
+      "avatarUrl": "https://...",
+      "authProvider": "google"
+    }
+  }
+}
+```
+
+**Lỗi có thể gặp:**
+| Status | code | Trường hợp |
+|---|---|---|
+| 400 | `MISSING_FIELDS` | Thiếu `code` |
+| 400 | `INVALID_EXCHANGE_CODE` | Mã exchange không đúng định dạng |
+| 400 | `EXCHANGE_CODE_EXPIRED` | Mã đã hết hạn (quá 60 giây) hoặc đã được sử dụng |
 
 ---
 
@@ -102,25 +143,20 @@ POST /api/auth/login
 ```
 GET /api/auth/google
 ```
-Server tự động chuyển hướng trình duyệt đến trang đồng thuận của Google (`accounts.google.com`).
+Server tự động sinh chuỗi `state` chống Login CSRF lưu vào cookie `oauth_state` (httpOnly), sau đó chuyển hướng trình duyệt đến trang đồng thuận của Google (`accounts.google.com`).
 
 - **Callback Google:**
 ```
-GET /api/auth/google/callback?code=...
+GET /api/auth/google/callback?code=...&state=...
 ```
-Sau khi xác thực thành công, server xử lý lưu/liên kết tài khoản và redirect về Frontend (`/login?token=<jwt_token>`). Nếu lỗi, redirect về (`/login?error=<thong_bao_loi>`).
-
-- **Đăng nhập bằng Code trực tiếp (API JSON):**
+Server đối chiếu `state`, xác thực mã với Google, tạo `exchangeCode` một lần (TTL 60s) và chuyển hướng về Frontend:
 ```
-POST /api/auth/google
+/auth/callback?code=<exchange_code>
 ```
-Body:
-```json
-{
-  "code": "4/0A..."
-}
+Nếu có lỗi, chuyển hướng về Frontend kèm mã lỗi cố định:
 ```
-Response 200: Trả về `{ success: true, data: { token, user } }`.
+/login?error=<error_code>
+```
 
 ---
 
@@ -130,25 +166,16 @@ Response 200: Trả về `{ success: true, data: { token, user } }`.
 ```
 GET /api/auth/discord
 ```
-Server tự động chuyển hướng trình duyệt đến trang cấp quyền của Discord (`discord.com/api/oauth2/authorize`).
+Server sinh `state` chống CSRF và chuyển hướng đến `discord.com/api/oauth2/authorize`.
 
 - **Callback Discord:**
 ```
-GET /api/auth/discord/callback?code=...
+GET /api/auth/discord/callback?code=...&state=...
 ```
-Sau khi xác thực thành công, redirect về Frontend (`/login?token=<jwt_token>`).
-
-- **Đăng nhập bằng Code trực tiếp (API JSON):**
+Server đối chiếu `state`, lấy thông tin người chơi, tạo `exchangeCode` và redirect về:
 ```
-POST /api/auth/discord
+/auth/callback?code=<exchange_code>
 ```
-Body:
-```json
-{
-  "code": "discord_auth_code_here"
-}
-```
-Response 200: Trả về `{ success: true, data: { token, user } }`.
 
 ---
 
@@ -158,22 +185,28 @@ Response 200: Trả về `{ success: true, data: { token, user } }`.
 ```
 GET /api/auth/steam
 ```
-Server tự động chuyển hướng trình duyệt đến cổng OpenID của Valve Steam (`steamcommunity.com/openid/login`).
+Server sinh `state` gắn vào `return_to` và chuyển hướng đến Valve Steam (`steamcommunity.com/openid/login`).
 
 - **Callback Steam:**
 ```
-GET /api/auth/steam/callback?openid.ns=...&openid.claimed_id=...
+GET /api/auth/steam/callback?openid.ns=...&openid.claimed_id=...&state=...
 ```
-Server xác thực chữ ký số với Steam server (`check_authentication`). Nếu hợp lệ, lấy SteamID 64-bit và thông tin hồ sơ (thông qua Steam Web API nếu có `STEAM_API_KEY`), sau đó redirect về Frontend (`/login?token=<jwt_token>`).
-
-- **Xác thực Steam trực tiếp (API JSON):**
-```
-POST /api/auth/steam
-```
-Body: các tham số OpenID trả về từ Steam.
-Response 200: Trả về `{ success: true, data: { token, user } }`.
+Server kiểm tra chữ ký số qua `check_authentication` với Steam, kiểm tra `return_to` và `state`. Nếu thành công, tạo `exchangeCode` và redirect về `/auth/callback?code=<exchange_code>`.
 
 ---
+
+### Bảng mã lỗi mạng xã hội (OAuth Error Codes)
+
+| Mã lỗi URL | Mã lỗi API / Server Code | Ý nghĩa |
+|---|---|---|
+| `email_in_use` | `EMAIL_ALREADY_IN_USE` | Email này đã được đăng ký bằng phương thức khác |
+| `invalid_state` | `INVALID_STATE` | Mã state CSRF không hợp lệ hoặc đã hết hạn |
+| `config_missing` | `GOOGLE_CONFIG_MISSING`, `DISCORD_CONFIG_MISSING` | Thiếu Client ID / Secret trong biến môi trường |
+| `auth_cancelled` | `STEAM_AUTH_CANCELLED` | Người dùng đã hủy quá trình đăng nhập |
+| `google_failed` | `GOOGLE_AUTH_FAILED`, `GOOGLE_USERINFO_FAILED` | Lỗi trao đổi dữ liệu với máy chủ Google |
+| `discord_failed` | `DISCORD_AUTH_FAILED`, `DISCORD_USERINFO_FAILED` | Lỗi trao đổi dữ liệu với máy chủ Discord |
+| `steam_failed` | `STEAM_VERIFICATION_FAILED`, `STEAM_PROVIDER_ERROR` | Lỗi xác thực OpenID với máy chủ Steam |
+| `auth_failed` | `INVALID_EXCHANGE_CODE`, `EXCHANGE_CODE_EXPIRED` | Mã đổi token không hợp lệ hoặc đã hết hạn |
 
 ---
 

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import authService from '../features/auth/authService';
 
@@ -8,12 +8,11 @@ export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // true khi đang kiểm tra token lúc load app
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')));
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      setLoading(false);
       return;
     }
 
@@ -28,14 +27,19 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function login(credentials) {
+  const login = useCallback(async (credentials) => {
     const { token, user: loggedInUser } = await authService.login(credentials);
     localStorage.setItem('token', token);
     setUser(loggedInUser);
     return loggedInUser;
-  }
+  }, []);
 
-  async function loginWithToken(token) {
+  const setTokenAndUser = useCallback((token, loggedInUser) => {
+    localStorage.setItem('token', token);
+    setUser(loggedInUser);
+  }, []);
+
+  const loginWithToken = useCallback(async (token) => {
     localStorage.setItem('token', token);
     try {
       const res = await api.get('/users/me');
@@ -46,25 +50,26 @@ export function AuthProvider({ children }) {
       setUser(null);
       throw err;
     }
-  }
+  }, []);
 
-  async function register(data) {
+  const register = useCallback(async (data) => {
     const { token, user: newUser } = await authService.register(data);
     localStorage.setItem('token', token);
     setUser(newUser);
     return newUser;
-  }
+  }, []);
 
-  function logout() {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);
-  }
+  }, []);
 
   const value = {
     user,
     isAuthenticated: !!user,
     loading,
     login,
+    setTokenAndUser,
     loginWithToken,
     register,
     logout,
