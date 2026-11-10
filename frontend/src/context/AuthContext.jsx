@@ -59,6 +59,18 @@ export function AuthProvider({ children }) {
     return newUser;
   }, []);
 
+  const updateUser = useCallback((nextUser) => {
+    setUser((prev) => (typeof nextUser === 'function' ? nextUser(prev) : nextUser));
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const res = await api.get('/users/me');
+    setUser(res.data.data);
+    return res.data.data;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);
@@ -72,6 +84,8 @@ export function AuthProvider({ children }) {
     setTokenAndUser,
     loginWithToken,
     register,
+    updateUser,
+    refreshUser,
     logout,
   };
 

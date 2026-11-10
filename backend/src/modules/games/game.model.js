@@ -11,10 +11,17 @@ const gameSchema = new mongoose.Schema(
     released: { type: String, default: null }, // RAWG trả dạng 'YYYY-MM-DD'
     genres: { type: [String], default: [] },
     platforms: { type: [String], default: [] },
+    developers: { type: [String], default: [] },
+    publishers: { type: [String], default: [] },
+    website: { type: String, default: null },
+    playtimeAvg: { type: Number, default: null },
+    esrbRating: { type: String, default: null },
+    screenshots: { type: [String], default: [] },
     rating: { type: Number, default: null }, // điểm cộng đồng RAWG (0-5)
     metacritic: { type: Number, default: null },
     description: { type: String, default: '' },
     detailFetched: { type: Boolean, default: false }, // đã gọi API chi tiết (có description) chưa
+    screenshotsFetched: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

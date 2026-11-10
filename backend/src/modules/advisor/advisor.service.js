@@ -1,6 +1,7 @@
 const AdvisorLog = require('./advisorLog.model');
 const geminiApi = require('./geminiApi.service');
 const libraryService = require('../library/library.service');
+const gameService = require('../games/game.service');
 
 const MAX_MESSAGE_LENGTH = 1500;
 const HISTORY_CONTEXT_LIMIT = 6; // Lấy 6 lượt gần nhất (mỗi lượt gồm 1 câu hỏi + 1 câu trả lời) để giữ ngữ cảnh
@@ -124,7 +125,55 @@ ${libraryContext}
 
 PHONG CÁCH PHẢN HỒI:
 - Sử dụng tiếng Việt tự nhiên, thân thiện, mang văn phong của một người bạn game thủ hiểu biết sâu sắc.
-- Trình bày định dạng Markdown rõ ràng, dễ đọc (dùng tiêu đề ###, in đậm, danh sách gạch đầu dòng).`;
+- Trình bày định dạng Markdown rõ ràng, dễ đọc (dùng tiêu đề ###, in đậm, danh sách gạch đầu dòng).
+- KHI và CHỈ KHI bạn nhắc tới hoặc gợi ý các tựa game cụ thể trong câu trả lời, hãy thêm 1 dòng cuối cùng theo đúng định dạng:
+[[GAMES: Tên Tiếng Anh Chuẩn 1 | Tên Tiếng Anh Chuẩn 2 | Tên Tiếng Anh Chuẩn 3]]
+(tối đa 4 tựa game nổi bật nhất để hệ thống hiển thị thẻ game tương tác cho người dùng bấm thêm vào kho). Nếu không gợi ý tựa game cụ thể nào thì không thêm dòng này.`;
+}
+
+const GAMES_TAG_REGEX = /\[\[GAMES:\s*([^\]]+)\]\]/i;
+
+async function extractAndResolveGames(rawText) {
+  const match = rawText.match(GAMES_TAG_REGEX);
+  const cleanReply = rawText.replace(GAMES_TAG_REGEX, '').trim();
+
+  if (!match || !match[1]) {
+    return { cleanReply, recommendedGames: [] };
+  }
+
+  const titles = match[1]
+    .split('|')
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  if (titles.length === 0) {
+    return { cleanReply, recommendedGames: [] };
+  }
+
+  const resolvedResults = await Promise.allSettled(
+    titles.map((title) => gameService.resolveByTitle(title))
+  );
+
+  const seenIds = new Set();
+  const recommendedGames = [];
+  resolvedResults.forEach((res) => {
+    if (res.status === 'fulfilled' && res.value && !seenIds.has(res.value.rawgId)) {
+      const g = res.value;
+      seenIds.add(g.rawgId);
+      recommendedGames.push({
+        rawgId: g.rawgId,
+        name: g.name,
+        backgroundImage: g.backgroundImage || null,
+        released: g.released || null,
+        genres: g.genres || [],
+        rating: g.rating ?? null,
+        metacritic: g.metacritic ?? null,
+      });
+    }
+  });
+
+  return { cleanReply, recommendedGames };
 }
 
 /**
@@ -171,19 +220,26 @@ async function chat(userId, { message, sessionId } = {}) {
     systemInstruction,
   });
 
-  // 4. Lưu hội thoại vào MongoDB (chỉ lưu nguyên văn câu trả lời của model, không kèm ghi chú hiển thị)
+  // 4. Trích xuất và tra cứu thẻ game tương tác nếu có
+  const { cleanReply, recommendedGames } = await extractAndResolveGames(text);
+
+  // 5. Lưu hội thoại vào MongoDB
   try {
     await AdvisorLog.create({
       userId,
       sessionId: session,
       userMessage: cleanMessage,
-      botReply: text,
+      botReply: cleanReply,
+      recommendedGames,
     });
   } catch (dbErr) {
     console.error('[ADVISOR] Lỗi lưu lịch sử chat vào DB:', dbErr.message);
   }
 
-  return { reply: truncated ? `${text}${TRUNCATED_NOTE}` : text };
+  return {
+    reply: truncated ? `${cleanReply}${TRUNCATED_NOTE}` : cleanReply,
+    recommendedGames,
+  };
 }
 
 /**

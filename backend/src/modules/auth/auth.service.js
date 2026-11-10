@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../users/user.model');
 const { signToken } = require('../../utils/jwt');
+const { MAX_LEVEL, getRequiredCheckIns, canCheckIn } = require('../users/levelSystem');
 
 const SALT_ROUNDS = 10;
 
@@ -58,12 +59,30 @@ function unauthorized() {
 
 // Không bao giờ trả passwordHash về cho frontend
 function toPublicUser(user) {
+  const level = Math.max(1, Math.min(user.level || 1, MAX_LEVEL));
+  const requiredCheckIns = getRequiredCheckIns(level);
+  const checkInStatus = canCheckIn(user.lastCheckInAt);
+
   return {
     id: user._id,
     username: user.username,
     email: user.email,
     avatarUrl: user.avatarUrl,
+    bio: user.bio || '',
+    favoritePlatform: user.favoritePlatform || 'PC',
     authProvider: user.authProvider || 'local',
+    level,
+    maxLevel: MAX_LEVEL,
+    checkInProgress: level >= MAX_LEVEL ? 0 : Math.max(0, user.checkInProgress || 0),
+    requiredCheckIns,
+    totalCheckIns: user.totalCheckIns || 0,
+    checkInStreak: user.checkInStreak || 0,
+    lastCheckInAt: user.lastCheckInAt || null,
+    canCheckInToday: checkInStatus.canCheckIn,
+    nextCheckInAt: checkInStatus.nextCheckInAt,
+    unlockedFrames: Array.isArray(user.unlockedFrames) ? user.unlockedFrames : [],
+    equippedFrame: user.equippedFrame || null,
+    createdAt: user.createdAt,
   };
 }
 

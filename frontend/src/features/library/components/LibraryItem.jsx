@@ -3,13 +3,18 @@ import StatusBadge from "./StatusBadge";
 export default function LibraryItem({
   game,
   onEdit,
+  onViewDetail,
   onQuickAddPlaytime,
   onStatusChange,
 }) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-white dark:bg-zinc-900 rounded-xl hover:bg-zinc-100/60 dark:hover:bg-zinc-850 transition-colors duration-150 gap-3">
       {/* Left: Thumbnail & Titles */}
-      <div className="flex items-center gap-3 min-w-0">
+      <button
+        type="button"
+        onClick={() => onViewDetail?.(game)}
+        className="flex items-center gap-3 min-w-0 text-left cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
+      >
         <div className="w-14 h-14 rounded-lg bg-zinc-200 dark:bg-zinc-800 overflow-hidden shrink-0">
           {game.coverUrl ? (
             <img
@@ -26,7 +31,7 @@ export default function LibraryItem({
         </div>
 
         <div className="min-w-0">
-          <h2 className="text-sm font-bold text-zinc-900 dark:text-white truncate">
+          <h2 className="text-sm font-bold text-zinc-900 dark:text-white truncate group-hover:text-emerald-500 transition-colors">
             {game.title}
           </h2>
           <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
@@ -35,7 +40,7 @@ export default function LibraryItem({
             <span>{game.developer || "Studio"}</span>
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Middle & Right: Status, Rating, Hours and Controls */}
       <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-6 shrink-0 pt-2 sm:pt-0">

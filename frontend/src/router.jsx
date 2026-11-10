@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
+const LandingPage = lazy(() => import('./features/landing/pages/LandingPage'));
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
 const AuthCallbackPage = lazy(() => import('./features/auth/pages/AuthCallbackPage'));
@@ -10,6 +11,7 @@ const AnalyticsPage = lazy(() => import('./features/analytics/pages/AnalyticsPag
 const AdvisorPage = lazy(() => import('./features/advisor/pages/AdvisorPage'));
 const CaseOpeningPage = lazy(() => import('./features/economy/pages/CaseOpeningPage'));
 const CollectionPage = lazy(() => import('./features/economy/pages/CollectionPage'));
+const ProfilePage = lazy(() => import('./features/users/pages/ProfilePage'));
 
 function RouteLoadingFallback() {
   return (
@@ -43,11 +45,15 @@ function RouteLoadingFallback() {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/library" replace />,
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: '/index.html',
-    element: <Navigate to="/library" replace />,
+    element: <Navigate to="/" replace />,
   },
   {
     path: '/login',
@@ -125,8 +131,18 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/profile',
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      </Suspense>
+    ),
+  },
+  {
     path: '*',
-    element: <Navigate to="/library" replace />,
+    element: <Navigate to="/" replace />,
   },
 ]);
 

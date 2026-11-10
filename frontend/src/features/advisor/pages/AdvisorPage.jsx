@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import AppNavbar from '../../../components/layout/AppNavbar';
+import GameDetailModal from '../../library/components/GameDetailModal';
+import libraryService from '../../library/libraryService';
 import {
   sendAdvisorMessage,
   getAdvisorHistory,
@@ -10,16 +12,17 @@ import {
 const MAX_INPUT_LENGTH = 1500;
 
 const SUGGESTION_PROMPTS = [
-  '🎮 Gợi ý game hợp gu dựa trên thư viện của tôi',
-  '⚔️ Top game nhập vai (RPG) thế giới mở đáng chơi',
-  '🕹️ Game souls-like nào dễ làm quen nhất cho người mới?',
-  '👥 Tìm game co-op 2-4 người vui nhộn chơi cuối tuần',
+  'Phân tích gu chơi game của tôi dựa trên thư viện và gợi ý 3 tựa game tiếp theo',
+  'Top game nhập vai (RPG) thế giới mở đáng chơi nhất',
+  'Mẹo làm quen dòng game souls-like cho người mới (không spoil cốt truyện)',
+  'Tìm game co-op 2-4 người chơi cùng bạn bè cuối tuần',
 ];
 
 const INITIAL_GREETING = {
   role: 'assistant',
   content:
-    'Chào bạn! Tôi là Cố vấn AI Game của PixelLog. Tôi có thể phân tích kho game của bạn để gợi ý game chuẩn gu, giải đáp cốt truyện hay cấu hình chơi game. Hôm nay bạn muốn tìm tựa game thế nào?',
+    'Chào bạn! Tôi là Cố vấn AI Game của PixelLog. Tôi có thể phân tích kho game của bạn để gợi ý game chuẩn gu, hướng dẫn mẹo chơi không tiết lộ cốt truyện hoặc tư vấn cấu hình. Hôm nay bạn muốn tìm tựa game thế nào?',
+  recommendedGames: [],
 };
 
 // react-markdown truyền thêm prop `node` (cây AST) vào mọi component — bỏ đi để không bị đẩy xuống thẻ DOM.
@@ -32,8 +35,6 @@ const withoutNode = (props) => {
 // Tạo component Markdown gắn class Tailwind cho một thẻ HTML.
 const styledTag = (Tag, className) => (props) => <Tag className={className} {...withoutNode(props)} />;
 
-// Lưu ý: react-markdown v9+ không còn truyền prop `inline` cho `code`, nên code khối / inline
-// được phân biệt bằng className (khối có `language-xxx`) hoặc ký tự xuống dòng ở cuối nội dung khối.
 const MARKDOWN_COMPONENTS = {
   h1: styledTag('h1', 'text-base font-bold my-2 text-zinc-900 dark:text-white'),
   h2: styledTag('h2', 'text-sm font-bold my-1.5 text-zinc-900 dark:text-white'),
@@ -66,6 +67,10 @@ export default function AdvisorPage() {
   const [loading, setLoading] = useState(false);
   const [lastFailedMessage, setLastFailedMessage] = useState(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [libraryMap, setLibraryMap] = useState(() => new Map());
+  const [addingRawgId, setAddingRawgId] = useState(null);
+  const [detailTarget, setDetailTarget] = useState(null);
+  const [actionAlert, setActionAlert] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -76,6 +81,25 @@ export default function AdvisorPage() {
     scrollToBottom();
   }, [messages, loading]);
 
+  // Nạp danh sách game trong thư viện để biết game nào đã có
+  useEffect(() => {
+    let ignore = false;
+    libraryService
+      .getGames({ limit: 100 })
+      .then((games) => {
+        if (ignore) return;
+        const nextMap = new Map();
+        games.forEach((g) => {
+          if (g.rawgId) nextMap.set(Number(g.rawgId), g);
+        });
+        setLibraryMap(nextMap);
+      })
+      .catch(() => {});
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   // Tải lịch sử chat
   useEffect(() => {
     let isMounted = true;
@@ -85,11 +109,18 @@ export default function AdvisorPage() {
         if (Array.isArray(history) && history.length > 0) {
           const loaded = [];
           history.forEach((item) => {
-            if (item.userMessage) loaded.push({ role: 'user', content: item.userMessage });
-            if (item.botReply) loaded.push({ role: 'assistant', content: item.botReply });
+            if (item.userMessage) {
+              loaded.push({ role: 'user', content: item.userMessage });
+            }
+            if (item.botReply) {
+              loaded.push({
+                role: 'assistant',
+                content: item.botReply,
+                recommendedGames: item.recommendedGames || [],
+              });
+            }
           });
           setMessages((prev) => {
-            // Giữ lại các tin nhắn vừa được gửi trong lúc history đang tải (tránh race condition)
             const newlySent = prev.filter((m) => m.isPending);
             return loaded.length > 0 ? [...loaded, ...newlySent] : prev;
           });
@@ -127,9 +158,12 @@ export default function AdvisorPage() {
     try {
       const data = await sendAdvisorMessage(messageText);
       const replyText = data?.reply || 'Không có câu trả lời nào được trả về.';
+      const recommendedGames = Array.isArray(data?.recommendedGames)
+        ? data.recommendedGames
+        : [];
       setMessages((prev) => [
         ...prev.map((m) => ({ ...m, isPending: false })),
-        { role: 'assistant', content: replyText },
+        { role: 'assistant', content: replyText, recommendedGames },
       ]);
     } catch (err) {
       console.error('[ADVISOR_UI] Lỗi gửi tin nhắn:', err);
@@ -139,7 +173,7 @@ export default function AdvisorPage() {
         'Rất tiếc, đã có lỗi kết nối tới trợ lý AI. Vui lòng bấm "Thử lại" hoặc gửi lại sau giây lát!';
       setMessages((prev) => [
         ...prev.map((m) => ({ ...m, isPending: false })),
-        { role: 'assistant', content: `⚠️ ${errorMsg}`, isError: true },
+        { role: 'assistant', content: errorMsg, isError: true, recommendedGames: [] },
       ]);
     } finally {
       setLoading(false);
@@ -169,57 +203,122 @@ export default function AdvisorPage() {
     }
   };
 
+  const handleAddRecommendedGame = async (game) => {
+    if (!game?.rawgId || addingRawgId) return;
+    setAddingRawgId(game.rawgId);
+    setActionAlert(null);
+
+    try {
+      const created = await libraryService.addGame({
+        rawgId: game.rawgId,
+        status: 'backlog',
+      });
+      setLibraryMap((prev) => {
+        const next = new Map(prev);
+        next.set(Number(game.rawgId), created);
+        return next;
+      });
+      setActionAlert({
+        type: 'success',
+        text: `Đã thêm "${game.name}" vào thư viện (Chờ chơi).`,
+      });
+      setTimeout(() => setActionAlert(null), 3500);
+    } catch (err) {
+      setActionAlert({
+        type: 'error',
+        text: err.response?.data?.message || `Không thể thêm "${game.name}".`,
+      });
+      setTimeout(() => setActionAlert(null), 3500);
+    } finally {
+      setAddingRawgId(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-150">
+    <div className="min-h-[100dvh] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-150">
       <div>
         <AppNavbar />
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 w-full flex flex-col h-[calc(100vh-4.5rem)]">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 w-full flex flex-col h-[calc(100dvh-6rem)]">
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-zinc-200 dark:border-zinc-800">
-            <div>
-              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
-                <span>🤖</span> Cố vấn AI Game (PixelLog)
-              </h1>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Gợi ý game chuẩn gu theo thư viện & giải đáp thắc mắc gaming.
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                  Cố vấn AI Game (PixelLog)
+                </h1>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Gợi ý game kèm thẻ tương tác thêm nhanh vào thư viện & giải đáp không spoil.
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() =>
+                  handleSendMessage(
+                    'Phân tích gu chơi game từ thư viện của tôi và đề xuất 3 tựa game phù hợp nhất tôi chưa sở hữu'
+                  )
+                }
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70 transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Phân tích gu game</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleNewChat}
                 title="Bắt đầu cuộc trò chuyện mới"
                 className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <span>Hội thoại mới</span>
               </button>
-
-              <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800/50 px-2.5 py-1 rounded-full">
-                Sẵn sàng
-              </span>
             </div>
           </div>
+
+          {actionAlert && (
+            <div
+              role="status"
+              className={`mb-2 px-3.5 py-2 rounded-xl text-xs font-semibold border ${
+                actionAlert.type === 'error'
+                  ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'
+              }`}
+            >
+              {actionAlert.text}
+            </div>
+          )}
 
           {/* Messages list with aria-live */}
           <div
             aria-live="polite"
             aria-relevant="additions"
-            className="flex-1 overflow-y-auto space-y-3.5 pr-1.5 pb-2"
+            className="flex-1 overflow-y-auto space-y-4 pr-1.5 pb-2"
           >
             {messages.map((msg, index) => {
               const isUser = msg.role === 'user';
+              const cards = Array.isArray(msg.recommendedGames) ? msg.recommendedGames : [];
+
               return (
                 <div
                   key={index}
-                  className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+                  className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    className={`max-w-[90%] sm:max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                       isUser
                         ? 'bg-emerald-600 text-white rounded-br-none shadow-sm'
                         : msg.isError
@@ -235,15 +334,123 @@ export default function AdvisorPage() {
                       </ReactMarkdown>
                     )}
                   </div>
+
+                  {/* Interactive Recommended Game Cards right inside chat */}
+                  {!isUser && cards.length > 0 && (
+                    <div className="mt-2.5 w-full max-w-[92%] sm:max-w-[85%] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {cards.map((game) => {
+                        const existingEntry = libraryMap.get(Number(game.rawgId));
+                        const isAddingThis = addingRawgId === game.rawgId;
+                        const year = game.released ? new Date(game.released).getFullYear() : null;
+
+                        return (
+                          <div
+                            key={game.rawgId}
+                            className="flex items-center gap-3 p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs hover:border-emerald-400/60 dark:hover:border-emerald-700/70 transition-colors"
+                          >
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setDetailTarget({
+                                  rawgId: game.rawgId,
+                                  userGame: existingEntry || null,
+                                })
+                              }
+                              className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                              aria-label={`Xem chi tiết ${game.name}`}
+                            >
+                              {game.backgroundImage ? (
+                                <img
+                                  src={game.backgroundImage}
+                                  alt={game.name}
+                                  loading="lazy"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-400">
+                                  {game.name?.slice(0, 2).toUpperCase()}
+                                </div>
+                              )}
+                            </button>
+
+                            <div className="min-w-0 flex-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDetailTarget({
+                                    rawgId: game.rawgId,
+                                    userGame: existingEntry || null,
+                                  })
+                                }
+                                className="text-left w-full cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none"
+                              >
+                                <h3 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white truncate">
+                                  {game.name}
+                                </h3>
+                              </button>
+
+                              <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
+                                {year && <span className="tabular-nums">{year}</span>}
+                                {game.genres?.length > 0 && (
+                                  <span className="truncate">{game.genres.slice(0, 2).join(', ')}</span>
+                                )}
+                                {game.metacritic && (
+                                  <span className="px-1 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold tabular-nums">
+                                    {game.metacritic}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-1.5 mt-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setDetailTarget({
+                                      rawgId: game.rawgId,
+                                      userGame: existingEntry || null,
+                                    })
+                                  }
+                                  className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 cursor-pointer transition-colors"
+                                >
+                                  Chi tiết
+                                </button>
+
+                                {existingEntry ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Đã có trong kho
+                                  </span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={isAddingThis}
+                                    onClick={() => handleAddRecommendedGame(game)}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-700 hover:bg-emerald-600 text-white cursor-pointer transition-colors disabled:opacity-50"
+                                  >
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>{isAddingThis ? 'Đang thêm...' : 'Thêm vào kho'}</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 rounded-2xl rounded-bl-none px-4 py-3 text-sm flex items-center gap-2 shadow-sm animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                  <span>Cố vấn AI đang suy nghĩ câu trả lời...</span>
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 rounded-2xl rounded-bl-none px-4 py-3 text-sm flex items-center gap-2 shadow-sm motion-safe:animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 motion-safe:animate-ping" />
+                  <span>Cố vấn AI đang phân tích và tìm thẻ game phù hợp...</span>
                 </div>
               </div>
             )}
@@ -255,7 +462,7 @@ export default function AdvisorPage() {
                   onClick={handleRetry}
                   className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 transition cursor-pointer flex items-center gap-1.5 border border-rose-300 dark:border-rose-800"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>Thử gửi lại tin nhắn trước</span>
@@ -266,7 +473,7 @@ export default function AdvisorPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestions (chỉ hiện khi ít tin nhắn) */}
+          {/* Quick Suggestions */}
           {messages.length <= 2 && !loading && (
             <div className="pb-2 pt-1 flex flex-wrap gap-1.5">
               {SUGGESTION_PROMPTS.map((promptText, i) => (
@@ -282,7 +489,7 @@ export default function AdvisorPage() {
             </div>
           )}
 
-          {/* Input Form with Char Counter */}
+          {/* Input Form */}
           <form onSubmit={handleFormSubmit} className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
             <div className="relative flex items-center gap-2">
               <input
@@ -292,12 +499,12 @@ export default function AdvisorPage() {
                 placeholder="Hỏi về game, mẹo chơi, hoặc gợi ý game theo gu của bạn..."
                 disabled={loading}
                 maxLength={MAX_INPUT_LENGTH}
+                aria-label="Nội dung tin nhắn gửi Cố vấn AI"
                 className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 transition shadow-sm pr-16"
               />
 
-              {/* Character counter */}
               {input.length > 0 && (
-                <span className="absolute right-20 text-[10px] text-zinc-400 font-mono">
+                <span className="absolute right-24 text-[10px] text-zinc-400 font-mono tabular-nums">
                   {input.length}/{MAX_INPUT_LENGTH}
                 </span>
               )}
@@ -308,7 +515,7 @@ export default function AdvisorPage() {
                 className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-900/10 flex items-center gap-1.5 shrink-0"
               >
                 <span>Gửi</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -316,6 +523,39 @@ export default function AdvisorPage() {
           </form>
         </main>
       </div>
+
+      {/* Interactive Game Detail Modal right inside Advisor */}
+      {detailTarget && (
+        <GameDetailModal
+          isOpen={!!detailTarget}
+          onClose={() => setDetailTarget(null)}
+          rawgId={detailTarget.rawgId}
+          userGame={detailTarget.userGame}
+          onAddedToLibrary={(created) => {
+            setLibraryMap((prev) => {
+              const next = new Map(prev);
+              next.set(Number(created.rawgId), created);
+              return next;
+            });
+          }}
+          onUserGameUpdated={(updated) => {
+            setLibraryMap((prev) => {
+              const next = new Map(prev);
+              next.set(Number(updated.rawgId), updated);
+              return next;
+            });
+          }}
+          onUserGameRemoved={(removedId) => {
+            setLibraryMap((prev) => {
+              const next = new Map(prev);
+              for (const [k, v] of next.entries()) {
+                if (v.id === removedId) next.delete(k);
+              }
+              return next;
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

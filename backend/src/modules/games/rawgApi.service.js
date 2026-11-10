@@ -75,9 +75,27 @@ async function searchGames({ search, page = 1, pageSize = 20, genres, ordering }
 }
 
 async function getGameDetail(rawgId) {
-  const raw = await rawgFetch(`/games/${rawgId}`);
+  const [raw, screenshotsRes] = await Promise.all([
+    rawgFetch(`/games/${rawgId}`),
+    rawgFetch(`/games/${rawgId}/screenshots`, { page_size: 8 }).catch(() => null),
+  ]);
+
+  const screenshotSet = new Set();
+  if (raw.background_image_additional) {
+    screenshotSet.add(raw.background_image_additional);
+  }
+  (screenshotsRes?.results || []).forEach((item) => {
+    if (item?.image) screenshotSet.add(item.image);
+  });
+
   return {
     ...normalizeGame(raw),
+    developers: (raw.developers || []).map((d) => d.name).filter(Boolean),
+    publishers: (raw.publishers || []).map((p) => p.name).filter(Boolean),
+    website: raw.website || null,
+    playtimeAvg: typeof raw.playtime === 'number' ? raw.playtime : null,
+    esrbRating: raw.esrb_rating?.name || null,
+    screenshots: Array.from(screenshotSet).slice(0, 8),
     // RAWG trả description dạng HTML — dùng bản text thuần để hiển thị an toàn
     description: raw.description_raw || '',
   };

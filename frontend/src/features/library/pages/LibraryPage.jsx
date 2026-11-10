@@ -6,6 +6,7 @@ import GameCard from "../components/GameCard";
 import LibraryItem from "../components/LibraryItem";
 import QuickEditModal from "../components/QuickEditModal";
 import AddGameModal from "../components/AddGameModal";
+import GameDetailModal from "../components/GameDetailModal";
 import libraryService from "../libraryService";
 
 export default function LibraryPage() {
@@ -16,6 +17,7 @@ export default function LibraryPage() {
   const [sortBy, setSortBy] = useState("playtimeDesc");
   const [viewMode, setViewMode] = useState("grid");
   const [editingGame, setEditingGame] = useState(null);
+  const [detailGame, setDetailGame] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
@@ -222,6 +224,7 @@ export default function LibraryPage() {
                   key={game.id}
                   game={game}
                   onEdit={setEditingGame}
+                  onViewDetail={setDetailGame}
                   onQuickAddPlaytime={handleQuickAddPlaytime}
                   onStatusChange={handleStatusChange}
                 />
@@ -235,6 +238,7 @@ export default function LibraryPage() {
                   key={game.id}
                   game={game}
                   onEdit={setEditingGame}
+                  onViewDetail={setDetailGame}
                   onQuickAddPlaytime={handleQuickAddPlaytime}
                   onStatusChange={handleStatusChange}
                 />
@@ -264,6 +268,24 @@ export default function LibraryPage() {
           onClose={() => setIsAddModalOpen(false)}
           existingGames={games}
           onGameAdded={handleGameAdded}
+        />
+      )}
+
+      {/* Game Detail & Gaming Logbook Modal */}
+      {detailGame && (
+        <GameDetailModal
+          isOpen={!!detailGame}
+          onClose={() => setDetailGame(null)}
+          rawgId={detailGame.rawgId}
+          userGame={detailGame}
+          onUserGameUpdated={(updated) => {
+            setGames((prev) =>
+              prev.map((g) => (g.id === updated.id ? updated : g))
+            );
+          }}
+          onUserGameRemoved={(removedId) => {
+            setGames((prev) => prev.filter((g) => g.id !== removedId));
+          }}
         />
       )}
     </div>

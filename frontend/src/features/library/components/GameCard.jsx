@@ -3,13 +3,19 @@ import StatusBadge from "./StatusBadge";
 export default function GameCard({
   game,
   onEdit,
+  onViewDetail,
   onQuickAddPlaytime,
   onStatusChange,
 }) {
   return (
     <div className="group rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 flex flex-col justify-between overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-150">
       {/* Cover Image */}
-      <div className="relative aspect-video w-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onViewDetail?.(game)}
+        className="relative aspect-video w-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        aria-label={`Xem chi tiết ${game.title}`}
+      >
         {game.coverUrl ? (
           <img
             src={game.coverUrl}
@@ -34,14 +40,20 @@ export default function GameCard({
             {game.genre || "Action"}
           </span>
         </div>
-      </div>
+      </button>
 
       {/* Content info */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h2 className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1 mb-1 group-hover:text-emerald-500 transition-colors duration-150">
-            {game.title}
-          </h2>
+          <button
+            type="button"
+            onClick={() => onViewDetail?.(game)}
+            className="text-left w-full cursor-pointer focus:outline-none focus-visible:underline"
+          >
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1 mb-1 group-hover:text-emerald-500 transition-colors duration-150">
+              {game.title}
+            </h2>
+          </button>
           <div className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1 mb-3">
             {game.developer || "Studio"} • Ra mắt {game.releaseYear || "2024"}
           </div>

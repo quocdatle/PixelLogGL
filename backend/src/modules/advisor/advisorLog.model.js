@@ -22,6 +22,23 @@ const advisorLogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    recommendedGames: {
+      type: [
+        new mongoose.Schema(
+          {
+            rawgId: Number,
+            name: String,
+            backgroundImage: String,
+            released: String,
+            genres: [String],
+            rating: Number,
+            metacritic: Number,
+          },
+          { _id: false }
+        ),
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

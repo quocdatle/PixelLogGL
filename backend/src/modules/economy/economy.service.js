@@ -3,6 +3,9 @@ const Item = require('./item.model');
 const Wallet = require('./wallet.model');
 const Inventory = require('./inventory.model');
 const CaseOpenLog = require('./caseOpenLog.model');
+const User = require('../users/user.model');
+const { toPublicUser } = require('../auth/auth.service');
+const { applyDailyCheckInToUser, canCheckIn, CHECK_IN_COOLDOWN_MS } = require('../users/levelSystem');
 const { seedItems } = require('../../../database/seeders/items.seed');
 
 const { DAILY_REWARD_AMOUNT, INITIAL_BALANCE } = Wallet;
@@ -97,8 +100,12 @@ async function ensureItemsSeeded() {
 
 // Lấy hoặc khởi tạo ví của người dùng
 async function getWallet(userId) {
-  let wallet = await Wallet.findOne({ userId });
+  const [existingWallet, user] = await Promise.all([
+    Wallet.findOne({ userId }),
+    User.findById(userId).select('lastCheckInAt'),
+  ]);
 
+  let wallet = existingWallet;
   if (!wallet) {
     wallet = await Wallet.create({
       userId,
@@ -110,49 +117,54 @@ async function getWallet(userId) {
   }
 
   const now = new Date();
-  let canClaimDaily = true;
-  let nextDailyAt = null;
-
-  if (wallet.lastDailyReward) {
-    const elapsed = now.getTime() - new Date(wallet.lastDailyReward).getTime();
-    const cooldownMs = 24 * 60 * 60 * 1000;
-    if (elapsed < cooldownMs) {
-      canClaimDaily = false;
-      nextDailyAt = new Date(new Date(wallet.lastDailyReward).getTime() + cooldownMs);
-    }
-  }
+  const latestTimestamp = Math.max(
+    wallet.lastDailyReward ? new Date(wallet.lastDailyReward).getTime() : 0,
+    user?.lastCheckInAt ? new Date(user.lastCheckInAt).getTime() : 0
+  );
+  const checkInState = canCheckIn(latestTimestamp ? new Date(latestTimestamp) : null, now);
 
   return {
     balance: wallet.balance,
     totalEarned: wallet.totalEarned,
     totalSpent: wallet.totalSpent,
-    canClaimDaily,
-    nextDailyAt,
+    canClaimDaily: checkInState.canCheckIn,
+    nextDailyAt: checkInState.nextCheckInAt,
     dailyRewardAmount: DAILY_REWARD_AMOUNT,
   };
 }
 
-// Điểm danh nhận xu hàng ngày (Daily Check-in)
+// Điểm danh nhận xu hàng ngày & tăng tiến độ cấp độ (Daily Check-in)
 async function claimDailyReward(userId) {
-  let wallet = await Wallet.findOne({ userId });
+  const [existingWallet, user] = await Promise.all([
+    Wallet.findOne({ userId }),
+    User.findById(userId),
+  ]);
+
+  if (!user) {
+    throw httpError('Không tìm thấy người dùng', 404, 'USER_NOT_FOUND');
+  }
+
+  let wallet = existingWallet;
   if (!wallet) {
     wallet = await Wallet.create({ userId });
   }
 
   const now = new Date();
-  if (wallet.lastDailyReward) {
-    const elapsed = now.getTime() - new Date(wallet.lastDailyReward).getTime();
-    const cooldownMs = 24 * 60 * 60 * 1000;
-    if (elapsed < cooldownMs) {
-      const waitMinutes = Math.ceil((cooldownMs - elapsed) / (60 * 1000));
-      const hours = Math.floor(waitMinutes / 60);
-      const minutes = waitMinutes % 60;
-      throw httpError(
-        `Bạn đã nhận xu hôm nay rồi. Vui lòng quay lại sau ${hours} giờ ${minutes} phút.`,
-        400,
-        'ALREADY_CLAIMED'
-      );
-    }
+  const latestTimestamp = Math.max(
+    wallet.lastDailyReward ? new Date(wallet.lastDailyReward).getTime() : 0,
+    user.lastCheckInAt ? new Date(user.lastCheckInAt).getTime() : 0
+  );
+  const checkInState = canCheckIn(latestTimestamp ? new Date(latestTimestamp) : null, now);
+
+  if (!checkInState.canCheckIn) {
+    const waitMinutes = Math.ceil(checkInState.remainingMs / (60 * 1000));
+    const hours = Math.floor(waitMinutes / 60);
+    const minutes = waitMinutes % 60;
+    throw httpError(
+      `Bạn đã điểm danh hôm nay rồi. Vui lòng quay lại sau ${hours} giờ ${minutes} phút.`,
+      400,
+      'ALREADY_CLAIMED'
+    );
   }
 
   wallet.balance += DAILY_REWARD_AMOUNT;
@@ -160,13 +172,26 @@ async function claimDailyReward(userId) {
   wallet.lastDailyReward = now;
   await wallet.save();
 
-  const nextDailyAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const checkInResult = applyDailyCheckInToUser(user, now);
+  await user.save();
+
+  const nextDailyAt = new Date(now.getTime() + CHECK_IN_COOLDOWN_MS);
+  const messageParts = [`Điểm danh thành công! Bạn nhận được +${DAILY_REWARD_AMOUNT} Xu`];
+  if (checkInResult.leveledUp) {
+    messageParts.push(`Thăng lên Cấp ${checkInResult.newLevel}`);
+  }
+  if (checkInResult.newlyUnlockedFrames.length > 0) {
+    const names = checkInResult.newlyUnlockedFrames.map((f) => f.name).join(', ');
+    messageParts.push(`Mở khóa khung avatar: ${names}`);
+  }
 
   return {
     balance: wallet.balance,
     claimedAmount: DAILY_REWARD_AMOUNT,
     nextDailyAt,
-    message: `Điểm danh thành công! Bạn nhận được +${DAILY_REWARD_AMOUNT} Xu.`,
+    user: toPublicUser(user),
+    checkInResult,
+    message: `${messageParts.join(' • ')}.`,
   };
 }
 

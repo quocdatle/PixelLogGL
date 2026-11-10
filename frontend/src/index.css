@@ -4,3 +4,22 @@
   --font-serif: 'IBM Plex Serif', ui-serif, serif;
 }
 @custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes frameSpinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-frame-spin {
+  animation: frameSpinSlow 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-frame-spin {
+    animation: none;
+  }
+}

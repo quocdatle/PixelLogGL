@@ -8,6 +8,8 @@ const router = express.Router();
 // Tất cả route ở đây đều cần đăng nhập (requireAuth chạy trước controller)
 router.get('/me', requireAuth, userController.getProfile);
 router.patch('/me', requireAuth, userController.updateProfile);
+router.get('/me/frames', requireAuth, userController.getAvatarFrames);
+router.post('/me/check-in', requireAuth, userController.dailyCheckIn);
 router.patch('/me/password', requireAuth, validateBody(['oldPassword', 'newPassword']), userController.changePassword);
 
 module.exports = router;

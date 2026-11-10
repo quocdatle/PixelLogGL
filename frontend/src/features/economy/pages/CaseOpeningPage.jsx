@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import AppNavbar from '../../../components/layout/AppNavbar';
 import CaseAnimation from '../components/CaseAnimation';
 import economyService from '../economyService';
+import useAuth from '../../../hooks/useAuth';
 
 export default function CaseOpeningPage() {
+  const { updateUser } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [cases, setCases] = useState([]);
   const [recentDrops, setRecentDrops] = useState([]);
@@ -54,6 +56,9 @@ export default function CaseOpeningPage() {
         canClaimDaily: false,
         nextDailyAt: data.nextDailyAt,
       }));
+      if (data.user) {
+        updateUser(data.user);
+      }
       setActionMessage({ type: 'success', text: data.message });
       setTimeout(() => setActionMessage(null), 4000);
     } catch (err) {

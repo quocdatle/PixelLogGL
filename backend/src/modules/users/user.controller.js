@@ -19,6 +19,24 @@ async function updateProfile(req, res, next) {
   }
 }
 
+async function getAvatarFrames(req, res, next) {
+  try {
+    const data = await userService.getAvatarFrames(req.userId);
+    return success(res, data);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function dailyCheckIn(req, res, next) {
+  try {
+    const result = await userService.dailyCheckIn(req.userId);
+    return success(res, result);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function changePassword(req, res, next) {
   try {
     const result = await userService.changePassword(req.userId, req.body);
@@ -28,4 +46,10 @@ async function changePassword(req, res, next) {
   }
 }
 
-module.exports = { getProfile, updateProfile, changePassword };
+module.exports = {
+  getProfile,
+  updateProfile,
+  getAvatarFrames,
+  dailyCheckIn,
+  changePassword,
+};

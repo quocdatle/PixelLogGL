@@ -9,7 +9,8 @@ function mapBackendToUi(entry) {
     userGameId: entry._id,
     rawgId: game.rawgId,
     title: game.name || "Không rõ tên",
-    developer: (game.platforms && game.platforms[0]) || "Studio",
+    developer: (game.developers && game.developers[0]) || (game.platforms && game.platforms[0]) || "Studio",
+    platforms: game.platforms || [],
     genre: (game.genres && game.genres[0]) || "Game",
     genres: game.genres || [],
     releaseYear: game.released ? new Date(game.released).getFullYear() : "2024",
@@ -104,6 +105,27 @@ export const libraryService = {
     const res = await api.post("/user-games", {
       rawgId: Number(rawgId),
       status: gameData.status || "backlog",
+    });
+    return mapBackendToUi(res.data?.data);
+  },
+
+  // Lấy chi tiết đầy đủ của 1 game từ RAWG (có description, screenshots, developers...)
+  async getGameDetail(rawgId) {
+    const res = await api.get(`/games/${rawgId}`);
+    return res.data?.data;
+  },
+
+  // Lấy 1 mục game chi tiết trong kho người dùng (bao gồm playSessions)
+  async getUserGameById(id) {
+    const res = await api.get(`/user-games/${id}`);
+    return mapBackendToUi(res.data?.data);
+  },
+
+  // Ghi nhận 1 phiên chơi mới với số phút & ghi chú
+  async logPlaySession(id, { minutes, note }) {
+    const res = await api.post(`/user-games/${id}/play-sessions`, {
+      minutes: Number(minutes),
+      note: note?.trim() || '',
     });
     return mapBackendToUi(res.data?.data);
   },
