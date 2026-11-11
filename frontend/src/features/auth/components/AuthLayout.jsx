@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import ThemeToggle from "../../../components/common/ThemeToggle";
+import BrandLogo from "../../../components/common/BrandLogo";
 
 // Khung dung chung cho Login va Register
 export default function AuthLayout({ activeTab, onTabChange, children }) {
@@ -9,29 +11,14 @@ export default function AuthLayout({ activeTab, onTabChange, children }) {
 
   return (
     <div className="min-h-[100dvh] w-full bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 sm:p-6 lg:p-8 flex flex-col justify-between transition-colors duration-150">
-      {/* Top Header Bar voi ThemeToggle */}
+      {/* Top Header Bar voi BrandLogo va ThemeToggle */}
       <header className="max-w-5xl mx-auto w-full mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-              />
-            </svg>
-          </div>
-          <span className="font-extrabold text-2xl tracking-tight text-zinc-900 dark:text-white">
-            Pixel
-            <span className="text-emerald-500">Log</span>
-          </span>
-        </div>
+        <Link
+          to="/"
+          className="inline-flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-xl"
+        >
+          <BrandLogo size="lg" />
+        </Link>
 
         {/* Nut ThemeToggle */}
         <ThemeToggle />

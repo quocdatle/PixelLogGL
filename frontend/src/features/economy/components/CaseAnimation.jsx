@@ -6,10 +6,14 @@ const CARD_GAP = 12; // Khoảng cách giữa các thẻ
 const TOTAL_CARD_STEP = CARD_WIDTH + CARD_GAP; // 152px
 const SPIN_DURATION_MS = 5500; // Thời gian quay 5.5s
 
-// Hàm phát tiếng click nhẹ mô phỏng roulette bằng Web Audio API thuần (không cần file mp3)
-function playTickSound() {
+// Hàm phát tiếng click nhẹ mô phỏng roulette bằng Web Audio API tái sử dụng 1 AudioContext
+function playTickSound(ctx) {
+  if (!ctx) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -49,6 +53,14 @@ export default function CaseAnimation({
   useEffect(() => {
     if (!reelItems || reelItems.length === 0) return;
 
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    try {
+      if (AudioCtx) audioCtx = new AudioCtx();
+    } catch {
+      audioCtx = null;
+    }
+
     // Tính toán vị trí dừng chính xác: căn giữa mục targetIndex vào giữa container
     const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 700;
     const centerPoint = containerWidth / 2;
@@ -72,7 +84,7 @@ export default function CaseAnimation({
       const runTicks = () => {
         const elapsed = Date.now() - startTime;
         if (elapsed < SPIN_DURATION_MS - 400) {
-          playTickSound();
+          playTickSound(audioCtx);
           currentInterval = Math.min(350, 50 + (elapsed / SPIN_DURATION_MS) * 300);
           tickIntervalRef.current = setTimeout(runTicks, currentInterval);
         }
@@ -92,6 +104,9 @@ export default function CaseAnimation({
       clearTimeout(timerStart);
       clearTimeout(timerEnd);
       clearTimeout(tickIntervalRef.current);
+      if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close().catch(() => {});
+      }
     };
   }, [reelItems, targetIndex, onFinish]);
 

@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import AppNavbar from '../../../components/layout/AppNavbar';
 import GameDetailModal from '../../library/components/GameDetailModal';
 import libraryService from '../../library/libraryService';
+import useFeedback from '../../../hooks/useFeedback';
 import {
   sendAdvisorMessage,
   getAdvisorHistory,
@@ -62,6 +63,7 @@ const MARKDOWN_COMPONENTS = {
 };
 
 export default function AdvisorPage() {
+  const { toast, confirm } = useFeedback();
   const [messages, setMessages] = useState([INITIAL_GREETING]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,14 @@ export default function AdvisorPage() {
   const [detailTarget, setDetailTarget] = useState(null);
   const [actionAlert, setActionAlert] = useState(null);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+  const alertTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -143,11 +153,14 @@ export default function AdvisorPage() {
     if (!messageText || loading) return;
 
     if (messageText.length > MAX_INPUT_LENGTH) {
-      alert(`Tin nhắn của bạn vượt quá giới hạn ${MAX_INPUT_LENGTH} ký tự.`);
+      toast(`Tin nhắn của bạn vượt quá giới hạn ${MAX_INPUT_LENGTH} ký tự.`, 'error');
       return;
     }
 
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setLastFailedMessage(null);
     setMessages((prev) => [
       ...prev,
@@ -192,14 +205,23 @@ export default function AdvisorPage() {
   };
 
   const handleNewChat = async () => {
-    if (window.confirm('Bạn có chắc muốn bắt đầu cuộc trò chuyện mới và xóa lịch sử hiện tại không?')) {
-      try {
-        await clearAdvisorHistory();
-        setMessages([INITIAL_GREETING]);
-        setLastFailedMessage(null);
-      } catch (err) {
-        console.error('Không thể làm mới lịch sử:', err);
-      }
+    const accepted = await confirm({
+      title: 'Bắt đầu cuộc trò chuyện mới',
+      message: 'Lịch sử trò chuyện hiện tại với Cố vấn AI sẽ được xóa. Bạn có muốn tiếp tục không?',
+      confirmLabel: 'Tạo hội thoại mới',
+      cancelLabel: 'Hủy',
+      danger: true,
+    });
+    if (!accepted) return;
+
+    try {
+      await clearAdvisorHistory();
+      setMessages([INITIAL_GREETING]);
+      setLastFailedMessage(null);
+      toast('Đã tạo cuộc trò chuyện mới.', 'success');
+    } catch (err) {
+      console.error('Không thể làm mới lịch sử:', err);
+      toast('Không thể làm mới lịch sử trò chuyện.', 'error');
     }
   };
 
@@ -207,6 +229,7 @@ export default function AdvisorPage() {
     if (!game?.rawgId || addingRawgId) return;
     setAddingRawgId(game.rawgId);
     setActionAlert(null);
+    if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
 
     try {
       const created = await libraryService.addGame({
@@ -222,24 +245,23 @@ export default function AdvisorPage() {
         type: 'success',
         text: `Đã thêm "${game.name}" vào thư viện (Chờ chơi).`,
       });
-      setTimeout(() => setActionAlert(null), 3500);
+      alertTimerRef.current = setTimeout(() => setActionAlert(null), 3500);
     } catch (err) {
       setActionAlert({
         type: 'error',
         text: err.response?.data?.message || `Không thể thêm "${game.name}".`,
       });
-      setTimeout(() => setActionAlert(null), 3500);
+      alertTimerRef.current = setTimeout(() => setActionAlert(null), 3500);
     } finally {
       setAddingRawgId(null);
     }
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-150">
-      <div>
-        <AppNavbar />
+    <div className="h-[100dvh] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors duration-150">
+      <AppNavbar />
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 w-full flex flex-col h-[calc(100dvh-6rem)]">
+      <main className="flex-1 min-h-0 max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 w-full flex flex-col">
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center gap-3">
@@ -491,28 +513,41 @@ export default function AdvisorPage() {
 
           {/* Input Form */}
           <form onSubmit={handleFormSubmit} className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-            <div className="relative flex items-center gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Hỏi về game, mẹo chơi, hoặc gợi ý game theo gu của bạn..."
-                disabled={loading}
-                maxLength={MAX_INPUT_LENGTH}
-                aria-label="Nội dung tin nhắn gửi Cố vấn AI"
-                className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 transition shadow-sm pr-16"
-              />
+            <div className="relative flex items-end gap-2">
+              <div className="relative flex-1">
+                <textarea
+                  ref={textareaRef}
+                  rows={1}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(input);
+                    }
+                  }}
+                  placeholder="Hỏi về game, mẹo chơi, hoặc gợi ý game... (Enter gửi, Shift+Enter xuống dòng)"
+                  disabled={loading}
+                  maxLength={MAX_INPUT_LENGTH}
+                  aria-label="Nội dung tin nhắn gửi Cố vấn AI"
+                  className="w-full resize-none bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 transition-colors pr-16 max-h-[140px] leading-snug"
+                />
 
-              {input.length > 0 && (
-                <span className="absolute right-24 text-[10px] text-zinc-400 font-mono tabular-nums">
-                  {input.length}/{MAX_INPUT_LENGTH}
-                </span>
-              )}
+                {input.length > 0 && (
+                  <span className="absolute right-3 bottom-3 text-[11px] text-zinc-400 tabular-nums pointer-events-none">
+                    {input.length}/{MAX_INPUT_LENGTH}
+                  </span>
+                )}
+              </div>
 
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-900/10 flex items-center gap-1.5 shrink-0"
+                className="bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white px-5 py-3 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shrink-0"
               >
                 <span>Gửi</span>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -522,7 +557,6 @@ export default function AdvisorPage() {
             </div>
           </form>
         </main>
-      </div>
 
       {/* Interactive Game Detail Modal right inside Advisor */}
       {detailTarget && (

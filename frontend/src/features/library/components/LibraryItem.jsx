@@ -8,7 +8,7 @@ export default function LibraryItem({
   onStatusChange,
 }) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-white dark:bg-zinc-900 rounded-xl hover:bg-zinc-100/60 dark:hover:bg-zinc-850 transition-colors duration-150 gap-3">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-white dark:bg-zinc-900 rounded-xl hover:bg-zinc-100/60 dark:hover:bg-zinc-800/70 transition-colors duration-150 gap-3">
       {/* Left: Thumbnail & Titles */}
       <button
         type="button"
@@ -81,7 +81,8 @@ export default function LibraryItem({
           <select
             value={game.status}
             onChange={(e) => onStatusChange(game.id, e.target.value)}
-            className="text-xs py-1 px-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-none cursor-pointer focus:outline-none"
+            aria-label={`Trạng thái của ${game.title}`}
+            className="text-xs py-1 px-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <option value="playing">Đang chơi</option>
             <option value="backlog">Chờ chơi</option>

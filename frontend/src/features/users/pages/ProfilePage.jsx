@@ -471,16 +471,31 @@ export default function ProfilePage() {
                       >
                         URL Ảnh đại diện
                       </label>
-                      <input
-                        id="profile-avatar-url"
-                        type="url"
-                        value={editForm.avatarUrl}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({ ...prev, avatarUrl: e.target.value }))
-                        }
-                        placeholder="https://example.com/avatar.png"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500"
-                      />
+                      <div className="flex items-center gap-3">
+                        <AvatarWithFrame
+                          user={{
+                            ...profile,
+                            avatarUrl: editForm.avatarUrl.trim() || null,
+                          }}
+                          size="md"
+                          showLevelBadge={false}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <input
+                            id="profile-avatar-url"
+                            type="url"
+                            value={editForm.avatarUrl}
+                            onChange={(e) =>
+                              setEditForm((prev) => ({ ...prev, avatarUrl: e.target.value }))
+                            }
+                            placeholder="Dán link ảnh trực tiếp (.png, .jpg, .webp)"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500"
+                          />
+                          <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                            Xem trước trực tiếp cùng khung avatar đang trang bị. Để trống để dùng chữ cái đầu.
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
                     <div>

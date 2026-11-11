@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import ThemeToggle from '../../../components/common/ThemeToggle';
 import AvatarWithFrame from '../../../components/common/AvatarWithFrame';
-import amiyaLogo from '../../../assets/amiya.gif';
+import BrandLogo from '../../../components/common/BrandLogo';
 import { AVATAR_FRAME_STYLES } from '../../../utils/avatarFrames';
 
 const FEATURES = [
@@ -55,37 +55,28 @@ export default function LandingPage() {
       <div>
         {/* Top Public Header */}
         <header className="w-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-11 h-11 rounded-2xl overflow-hidden bg-emerald-600/10 border border-emerald-500/30 shrink-0">
-                <img
-                  src={amiyaLogo}
-                  alt="PixelLog GL"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
-              <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-zinc-900 dark:text-white">
-                Pixel<span className="text-emerald-500">Log</span>{' '}
-                <span className="text-xs px-2 py-0.5 rounded-md font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 align-middle">
-                  GL
-                </span>
-              </span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
+            <Link
+              to="/"
+              className="inline-flex items-center shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-xl"
+            >
+              <BrandLogo size="md" />
             </Link>
 
-            <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
               <ThemeToggle />
 
               {isAuthenticated ? (
                 <>
                   <Link
                     to="/profile"
-                    className="hidden sm:inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    className="hidden sm:inline-flex items-center px-3 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors whitespace-nowrap"
                   >
                     {user?.username || 'Hồ sơ'}
                   </Link>
                   <Link
                     to="/library"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold transition-colors shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap"
                   >
                     <span>Vào Thư viện</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -97,13 +88,13 @@ export default function LandingPage() {
                 <>
                   <Link
                     to="/login"
-                    className="px-4 py-2 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    className="px-2.5 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors whitespace-nowrap"
                   >
                     Đăng nhập
                   </Link>
                   <Link
                     to="/register"
-                    className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold transition-colors shadow-xs"
+                    className="px-3 sm:px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-colors whitespace-nowrap"
                   >
                     Bắt đầu ngay
                   </Link>

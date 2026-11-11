@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import AppNavbar from '../../../components/layout/AppNavbar';
 import GenreChart from '../components/GenreChart';
-import PlaytimeChart from '../components/PlaytimeChart';
-import { getGenreStats, getOverview, getPlaytimeStats, getTopGames } from '../analyticsService';
+import LibraryBreakdownChart from '../components/LibraryBreakdownChart';
+import { getDistributionStats, getGenreStats, getOverview, getTopGames } from '../analyticsService';
 
 const STATUS_META = [
   { key: 'playing', label: 'Đang chơi', color: 'bg-sky-500' },
@@ -188,13 +188,13 @@ function TopGamesList({ games }) {
 }
 
 export default function AnalyticsPage() {
-  const [range, setRange] = useState('week');
+  const [groupBy, setGroupBy] = useState('status');
   const [genreMetric, setGenreMetric] = useState('games');
 
   const overview = useApiData(getOverview);
   const topGames = useApiData(getTopGames, TOP_GAMES_LIMIT);
   const genres = useApiData(getGenreStats, genreMetric);
-  const playtime = useApiData(getPlaytimeStats, range);
+  const distribution = useApiData(getDistributionStats, groupBy);
 
   const isEmptyLibrary = overview.data && overview.data.totalGames === 0;
 
@@ -237,21 +237,24 @@ export default function AnalyticsPage() {
               <OverviewStrip overview={overview.data} />
 
               <Panel
-                title="Giờ chơi theo thời gian"
+                title="Phân tích Giờ chơi & Thư viện"
                 action={
                   <Toggle
-                    label="Khoảng thời gian"
-                    value={range}
-                    onChange={setRange}
+                    label="Nhóm thống kê"
+                    value={groupBy}
+                    onChange={setGroupBy}
                     options={[
-                      { value: 'week', label: 'Theo tuần' },
-                      { value: 'month', label: 'Theo tháng' },
+                      { value: 'status', label: 'Trạng thái' },
+                      { value: 'platform', label: 'Nền tảng' },
+                      { value: 'rating', label: 'Điểm đánh giá' },
                     ]}
                   />
                 }
               >
-                <PanelState loading={playtime.loading && !playtime.data} error={playtime.error} height="h-72">
-                  {playtime.data && <PlaytimeChart data={playtime.data.items} range={range} />}
+                <PanelState loading={distribution.loading && !distribution.data} error={distribution.error} height="h-72">
+                  {distribution.data && (
+                    <LibraryBreakdownChart data={distribution.data.items} groupBy={groupBy} />
+                  )}
                 </PanelState>
               </Panel>
 

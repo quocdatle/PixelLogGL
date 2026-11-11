@@ -82,7 +82,7 @@ export default function GameCard({
       </div>
 
       {/* Card Footer Actions */}
-      <div className="px-4 py-2.5 bg-zinc-50 dark:bg-zinc-850/60 flex items-center justify-between gap-2">
+      <div className="px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => onQuickAddPlaytime(game.id)}
@@ -96,7 +96,8 @@ export default function GameCard({
           <select
             value={game.status}
             onChange={(e) => onStatusChange(game.id, e.target.value)}
-            className="text-[11px] py-1 px-2 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-none cursor-pointer focus:outline-none"
+            aria-label={`Trạng thái của ${game.title}`}
+            className="text-[11px] py-1 px-2 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <option value="playing">Đang chơi</option>
             <option value="backlog">Chờ chơi</option>

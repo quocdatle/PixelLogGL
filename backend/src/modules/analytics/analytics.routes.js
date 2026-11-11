@@ -10,6 +10,7 @@ router.use(requireAuth);
 router.get('/overview', analyticsController.getOverview);
 router.get('/genres', analyticsController.getGenreStats);
 router.get('/playtime', analyticsController.getPlaytimeStats);
+router.get('/distribution', analyticsController.getDistributionStats);
 router.get('/top-games', analyticsController.getTopGames);
 
 module.exports = router;

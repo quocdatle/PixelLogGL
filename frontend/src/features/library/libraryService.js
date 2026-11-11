@@ -13,7 +13,11 @@ function mapBackendToUi(entry) {
     platforms: game.platforms || [],
     genre: (game.genres && game.genres[0]) || "Game",
     genres: game.genres || [],
-    releaseYear: game.released ? new Date(game.released).getFullYear() : "2024",
+    releaseYear: (() => {
+      if (!game.released) return "—";
+      const y = new Date(game.released).getFullYear();
+      return Number.isFinite(y) ? y : "—";
+    })(),
     status: entry.status || "backlog",
     rating: entry.rating ?? null,
     playtimeHours: entry.hoursPlayed || 0,

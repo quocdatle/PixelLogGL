@@ -5,6 +5,9 @@ const mongoose = require('mongoose');
 const gameSchema = new mongoose.Schema(
   {
     rawgId: { type: Number, required: true, unique: true, index: true },
+    igdbId: { type: Number, index: { unique: true, sparse: true } },
+    steamAppId: { type: Number, index: { unique: true, sparse: true } },
+    source: { type: String, enum: ['rawg', 'igdb', 'steam'], default: 'rawg' },
     name: { type: String, required: true, trim: true },
     slug: { type: String, default: null },
     backgroundImage: { type: String, default: null },

@@ -19,6 +19,10 @@ module.exports = {
   jwtSecret: required('JWT_SECRET'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   rawgApiKey: process.env.RAWG_API_KEY,
+  twitch: {
+    clientId: process.env.TWITCH_CLIENT_ID || '',
+    clientSecret: process.env.TWITCH_CLIENT_SECRET || '',
+  },
   geminiApiKey: process.env.GEMINI_API_KEY,
   geminiModel: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
 

@@ -4,6 +4,7 @@ import AuthLayout from '../components/AuthLayout';
 import FormField from '../components/FormField';
 import SocialLoginButtons from '../components/SocialLoginButtons';
 import useAuth from '../../../hooks/useAuth';
+import useFeedback from '../../../hooks/useFeedback';
 
 const OAUTH_ERROR_MAP = {
   email_in_use: 'Email này đã được sử dụng bởi phương thức đăng nhập khác. Vui lòng đăng nhập bằng tài khoản ban đầu.',
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
+  const { toast } = useFeedback();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -60,7 +62,7 @@ export default function LoginPage() {
           id="login-email"
           name="email"
           type="text"
-          placeholder="gamer@example.com"
+          placeholder="tenban@gmail.com"
           value={form.email}
           onChange={handleChange}
           required
@@ -84,7 +86,7 @@ export default function LoginPage() {
           labelAction={
             <button
               type="button"
-              onClick={() => alert('Vui lòng kiểm tra email để đặt lại mật khẩu.')}
+              onClick={() => toast('Tính năng đặt lại mật khẩu qua email sẽ sớm được hỗ trợ. Vui lòng liên hệ quản trị viên nếu quên mật khẩu.', 'info')}
               className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
             >
               Quên mật khẩu?

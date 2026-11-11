@@ -80,7 +80,10 @@ export default function AddGameModal({
       } catch (err) {
         if (err.name !== "CanceledError" && err.name !== "AbortError") {
           console.error("Lỗi khi tìm kiếm game:", err);
-          setError("Không thể tìm kiếm game lúc này. Vui lòng thử lại.");
+          setError(
+            err.response?.data?.message ||
+              "Không thể tìm kiếm game lúc này. Vui lòng thử lại."
+          );
         }
       } finally {
         setLoading(false);
@@ -412,8 +415,8 @@ export default function AddGameModal({
                     Mẹo tìm kiếm:
                   </p>
                   <p>
-                    Hệ thống sẽ tự động tìm kiếm trực tiếp trên cơ sở dữ liệu quốc
-                    tế RAWG khi bạn gõ. Dùng phím{" "}
+                    Hệ thống sẽ tự động tìm kiếm trực tiếp trên kho dữ liệu
+                    Steam khi bạn gõ. Dùng phím{" "}
                     <kbd className="px-1 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-[10px]">
                       ↑
                     </kbd>{" "}
@@ -704,7 +707,7 @@ export default function AddGameModal({
 
         {/* Footer info bar */}
         <div className="py-2.5 px-4 bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
-          <span>Dữ liệu trò chơi từ RAWG Database</span>
+          <span>Dữ liệu trò chơi từ Steam Database</span>
           <button
             type="button"
             onClick={onClose}

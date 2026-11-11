@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
   const [playtimeHours, setPlaytimeHours] = useState(
@@ -7,6 +7,15 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
   const [rating, setRating] = useState(game?.rating ?? 8.5);
   const [status, setStatus] = useState(game?.status ?? "playing");
   const [notes, setNotes] = useState(game?.notes ?? "");
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !game) return null;
 
@@ -22,12 +31,24 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 shadow-xl" /* taste-skill-ignore: modal dialog overlay */>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quick-edit-title"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 shadow-xl" /* taste-skill-ignore: modal dialog overlay */
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-3">
           <div>
-            <h2 className="text-base font-bold text-zinc-900 dark:text-white">
+            <h2
+              id="quick-edit-title"
+              className="text-base font-bold text-zinc-900 dark:text-white"
+            >
               Cập nhật tiến độ
             </h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -37,13 +58,15 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+            aria-label="Đóng cửa sổ chỉnh sửa"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <svg
               className="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -59,10 +82,14 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           {/* Trạng thái */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label
+              htmlFor="quick-edit-status"
+              className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+            >
               Trạng thái chơi
             </label>
             <select
+              id="quick-edit-status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="w-full py-2 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 cursor-pointer"
@@ -78,13 +105,17 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
           {/* Giờ chơi & Đánh giá */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label
+                htmlFor="quick-edit-hours"
+                className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+              >
                 Thời gian (giờ)
               </label>
               <input
+                id="quick-edit-hours"
                 type="number"
                 min="0"
-                step="1"
+                step="0.5"
                 value={playtimeHours}
                 onChange={(e) => setPlaytimeHours(e.target.value)}
                 /* taste-skill-ignore: real form field input border */
@@ -93,10 +124,14 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                Điểm đánh giá (1-10)
+              <label
+                htmlFor="quick-edit-rating"
+                className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+              >
+                Điểm đánh giá (1–10)
               </label>
               <input
+                id="quick-edit-rating"
                 type="number"
                 min="0"
                 max="10"
@@ -111,10 +146,14 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
 
           {/* Ghi chú cá nhân */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label
+              htmlFor="quick-edit-notes"
+              className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+            >
               Ghi chú cá nhân
             </label>
             <textarea
+              id="quick-edit-notes"
               rows="3"
               placeholder="Cảm nhận, kế hoạch chơi tiếp..."
               value={notes}
@@ -135,7 +174,7 @@ export default function QuickEditModal({ game, isOpen, onClose, onSave }) {
             </button>
             <button
               type="submit"
-              className="py-2 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer transition-colors duration-150"
+              className="py-2 px-4 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white cursor-pointer transition-colors duration-150"
             >
               Lưu thay đổi
             </button>

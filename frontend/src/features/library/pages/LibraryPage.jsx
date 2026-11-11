@@ -8,8 +8,10 @@ import QuickEditModal from "../components/QuickEditModal";
 import AddGameModal from "../components/AddGameModal";
 import GameDetailModal from "../components/GameDetailModal";
 import libraryService from "../libraryService";
+import useFeedback from "../../../hooks/useFeedback";
 
 export default function LibraryPage() {
+  const { toast } = useFeedback();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,9 +52,10 @@ export default function LibraryPage() {
       const updated = await libraryService.addPlaytime(id, 1);
       if (updated) {
         setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+        toast("Đã cộng thêm 1 giờ chơi.", "success");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Không thể cập nhật giờ chơi");
+      toast(err.response?.data?.message || "Không thể cập nhật giờ chơi", "error");
     }
   }
 
@@ -63,7 +66,7 @@ export default function LibraryPage() {
         setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Không thể thay đổi trạng thái");
+      toast(err.response?.data?.message || "Không thể thay đổi trạng thái", "error");
     }
   }
 
@@ -72,9 +75,10 @@ export default function LibraryPage() {
       const updated = await libraryService.updateGame(id, updatedFields);
       if (updated) {
         setGames((prev) => prev.map((g) => (g.id === id ? updated : g)));
+        toast("Đã lưu cập nhật tiến độ.", "success");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Không thể lưu cập nhật");
+      toast(err.response?.data?.message || "Không thể lưu cập nhật", "error");
     }
   }
 
@@ -255,6 +259,7 @@ export default function LibraryPage() {
 
       {/* Quick Edit Modal */}
       <QuickEditModal
+        key={editingGame?.id || "closed"}
         game={editingGame}
         isOpen={!!editingGame}
         onClose={() => setEditingGame(null)}

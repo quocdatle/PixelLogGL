@@ -61,7 +61,7 @@ export default function ItemGridCard({
       {/* Details */}
       <div className="relative z-10 text-center mt-1 mb-3">
         <h3
-          className={`font-bold text-sm leading-snug line-clamp-1 text-zinc-900 dark:text-white group-hover:${theme.text} transition-colors`}
+          className={`font-bold text-sm leading-snug line-clamp-1 text-zinc-900 dark:text-white ${theme.groupHoverText} transition-colors`}
           title={item.name}
         >
           {item.name}

@@ -263,10 +263,126 @@ const getTopGames = async (userId, limit = 5) => {
   ]);
 };
 
+// ---------------------------------------------------------------------------
+// 5. Phân bổ thư viện theo Trạng thái / Nền tảng / Điểm đánh giá
+// ---------------------------------------------------------------------------
+const DISTRIBUTION_GROUPS = ['status', 'platform', 'rating'];
+const STATUS_LABELS = {
+  playing: 'Đang chơi',
+  completed: 'Đã xong',
+  backlog: 'Chờ chơi',
+  wishlist: 'Muốn chơi',
+  dropped: 'Bỏ dở',
+};
+const STATUS_ORDER = ['playing', 'completed', 'backlog', 'wishlist', 'dropped'];
+const MAX_PLATFORMS = 8;
+
+const getDistributionStats = async (userId, groupBy = 'status') => {
+  if (!DISTRIBUTION_GROUPS.includes(groupBy)) {
+    throw new Error(`groupBy phải là một trong: ${DISTRIBUTION_GROUPS.join(', ')}`);
+  }
+
+  const uid = toObjectId(userId);
+
+  if (groupBy === 'status') {
+    const rows = await UserGame.aggregate([
+      { $match: { userId: uid } },
+      addTotalMinutes,
+      {
+        $group: {
+          _id: '$status',
+          games: { $sum: 1 },
+          totalMinutes: { $sum: '$totalMinutes' },
+        },
+      },
+    ]);
+
+    const byKey = new Map(rows.map((r) => [r._id, r]));
+    return {
+      groupBy,
+      items: STATUS_ORDER.map((status) => {
+        const row = byKey.get(status);
+        return {
+          key: status,
+          label: STATUS_LABELS[status] || status,
+          games: row ? row.games : 0,
+          hours: row ? minutesToHours(row.totalMinutes) : 0,
+        };
+      }),
+    };
+  }
+
+  if (groupBy === 'platform') {
+    const rows = await UserGame.aggregate([
+      { $match: { userId: uid } },
+      addTotalMinutes,
+      { $lookup: { from: GAME_COLLECTION, localField: 'gameId', foreignField: '_id', as: 'game' } },
+      { $unwind: '$game' },
+      { $unwind: '$game.platforms' },
+      {
+        $group: {
+          _id: '$game.platforms',
+          games: { $sum: 1 },
+          totalMinutes: { $sum: '$totalMinutes' },
+        },
+      },
+      { $sort: { games: -1, totalMinutes: -1, _id: 1 } },
+      { $limit: MAX_PLATFORMS },
+    ]);
+
+    return {
+      groupBy,
+      items: rows.map((row) => ({
+        key: row._id,
+        label: row._id,
+        games: row.games,
+        hours: minutesToHours(row.totalMinutes),
+      })),
+    };
+  }
+
+  // groupBy === 'rating'
+  const rows = await UserGame.aggregate([
+    { $match: { userId: uid } },
+    addTotalMinutes,
+    {
+      $group: {
+        _id: '$rating',
+        games: { $sum: 1 },
+        totalMinutes: { $sum: '$totalMinutes' },
+      },
+    },
+  ]);
+
+  const ratedRows = rows
+    .filter((r) => typeof r._id === 'number')
+    .sort((a, b) => b._id - a._id)
+    .map((r) => ({
+      key: String(r._id),
+      label: `${r._id} điểm`,
+      games: r.games,
+      hours: minutesToHours(r.totalMinutes),
+    }));
+
+  const unrated = rows.find((r) => r._id === null || r._id === undefined);
+  if (unrated) {
+    ratedRows.push({
+      key: 'unrated',
+      label: 'Chưa chấm',
+      games: unrated.games,
+      hours: minutesToHours(unrated.totalMinutes),
+    });
+  }
+
+  return { groupBy, items: ratedRows };
+};
+
 module.exports = {
   PLAYTIME_RANGES,
+  DISTRIBUTION_GROUPS,
   getOverview,
   getGenreStats,
   getPlaytimeStats,
   getTopGames,
+  getDistributionStats,
 };

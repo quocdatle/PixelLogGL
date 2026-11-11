@@ -63,4 +63,23 @@ const getTopGames = async (req, res, next) => {
   }
 };
 
-module.exports = { getOverview, getGenreStats, getPlaytimeStats, getTopGames };
+// GET /api/analytics/distribution?groupBy=status|platform|rating
+const getDistributionStats = async (req, res, next) => {
+  try {
+    const groupBy = req.query.groupBy || 'status';
+    if (!analyticsService.DISTRIBUTION_GROUPS.includes(groupBy)) {
+      return error(
+        res,
+        `groupBy phải là một trong: ${analyticsService.DISTRIBUTION_GROUPS.join(', ')}`,
+        400,
+        'VALIDATION_ERROR'
+      );
+    }
+    const data = await analyticsService.getDistributionStats(req.userId, groupBy);
+    return success(res, data);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { getOverview, getGenreStats, getPlaytimeStats, getTopGames, getDistributionStats };

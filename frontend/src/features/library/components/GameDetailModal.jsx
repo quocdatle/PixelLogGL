@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import libraryService from "../libraryService";
 import StatusBadge from "./StatusBadge";
+import useFeedback from "../../../hooks/useFeedback";
 
 const STATUS_OPTIONS = [
   { value: "backlog", label: "Chờ chơi" },
@@ -19,6 +20,7 @@ export default function GameDetailModal({
   onUserGameRemoved,
   onAddedToLibrary,
 }) {
+  const { confirm } = useFeedback();
   const [gameDetail, setGameDetail] = useState(null);
   const [userGame, setUserGame] = useState(initialUserGame);
   const [loading, setLoading] = useState(true);
@@ -218,9 +220,14 @@ export default function GameDetailModal({
 
   async function handleRemoveFromLibrary() {
     if (!userGame) return;
-    if (!window.confirm(`Bạn có chắc muốn xóa "${title}" khỏi thư viện?`)) {
-      return;
-    }
+    const accepted = await confirm({
+      title: "Xóa game khỏi thư viện",
+      message: `Bạn có chắc muốn xóa "${title}" khỏi thư viện? Mọi nhật ký phiên chơi của game này cũng sẽ bị xóa.`,
+      confirmLabel: "Xóa khỏi kho",
+      cancelLabel: "Giữ lại",
+      danger: true,
+    });
+    if (!accepted) return;
     setRemoving(true);
     try {
       await libraryService.removeGame(userGame.id);
@@ -426,7 +433,7 @@ export default function GameDetailModal({
 
                 <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-800">
                   <div className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
-                    Thời lượng TB (RAWG)
+                    Thời lượng chơi TB
                   </div>
                   <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white mt-0.5 tabular-nums">
                     {gameDetail?.playtimeAvg ? `${gameDetail.playtimeAvg} giờ` : "Chưa có số liệu"}

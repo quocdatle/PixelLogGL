@@ -13,5 +13,8 @@ export const getGenreStats = (sortBy = 'games') =>
 export const getPlaytimeStats = (range = 'week') =>
   api.get('/analytics/playtime', { params: { range } }).then(unwrap);
 
+export const getDistributionStats = (groupBy = 'status') =>
+  api.get('/analytics/distribution', { params: { groupBy } }).then(unwrap);
+
 export const getTopGames = (limit = 5) =>
   api.get('/analytics/top-games', { params: { limit } }).then(unwrap);

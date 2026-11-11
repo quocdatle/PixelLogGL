@@ -45,7 +45,7 @@ export default function LibraryFilters({
             placeholder="Tìm theo tên game, nhà phát triển..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-zinc-850 transition-colors duration-150" /* taste-skill-ignore: real input border */
+            className="w-full pl-10 pr-4 py-2 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-zinc-800 transition-colors duration-150" /* taste-skill-ignore: real input border */
           />
         </div>
 

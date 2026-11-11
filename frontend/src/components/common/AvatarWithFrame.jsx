@@ -1,11 +1,11 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { getFrameStyle } from '../../utils/avatarFrames';
 
 const SIZE_MAP = {
   nav: {
-    box: 'w-[66px] h-[70px] sm:w-[70px] sm:h-[74px]',
-    initials: 'text-lg',
-    levelText: '20',
+    box: 'w-11 h-[47px] sm:w-12 sm:h-[51px]',
+    initials: 'text-xs sm:text-sm',
+    levelText: '19',
   },
   md: {
     box: 'w-16 h-[68px]',
@@ -32,12 +32,13 @@ export default function AvatarWithFrame({
   previewLevel,
 }) {
   const uid = useId().replace(/:/g, '');
+  const [failedUrl, setFailedUrl] = useState(null);
   const activeFrameId = frameId !== undefined ? frameId : user?.equippedFrame;
   const style = getFrameStyle(activeFrameId);
   const dims = SIZE_MAP[size] || SIZE_MAP.md;
 
   const initials = user?.username ? user.username.slice(0, 2).toUpperCase() : 'PL';
-  const hasAvatar = Boolean(user?.avatarUrl);
+  const hasAvatar = Boolean(user?.avatarUrl) && failedUrl !== user?.avatarUrl;
 
   const displayLevel =
     previewLevel !== undefined ? previewLevel : user?.level || 1;
@@ -89,12 +90,10 @@ export default function AvatarWithFrame({
             src={user.avatarUrl}
             alt={user?.username || 'Avatar'}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+            onError={() => setFailedUrl(user.avatarUrl)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-950 text-zinc-100 flex items-center justify-center font-extrabold tracking-tight">
+          <div className="w-full h-full bg-zinc-900 text-zinc-100 flex items-center justify-center font-extrabold tracking-tight">
             <span className={dims.initials}>{initials}</span>
           </div>
         )}

@@ -1,7 +1,7 @@
 require('../../config/env'); // nạp dotenv để đọc được RAWG_API_KEY
 
 const RAWG_BASE_URL = 'https://api.rawg.io/api';
-const REQUEST_TIMEOUT_MS = 10000;
+const REQUEST_TIMEOUT_MS = 20000;
 
 function createError(message, statusCode, code) {
   const err = new Error(message);
@@ -29,13 +29,37 @@ async function rawgFetch(path, params = {}) {
   try {
     res = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   } catch (err) {
-    throw createError('Không kết nối được tới RAWG API', 502, 'RAWG_UNREACHABLE');
+    const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+    const causeDetail = err.cause?.code || err.cause?.message || '';
+    console.error(
+      `[RAWG_API] ${isTimeout ? 'RAWG phản hồi chậm (timeout)' : 'Lỗi mạng cục bộ'} tại ${path}:`,
+      {
+        name: err.name,
+        message: err.message,
+        ...(causeDetail ? { cause: causeDetail } : {}),
+      }
+    );
+
+    if (isTimeout) {
+      throw createError(
+        'RAWG API phản hồi quá chậm (hết thời gian chờ)',
+        504,
+        'RAWG_TIMEOUT'
+      );
+    }
+
+    throw createError(
+      'Không kết nối được tới RAWG API (lỗi mạng cục bộ)',
+      502,
+      'RAWG_UNREACHABLE'
+    );
   }
 
   if (res.status === 404) {
     throw createError('Không tìm thấy game trên RAWG', 404, 'GAME_NOT_FOUND');
   }
   if (!res.ok) {
+    console.error(`[RAWG_API] RAWG trả mã lỗi HTTP ${res.status} tại ${path}`);
     throw createError(`RAWG API trả lỗi (${res.status})`, 502, 'RAWG_ERROR');
   }
   return res.json();

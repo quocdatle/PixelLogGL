@@ -91,7 +91,7 @@ export default function RegisterPage() {
           id="reg-email"
           name="email"
           type="email"
-          placeholder="gamer@example.com"
+          placeholder="tenban@gmail.com"
           value={form.email}
           onChange={handleChange}
           required
