@@ -40,6 +40,7 @@ export default function CaseAnimation({
   targetIndex = 36,
   wonItem,
   isNew = false,
+  remainingKeys = 0,
   onFinish,
   onReset,
 }) {
@@ -285,10 +286,15 @@ export default function CaseAnimation({
               <button
                 type="button"
                 onClick={onReset}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white transition cursor-pointer shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2"
+                disabled={remainingKeys < 1}
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:bg-zinc-800 disabled:text-zinc-400 disabled:cursor-not-allowed text-white transition cursor-pointer shadow-lg shadow-emerald-900/30 disabled:shadow-none flex items-center justify-center gap-2"
               >
-                <span>Mở tiếp hòm này</span>
-                <span>📦</span>
+                <span>
+                  {remainingKeys >= 1
+                    ? `Mở tiếp (còn ${remainingKeys} ${caseInfo?.keyIcon || '🔑'})`
+                    : `Hết ${caseInfo?.keyName || 'chìa khóa'}`}
+                </span>
+                <span>{remainingKeys >= 1 ? '📦' : '🔒'}</span>
               </button>
 
               <button

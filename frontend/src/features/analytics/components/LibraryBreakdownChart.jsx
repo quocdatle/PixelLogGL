@@ -3,8 +3,6 @@ import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis
 const STATUS_COLORS = {
   playing: '#0ea5e9',
   completed: '#10b981',
-  backlog: '#f59e0b',
-  wishlist: '#8b5cf6',
   dropped: '#a1a1aa',
 };
 
@@ -42,7 +40,9 @@ export default function LibraryBreakdownChart({ data = [], groupBy = 'status' })
   if (!hasAnyGames) {
     return (
       <p className="py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
-        Chưa có dữ liệu trong thư viện để thống kê.
+        {groupBy === 'status'
+          ? 'Chưa có game nào ở trạng thái Đang chơi, Đã xong hoặc Bỏ dở.'
+          : 'Chưa có dữ liệu trong thư viện để thống kê.'}
       </p>
     );
   }

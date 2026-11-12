@@ -21,6 +21,17 @@ async function claimDailyReward(req, res, next) {
   }
 }
 
+// POST /api/economy/buy-key
+async function buyKey(req, res, next) {
+  try {
+    const { caseId, quantity } = req.body;
+    const data = await economyService.buyKey(req.userId, { caseId, quantity });
+    return success(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}
+
 // GET /api/economy/cases
 async function getCases(req, res, next) {
   try {
@@ -96,6 +107,7 @@ async function getRecentDrops(req, res, next) {
 module.exports = {
   getWallet,
   claimDailyReward,
+  buyKey,
   getCases,
   openCase,
   getInventory,

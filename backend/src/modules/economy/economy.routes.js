@@ -14,6 +14,7 @@ router.get('/recent-drops', economyController.getRecentDrops);
 // Các endpoint yêu cầu xác thực người dùng
 router.get('/wallet', requireAuth, economyController.getWallet);
 router.post('/daily-reward', requireAuth, economyController.claimDailyReward);
+router.post('/buy-key', requireAuth, validateBody(['caseId']), economyController.buyKey);
 router.post('/open', requireAuth, validateBody(['caseId']), economyController.openCase);
 router.get('/inventory', requireAuth, economyController.getInventory);
 router.post('/sell', requireAuth, validateBody(['inventoryId']), economyController.sellItem);

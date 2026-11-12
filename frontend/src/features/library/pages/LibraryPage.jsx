@@ -11,7 +11,7 @@ import libraryService from "../libraryService";
 import useFeedback from "../../../hooks/useFeedback";
 
 export default function LibraryPage() {
-  const { toast } = useFeedback();
+  const { toast, confirm } = useFeedback();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,6 +85,29 @@ export default function LibraryPage() {
   function handleGameAdded(newGame) {
     if (newGame) {
       setGames((prev) => [newGame, ...prev]);
+    }
+  }
+
+  async function handleRemoveGame(game) {
+    if (!game?.id) return;
+    const accepted = await confirm({
+      title: "Xóa game khỏi thư viện",
+      message: `Bạn có chắc muốn xóa "${game.title}" khỏi thư viện?`,
+      confirmLabel: "Xóa game",
+      cancelLabel: "Hủy",
+      danger: true,
+    });
+    if (!accepted) return;
+
+    try {
+      await libraryService.removeGame(game.id);
+      setGames((prev) => prev.filter((g) => g.id !== game.id));
+      toast(`Đã xóa "${game.title}" khỏi thư viện.`, "success");
+    } catch (err) {
+      toast(
+        err.response?.data?.message || "Không thể xóa game khỏi thư viện",
+        "error"
+      );
     }
   }
 
@@ -231,6 +254,7 @@ export default function LibraryPage() {
                   onViewDetail={setDetailGame}
                   onQuickAddPlaytime={handleQuickAddPlaytime}
                   onStatusChange={handleStatusChange}
+                  onRemove={handleRemoveGame}
                 />
               ))}
             </div>
@@ -245,6 +269,7 @@ export default function LibraryPage() {
                   onViewDetail={setDetailGame}
                   onQuickAddPlaytime={handleQuickAddPlaytime}
                   onStatusChange={handleStatusChange}
+                  onRemove={handleRemoveGame}
                 />
               ))}
             </div>

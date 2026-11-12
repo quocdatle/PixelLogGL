@@ -28,9 +28,20 @@ export const getCases = async () => {
 };
 
 /**
- * Gửi lệnh mở hòm tới server (kết quả và RNG tính 100% tại backend)
+ * Mua chìa khóa tương ứng cho từng loại rương bằng Xu ảo
  * @param {string} caseId Mã định danh loại rương ('standard', 'cyber', 'mythic')
- * @returns {Promise<{wonItem: Object, isNew: boolean, remainingBalance: number, reelItems: Array, targetIndex: number, cost: number}>}
+ * @param {number} quantity Số lượng chìa khóa muốn mua (1..50)
+ * @returns {Promise<{balance: number, totalSpent: number, keys: Object, purchasedCaseId: string, keyName: string, quantity: number, totalCost: number, message: string}>}
+ */
+export const buyKey = async (caseId, quantity = 1) => {
+  const res = await api.post('/economy/buy-key', { caseId, quantity });
+  return res.data?.data;
+};
+
+/**
+ * Gửi lệnh mở hòm tới server (tiêu thụ 1 chìa khóa tương ứng; RNG tính 100% tại backend)
+ * @param {string} caseId Mã định danh loại rương ('standard', 'cyber', 'mythic')
+ * @returns {Promise<{wonItem: Object, isNew: boolean, remainingBalance: number, remainingKeys: Object, reelItems: Array, targetIndex: number, cost: number}>}
  */
 export const openCase = async (caseId) => {
   const res = await api.post('/economy/open', { caseId });
@@ -81,6 +92,7 @@ export const getRecentDrops = async (limit = 10) => {
 export default {
   getWallet,
   claimDailyReward,
+  buyKey,
   getCases,
   openCase,
   getInventory,

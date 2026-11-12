@@ -29,6 +29,23 @@ const walletSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    keys: {
+      standard: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      cyber: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      mythic: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
     lastDailyReward: {
       type: Date,
       default: null,

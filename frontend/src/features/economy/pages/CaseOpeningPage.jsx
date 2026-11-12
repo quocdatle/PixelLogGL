@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AppNavbar from '../../../components/layout/AppNavbar';
 import CaseAnimation from '../components/CaseAnimation';
+import CasePoolModal from '../components/CasePoolModal';
 import economyService from '../economyService';
 import useAuth from '../../../hooks/useAuth';
 
@@ -13,7 +14,9 @@ export default function CaseOpeningPage() {
   const [loading, setLoading] = useState(true);
   const [openingState, setOpeningState] = useState(null); // { caseInfo, wonItem, isNew, reelItems, targetIndex }
   const [isOpening, setIsOpening] = useState(false);
+  const [buyingKeyCaseId, setBuyingKeyCaseId] = useState(null);
   const [selectedCaseId, setSelectedCaseId] = useState('standard');
+  const [inspectingCase, setInspectingCase] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
 
   useEffect(() => {
@@ -53,6 +56,7 @@ export default function CaseOpeningPage() {
       setWallet((prev) => ({
         ...prev,
         balance: data.balance,
+        keys: data.keys ?? prev?.keys,
         canClaimDaily: false,
         nextDailyAt: data.nextDailyAt,
       }));
@@ -68,33 +72,77 @@ export default function CaseOpeningPage() {
     }
   };
 
-  // Mở hòm
+  // Mua chìa khóa mở rương bằng Xu
+  const handleBuyKey = async (caseIdToBuy, quantity = 1) => {
+    const targetCaseId = caseIdToBuy || selectedCaseId;
+    const targetCase = cases.find((c) => c.id === targetCaseId);
+
+    if (!targetCase || buyingKeyCaseId) return;
+
+    const totalCost = targetCase.cost * quantity;
+    if (wallet && wallet.balance < totalCost) {
+      setActionMessage({
+        type: 'error',
+        text: `Bạn không đủ Xu để mua ${quantity} ${targetCase.keyName || 'chìa khóa'}. Cần ${totalCost} Xu nhưng chỉ có ${wallet.balance} Xu.`,
+      });
+      setTimeout(() => setActionMessage(null), 4000);
+      return;
+    }
+
+    setBuyingKeyCaseId(targetCaseId);
+    setActionMessage(null);
+
+    try {
+      const result = await economyService.buyKey(targetCaseId, quantity);
+      setWallet((prev) => ({
+        ...prev,
+        balance: result.balance,
+        totalSpent: result.totalSpent ?? ((prev?.totalSpent || 0) + totalCost),
+        keys: result.keys,
+      }));
+      setActionMessage({ type: 'success', text: result.message });
+      setTimeout(() => setActionMessage(null), 4000);
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Không thể mua chìa khóa. Vui lòng thử lại!';
+      setActionMessage({ type: 'error', text: msg });
+      setTimeout(() => setActionMessage(null), 4000);
+    } finally {
+      setBuyingKeyCaseId(null);
+    }
+  };
+
+  // Mở hòm (tiêu thụ 1 chìa khóa tương ứng)
   const handleOpenCase = async (caseIdToOpen) => {
     const targetCaseId = caseIdToOpen || selectedCaseId;
     const targetCase = cases.find((c) => c.id === targetCaseId);
 
     if (!targetCase) return;
 
-    if (wallet && wallet.balance < targetCase.cost) {
+    const currentKeyCount = wallet?.keys?.[targetCaseId] ?? 0;
+    if (wallet && currentKeyCount < 1) {
       setActionMessage({
         type: 'error',
-        text: `Bạn không đủ Xu để mở ${targetCase.name}. Cần ${targetCase.cost} Xu nhưng chỉ có ${wallet.balance} Xu.`,
+        text: `Bạn chưa có ${targetCase.keyName || 'chìa khóa'} để mở ${targetCase.name}. Hãy mua chìa khóa bằng Xu trước!`,
       });
       setTimeout(() => setActionMessage(null), 4000);
       return;
     }
 
+    setSelectedCaseId(targetCaseId);
     setIsOpening(true);
     setActionMessage(null);
 
     try {
       const result = await economyService.openCase(targetCaseId);
 
-      // Cập nhật số dư ví sau khi trừ tiền
+      // Cập nhật số dư chìa khóa sau khi mở rương
       setWallet((prev) => ({
         ...prev,
-        balance: result.remainingBalance,
-        totalSpent: (prev?.totalSpent || 0) + targetCase.cost,
+        balance: result.remainingBalance ?? prev?.balance,
+        keys: result.remainingKeys ?? {
+          ...(prev?.keys || {}),
+          [targetCaseId]: Math.max(0, (prev?.keys?.[targetCaseId] ?? 1) - 1),
+        },
       }));
 
       // Chuyển sang màn hình animation roulette
@@ -145,7 +193,7 @@ export default function CaseOpeningPage() {
                 <span>🎁</span> Rương Báu PixelLog
               </h1>
               <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl">
-                Dùng Xu ảo để thử vận may mở các bảo vật, vũ khí và danh hiệu huyền thoại từ thế giới game.
+                Dùng Xu ảo để mua chìa khóa tương ứng và mở các bảo vật, vũ khí, danh hiệu huyền thoại từ thế giới game.
               </p>
             </div>
 
@@ -160,7 +208,7 @@ export default function CaseOpeningPage() {
                   <div className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">
                     Số dư PixelCoins
                   </div>
-                  <div className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 leading-tight">
+                  <div className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 leading-tight tabular-nums">
                     {wallet ? `${wallet.balance.toLocaleString()} Xu` : '...'}
                   </div>
                 </div>
@@ -222,6 +270,7 @@ export default function CaseOpeningPage() {
                 targetIndex={openingState.targetIndex}
                 wonItem={openingState.wonItem}
                 isNew={openingState.isNew}
+                remainingKeys={wallet?.keys?.[openingState.caseInfo?.id] ?? 0}
                 onReset={handleResetOpening}
               />
             </div>
@@ -229,7 +278,7 @@ export default function CaseOpeningPage() {
 
           {/* CASE SELECTION CARDS */}
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
                 <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white">
                   Chọn rương muốn mở
@@ -237,6 +286,35 @@ export default function CaseOpeningPage() {
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Mỗi rương mang chủ đề và tỷ lệ rơi vật phẩm cao cấp riêng biệt.
                 </p>
+              </div>
+
+              {/* Keys Pouch Pill */}
+              <div
+                className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs self-start sm:self-auto"
+                title="Số lượng chìa khóa mở rương bạn đang sở hữu"
+              >
+                <div className="text-[11px] text-zinc-400 font-semibold uppercase tracking-wider">
+                  Chìa khóa
+                </div>
+                <div className="flex items-center gap-2">
+                  {(cases.length > 0
+                    ? cases
+                    : [
+                        { id: 'standard', name: 'Rương Tân Thủ', keyIcon: '🗝️' },
+                        { id: 'cyber', name: 'Rương Cyberpunk', keyIcon: '🔑' },
+                        { id: 'mythic', name: 'Rương Thần Thoại', keyIcon: '🔱' },
+                      ]
+                  ).map((c) => (
+                    <span
+                      key={c.id}
+                      title={`${c.keyName || c.name}: ${wallet?.keys?.[c.id] ?? 0}`}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-extrabold text-zinc-800 dark:text-zinc-200 tabular-nums"
+                    >
+                      <span>{c.keyIcon || '🔑'}</span>
+                      <span>{wallet ? (wallet.keys?.[c.id] ?? 0) : '-'}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -253,7 +331,11 @@ export default function CaseOpeningPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {cases.map((c) => {
                   const isSelected = selectedCase?.id === c.id;
-                  const canAfford = wallet ? wallet.balance >= c.cost : false;
+                  const keyCount = wallet?.keys?.[c.id] ?? 0;
+                  const hasKey = keyCount >= 1;
+                  const canBuy1 = wallet ? wallet.balance >= c.cost : false;
+                  const canBuy5 = wallet ? wallet.balance >= c.cost * 5 : false;
+                  const isBuyingThisKey = buyingKeyCaseId === c.id;
 
                   return (
                     <div
@@ -266,14 +348,20 @@ export default function CaseOpeningPage() {
                       }`}
                     >
                       {/* Top Case Badge */}
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center justify-between gap-2 mb-4">
                         <span className="text-xs uppercase font-extrabold tracking-wider px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                           {c.englishName}
                         </span>
 
-                        <div className="flex items-center gap-1 text-sm font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800">
-                          <span>🪙</span>
-                          <span>{c.cost} Xu</span>
+                        <div
+                          className={`flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full border tabular-nums ${
+                            hasKey
+                              ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800'
+                              : 'text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700'
+                          }`}
+                        >
+                          <span>{c.keyIcon || '🔑'}</span>
+                          <span>Có: {keyCount}</span>
                         </div>
                       </div>
 
@@ -327,34 +415,94 @@ export default function CaseOpeningPage() {
                         </div>
                       </div>
 
-                      {/* Action Open Button */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenCase(c.id);
-                        }}
-                        disabled={isOpening || !canAfford}
-                        className={`w-full py-3 px-4 rounded-2xl font-bold text-sm transition-all duration-150 cursor-pointer shadow-md flex items-center justify-center gap-2 ${
-                          !canAfford
-                            ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed shadow-none'
-                            : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-emerald-900/20 hover:scale-[1.02]'
-                        }`}
-                      >
-                        {isOpening && selectedCaseId === c.id ? (
-                          <>
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>Đang chuẩn bị...</span>
-                          </>
-                        ) : !canAfford ? (
-                          <span>Không đủ Xu ({c.cost} Xu)</span>
-                        ) : (
-                          <>
-                            <span>Mở ngay ({c.cost} Xu)</span>
-                            <span>🎲</span>
-                          </>
-                        )}
-                      </button>
+                      {/* Action Buttons */}
+                      <div className="space-y-2.5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setInspectingCase(c);
+                          }}
+                          className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          <span>Xem vật phẩm &amp; tỷ lệ ({c.itemCount ?? c.pool?.length ?? 0})</span>
+                        </button>
+
+                        {/* Buy Key Box */}
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 space-y-2"
+                        >
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-1 truncate">
+                              <span>{c.keyIcon || '🔑'}</span>
+                              <span className="truncate">{c.keyName || 'Chìa khóa'}</span>
+                            </span>
+                            <span className="font-extrabold text-amber-600 dark:text-amber-400 shrink-0 tabular-nums">
+                              {c.cost} Xu/chìa
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBuyKey(c.id, 1);
+                              }}
+                              disabled={!canBuy1 || isBuyingThisKey}
+                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-bold bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 transition-colors cursor-pointer disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:cursor-not-allowed tabular-nums"
+                            >
+                              {isBuyingThisKey ? 'Đang mua...' : `+1 Chìa (${c.cost})`}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBuyKey(c.id, 5);
+                              }}
+                              disabled={!canBuy5 || isBuyingThisKey}
+                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-bold bg-amber-600/15 hover:bg-amber-600/25 dark:bg-amber-500/20 dark:hover:bg-amber-500/30 text-amber-800 dark:text-amber-300 border border-amber-400/50 dark:border-amber-700 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed tabular-nums"
+                            >
+                              +5 Chìa ({(c.cost * 5).toLocaleString()})
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenCase(c.id);
+                          }}
+                          disabled={isOpening || !hasKey}
+                          className={`w-full py-3 px-4 rounded-2xl font-bold text-sm transition-all duration-150 cursor-pointer shadow-md flex items-center justify-center gap-2 ${
+                            !hasKey
+                              ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed shadow-none'
+                              : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-emerald-900/20 hover:scale-[1.02]'
+                          }`}
+                        >
+                          {isOpening && selectedCaseId === c.id ? (
+                            <>
+                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              <span>Đang chuẩn bị...</span>
+                            </>
+                          ) : !hasKey ? (
+                            <>
+                              <span>🔒</span>
+                              <span>Cần 1 {c.keyName || 'Chìa khóa'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Mở ngay (-1 {c.keyIcon || '🔑'})</span>
+                              <span>🎲</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -402,6 +550,23 @@ export default function CaseOpeningPage() {
       <footer className="py-8 px-6 text-center text-xs text-zinc-500 dark:text-zinc-500 border-t border-zinc-200 dark:border-zinc-900">
         PixelLog GL Minigame Engine © 2026. Tỷ lệ mở hòm được quản lý độc quyền tại Backend.
       </footer>
+
+      {/* Case Pool & Drop Rate Modal */}
+      {inspectingCase && (
+        <CasePoolModal
+          key={inspectingCase.id}
+          caseInfo={inspectingCase}
+          isOpen={!!inspectingCase}
+          onClose={() => setInspectingCase(null)}
+          onOpenCase={handleOpenCase}
+          onBuyKey={handleBuyKey}
+          keyCount={wallet?.keys?.[inspectingCase.id] ?? 0}
+          canOpen={wallet ? (wallet.keys?.[inspectingCase.id] ?? 0) >= 1 : false}
+          canBuyKey={wallet ? wallet.balance >= inspectingCase.cost : false}
+          isBuyingKey={buyingKeyCaseId === inspectingCase.id}
+          isOpening={isOpening}
+        />
+      )}
     </div>
   );
 }

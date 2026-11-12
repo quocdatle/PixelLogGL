@@ -18,6 +18,8 @@ const CASE_CONFIGS = {
     englishName: 'Standard Case',
     description: 'Rương nhập môn dành cho mọi game thủ. Chi phí vừa phải, cơ hội mở được nhiều bảo bối kinh điển.',
     cost: 100,
+    keyName: 'Chìa Khóa Tân Thủ',
+    keyIcon: '🗝️',
     icon: '📦',
     themeColor: 'emerald',
     chances: {
@@ -41,6 +43,8 @@ const CASE_CONFIGS = {
     englishName: 'Cyber Vault',
     description: 'Kho báu công nghệ tương lai từ Night City. Tỷ lệ rơi vật phẩm Hiếm và Sử Thi cực hấp dẫn!',
     cost: 250,
+    keyName: 'Chìa Khóa Cyberpunk',
+    keyIcon: '🔑',
     icon: '⚡',
     themeColor: 'sky',
     chances: {
@@ -64,6 +68,8 @@ const CASE_CONFIGS = {
     englishName: 'Mythic Relic',
     description: 'Hòm cổ ngữ ngưng tụ ma lực tối thượng. Đảm bảo từ Hiếm trở lên, tỷ lệ mở ra Thần Thoại cao nhất!',
     cost: 500,
+    keyName: 'Chìa Khóa Thần Thoại',
+    keyIcon: '🔱',
     icon: '👑',
     themeColor: 'amber',
     chances: {
@@ -98,6 +104,15 @@ async function ensureItemsSeeded() {
   }
 }
 
+// Chuẩn hóa số lượng chìa khóa từ Wallet document (an toàn với bản ghi cũ chưa có keys)
+function normalizeWalletKeys(wallet) {
+  return {
+    standard: Math.max(0, Number(wallet?.keys?.standard) || 0),
+    cyber: Math.max(0, Number(wallet?.keys?.cyber) || 0),
+    mythic: Math.max(0, Number(wallet?.keys?.mythic) || 0),
+  };
+}
+
 // Lấy hoặc khởi tạo ví của người dùng
 async function getWallet(userId) {
   const [existingWallet, user] = await Promise.all([
@@ -127,6 +142,7 @@ async function getWallet(userId) {
     balance: wallet.balance,
     totalEarned: wallet.totalEarned,
     totalSpent: wallet.totalSpent,
+    keys: normalizeWalletKeys(wallet),
     canClaimDaily: checkInState.canCheckIn,
     nextDailyAt: checkInState.nextCheckInAt,
     dailyRewardAmount: DAILY_REWARD_AMOUNT,
@@ -187,6 +203,7 @@ async function claimDailyReward(userId) {
 
   return {
     balance: wallet.balance,
+    keys: normalizeWalletKeys(wallet),
     claimedAmount: DAILY_REWARD_AMOUNT,
     nextDailyAt,
     user: toPublicUser(user),
@@ -195,16 +212,114 @@ async function claimDailyReward(userId) {
   };
 }
 
-// Lấy danh sách rương và thông số tỷ lệ
+// Mua chìa khóa mở rương bằng Xu ảo
+async function buyKey(userId, { caseId = 'standard', quantity = 1 }) {
+  const caseConfig = CASE_CONFIGS[caseId];
+  if (!caseConfig) {
+    throw httpError(
+      `Loại chìa khóa không hợp lệ. Phải là một trong: ${Object.keys(CASE_CONFIGS).join(', ')}`,
+      400,
+      'INVALID_CASE'
+    );
+  }
+
+  const parsedQty = Number(quantity);
+  if (!Number.isInteger(parsedQty) || parsedQty < 1 || parsedQty > 50) {
+    throw httpError('Số lượng chìa khóa phải là số nguyên từ 1 đến 50.', 400, 'INVALID_QUANTITY');
+  }
+
+  let wallet = await Wallet.findOne({ userId });
+  if (!wallet) {
+    wallet = await Wallet.create({ userId });
+  }
+
+  const totalCost = caseConfig.cost * parsedQty;
+  if (wallet.balance < totalCost) {
+    throw httpError(
+      `Số dư không đủ. Cần ${totalCost} Xu để mua ${parsedQty} ${caseConfig.keyName}, nhưng bạn chỉ có ${wallet.balance} Xu.`,
+      400,
+      'INSUFFICIENT_FUNDS'
+    );
+  }
+
+  const updatedWallet = await Wallet.findOneAndUpdate(
+    { _id: wallet._id, balance: { $gte: totalCost } },
+    {
+      $inc: {
+        balance: -totalCost,
+        totalSpent: totalCost,
+        [`keys.${caseId}`]: parsedQty,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedWallet) {
+    throw httpError(
+      `Số dư không đủ để mua ${parsedQty} ${caseConfig.keyName}.`,
+      400,
+      'INSUFFICIENT_FUNDS'
+    );
+  }
+
+  return {
+    balance: updatedWallet.balance,
+    totalSpent: updatedWallet.totalSpent,
+    keys: normalizeWalletKeys(updatedWallet),
+    purchasedCaseId: caseId,
+    keyName: caseConfig.keyName,
+    quantity: parsedQty,
+    totalCost,
+    message: `Đã mua thành công ${parsedQty} ${caseConfig.keyName} (-${totalCost} Xu)!`,
+  };
+}
+
+const RARITY_ORDER = {
+  legendary: 5,
+  epic: 4,
+  rare: 3,
+  uncommon: 2,
+  common: 1,
+};
+
+// Lấy danh sách rương, toàn bộ vật phẩm có thể mở được và tỷ lệ chính xác từng món
 async function getCases() {
   await ensureItemsSeeded();
-  const allItems = await Item.find().sort({ coinValue: 1 }).lean();
+  const allItems = await Item.find().sort({ coinValue: -1 }).lean();
 
-  return Object.values(CASE_CONFIGS).map((c) => ({
-    ...c,
-    itemCount: allItems.length,
-    poolPreview: allItems.slice(0, 8),
-  }));
+  const rarityWeightSums = {};
+  allItems.forEach((item) => {
+    const r = item.rarity || 'common';
+    rarityWeightSums[r] = (rarityWeightSums[r] || 0) + (item.dropRate || 100);
+  });
+
+  return Object.values(CASE_CONFIGS).map((c) => {
+    const pool = allItems
+      .filter((item) => (c.chances?.[item.rarity] || 0) > 0)
+      .map((item) => {
+        const tierProb = c.chances[item.rarity] || 0;
+        const weightSum = rarityWeightSums[item.rarity] || 1;
+        const exactChancePct = Number(
+          (tierProb * ((item.dropRate || 100) / weightSum) * 100).toFixed(3)
+        );
+        return {
+          ...item,
+          exactChancePct,
+        };
+      })
+      .sort((a, b) => {
+        const rankDiff = (RARITY_ORDER[b.rarity] || 0) - (RARITY_ORDER[a.rarity] || 0);
+        if (rankDiff !== 0) return rankDiff;
+        return (b.coinValue || 0) - (a.coinValue || 0);
+      });
+
+    return {
+      ...c,
+      itemCount: pool.length,
+      poolPreview: pool.slice(0, 8),
+      pool,
+    };
+  });
 }
 
 // Thuật toán chọn độ hiếm theo trọng số xác suất
@@ -237,11 +352,12 @@ async function openCase(userId, { caseId = 'standard' }) {
     wallet = await Wallet.create({ userId });
   }
 
-  if (wallet.balance < caseConfig.cost) {
+  const keys = normalizeWalletKeys(wallet);
+  if (keys[caseId] < 1) {
     throw httpError(
-      `Số dư không đủ. Bạn cần ${caseConfig.cost} Xu nhưng hiện chỉ có ${wallet.balance} Xu.`,
+      `Bạn chưa có ${caseConfig.keyName} để mở ${caseConfig.name}. Vui lòng mua chìa khóa bằng Xu (${caseConfig.cost} Xu/chìa).`,
       400,
-      'INSUFFICIENT_FUNDS'
+      'INSUFFICIENT_KEYS'
     );
   }
 
@@ -267,10 +383,20 @@ async function openCase(userId, { caseId = 'standard' }) {
     }
   }
 
-  // 4. Trừ xu trong ví
-  wallet.balance -= caseConfig.cost;
-  wallet.totalSpent += caseConfig.cost;
-  await wallet.save();
+  // 4. Tiêu thụ 1 chìa khóa tương ứng với rương
+  const updatedWallet = await Wallet.findOneAndUpdate(
+    { _id: wallet._id, [`keys.${caseId}`]: { $gte: 1 } },
+    { $inc: { [`keys.${caseId}`]: -1 } },
+    { new: true }
+  );
+
+  if (!updatedWallet) {
+    throw httpError(
+      `Bạn chưa có ${caseConfig.keyName} để mở ${caseConfig.name}. Vui lòng mua chìa khóa bằng Xu (${caseConfig.cost} Xu/chìa).`,
+      400,
+      'INSUFFICIENT_KEYS'
+    );
+  }
 
   // 5. Cập nhật túi đồ người chơi (Inventory)
   const existingInventory = await Inventory.findOne({ userId, itemId: wonItem._id });
@@ -316,7 +442,8 @@ async function openCase(userId, { caseId = 'standard' }) {
     isNew,
     caseId,
     cost: caseConfig.cost,
-    remainingBalance: wallet.balance,
+    remainingBalance: updatedWallet.balance,
+    remainingKeys: normalizeWalletKeys(updatedWallet),
     reelItems,
     targetIndex: TARGET_INDEX,
   };
@@ -538,6 +665,7 @@ module.exports = {
   CASE_CONFIGS,
   getWallet,
   claimDailyReward,
+  buyKey,
   getCases,
   openCase,
   getInventory,

@@ -270,11 +270,9 @@ const DISTRIBUTION_GROUPS = ['status', 'platform', 'rating'];
 const STATUS_LABELS = {
   playing: 'Đang chơi',
   completed: 'Đã xong',
-  backlog: 'Chờ chơi',
-  wishlist: 'Muốn chơi',
   dropped: 'Bỏ dở',
 };
-const STATUS_ORDER = ['playing', 'completed', 'backlog', 'wishlist', 'dropped'];
+const PLAYED_STATUS_ORDER = ['playing', 'completed', 'dropped'];
 const MAX_PLATFORMS = 8;
 
 const getDistributionStats = async (userId, groupBy = 'status') => {
@@ -286,7 +284,7 @@ const getDistributionStats = async (userId, groupBy = 'status') => {
 
   if (groupBy === 'status') {
     const rows = await UserGame.aggregate([
-      { $match: { userId: uid } },
+      { $match: { userId: uid, status: { $in: PLAYED_STATUS_ORDER } } },
       addTotalMinutes,
       {
         $group: {
@@ -300,7 +298,7 @@ const getDistributionStats = async (userId, groupBy = 'status') => {
     const byKey = new Map(rows.map((r) => [r._id, r]));
     return {
       groupBy,
-      items: STATUS_ORDER.map((status) => {
+      items: PLAYED_STATUS_ORDER.map((status) => {
         const row = byKey.get(status);
         return {
           key: status,

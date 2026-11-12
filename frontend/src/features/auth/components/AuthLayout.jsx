@@ -48,8 +48,8 @@ export default function AuthLayout({ activeTab, onTabChange, children }) {
                 </div>
 
                 <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-md leading-relaxed mb-6">
-                  Quản lý thư viện game tập trung, nhận gợi ý trò chơi chuẩn gu từ
-                  AI và mở hòm thu thập chiến lợi phẩm độc quyền.
+                  Quản lý thư viện game tập trung, nhận gợi ý trò chơi chuẩn gu
+                  từ AI và mở hòm thu thập chiến lợi phẩm độc quyền.
                 </p>
 
                 {/* Danh muc Game Cards Showcase */}
@@ -164,7 +164,7 @@ export default function AuthLayout({ activeTab, onTabChange, children }) {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckIcon />
-                  Trợ lý AI Claude
+                  Trợ lý AI
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckIcon />
