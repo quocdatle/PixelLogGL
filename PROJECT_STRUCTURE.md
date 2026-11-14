@@ -50,11 +50,11 @@ PixelLogGL/
 │   │   │   │   ├── inventory.model.js
 │   │   │   │   ├── item.model.js
 │   │   │   │   └── wallet.model.js
-│   │   │   ├── games/                  # Module Tra cứu game & tích hợp RAWG
+│   │   │   ├── games/                  # Module Tra cứu game & tích hợp IGDB
 │   │   │   │   ├── game.controller.js
 │   │   │   │   ├── game.model.js
 │   │   │   │   ├── game.routes.js
-│   │   │   │   └── rawgApi.service.js
+│   │   │   │   └── igdbApi.service.js
 │   │   │   ├── library/                # Module Thư viện game cá nhân
 │   │   │   │   ├── library.controller.js
 │   │   │   │   ├── library.routes.js
@@ -180,7 +180,7 @@ Toàn bộ backend tuân theo mô hình **Module hóa theo tính năng (Feature-
   - `user.model.js`: Schema chứa thông tin tài khoản (`username`, `email`, `passwordHash`, `avatarUrl`, `timestamps`).
   - `user.routes.js`: Định tuyến lấy thông tin (`GET /me`), cập nhật ảnh đại diện (`PATCH /me`), đổi mật khẩu (`PATCH /me/password`).
   - `user.service.js`: Thao tác dữ liệu người dùng trên MongoDB.
-- **`modules/games`**: Chịu trách nhiệm quản lý thông tin game và kết nối tới dịch vụ RAWG API để tìm kiếm game quốc tế.
+- **`modules/games`**: Chịu trách nhiệm quản lý thông tin game và kết nối tới dịch vụ IGDB API (qua Twitch OAuth) để tìm kiếm và tra cứu game quốc tế.
 - **`modules/library`**: Lưu trữ danh sách game của từng người dùng (`userGame.model.js`), trạng thái hoàn thành (Backlog, Playing, Completed, Dropped), đánh giá điểm và số giờ chơi.
 - **`modules/advisor`**: Tích hợp với Google Gemini API (`geminiApi.service.js`) để đóng vai trò AI Chatbot phân tích sở thích và gợi ý game phù hợp cho người chơi.
 - **`modules/analytics`**: Tính toán và tổng hợp dữ liệu thống kê từ thư viện game: phân bổ thể loại, tổng số giờ chơi theo tuần/tháng.
@@ -234,5 +234,5 @@ Frontend được xây dựng bằng React 19 và Vite, tổ chức tương ứn
    - Frontend: Khai báo route mới bằng **duy nhất 1 dòng** trong `frontend/src/router.jsx`.
    - **Tuyệt đối không sửa mã nguồn trong module của thành viên khác** để phòng ngừa xung đột merge trên Git.
 2. **Quy tắc an toàn dữ liệu:**
-   - Không gọi API Gemini hoặc RAWG trực tiếp từ Frontend để bảo mật API key.
+   - Không gọi API Gemini hoặc IGDB trực tiếp từ Frontend để bảo mật API key.
    - Các thuật toán tính xác suất, mở hòm, cộng trừ xu phải chạy 100% tại Backend.

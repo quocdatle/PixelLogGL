@@ -21,8 +21,9 @@ async function summary(req, res, next) {
 
 async function add(req, res, next) {
   try {
-    const { rawgId, status } = req.body;
-    const entry = await libraryService.add(req.userId, { rawgId, status });
+    const { igdbId, rawgId, gameId, status } = req.body;
+    const targetId = igdbId || rawgId || gameId;
+    const entry = await libraryService.add(req.userId, { igdbId: targetId, status });
     return success(res, entry, 201);
   } catch (err) {
     next(err);

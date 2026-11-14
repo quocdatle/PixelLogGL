@@ -18,11 +18,15 @@ module.exports = {
   mongoUri: required('MONGO_URI'),
   jwtSecret: required('JWT_SECRET'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  rawgApiKey: process.env.RAWG_API_KEY,
+
+  // IGDB API (via Twitch Developer)
   twitch: {
     clientId: process.env.TWITCH_CLIENT_ID || '',
     clientSecret: process.env.TWITCH_CLIENT_SECRET || '',
   },
+  twitchClientId: process.env.TWITCH_CLIENT_ID || '',
+  twitchClientSecret: process.env.TWITCH_CLIENT_SECRET || '',
+
   geminiApiKey: process.env.GEMINI_API_KEY,
   geminiModel: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
 
@@ -44,7 +48,7 @@ module.exports = {
     callbackUrl: process.env.DISCORD_CALLBACK_URL || `${backendUrl}/api/auth/discord/callback`,
   },
 
-  // Steam OpenID 2.0
+  // Steam OpenID 2.0 (Auth only)
   steam: {
     apiKey: process.env.STEAM_API_KEY || '',
     callbackUrl: process.env.STEAM_CALLBACK_URL || `${backendUrl}/api/auth/steam/callback`,

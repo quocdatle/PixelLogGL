@@ -4,7 +4,6 @@ const IGDB_BASE_URL = 'https://api.igdb.com/v4';
 const TWITCH_TOKEN_URL = 'https://id.twitch.tv/oauth2/token';
 const IGDB_IMAGE_BASE = 'https://images.igdb.com/igdb/image/upload';
 const REQUEST_TIMEOUT_MS = 15000;
-const IGDB_ID_OFFSET = 100000000;
 
 let cachedToken = null;
 let tokenExpiresAt = 0;
@@ -37,16 +36,6 @@ function getCredentials() {
 function isConfigured() {
   const { clientId, clientSecret } = getCredentials();
   return Boolean(clientId && clientSecret);
-}
-
-function toExternalId(igdbId) {
-  return IGDB_ID_OFFSET + Number(igdbId);
-}
-
-function fromExternalId(externalId) {
-  const n = Number(externalId);
-  if (!Number.isInteger(n) || n < IGDB_ID_OFFSET) return null;
-  return n - IGDB_ID_OFFSET;
 }
 
 function escapeApicalypseString(value) {
@@ -190,9 +179,11 @@ function normalizeGame(raw) {
       ? raw.aggregated_rating
       : null;
 
+  const id = Number(raw.id);
+
   return {
-    rawgId: toExternalId(raw.id),
-    igdbId: raw.id,
+    igdbId: id,
+    rawgId: id, // Alias tương thích ngược với các trường frontend/database
     source: 'igdb',
     name: raw.name,
     slug: raw.slug || null,
@@ -234,7 +225,7 @@ async function searchGames({ search, page = 1, pageSize = 20, genres }) {
   if (cleanSearch) {
     lines.push(`search "${cleanSearch}";`);
   } else {
-    whereClauses.push('rating_count > 30');
+    whereClauses.push('rating_count > 20');
     lines.push('sort rating desc;');
   }
 
@@ -323,10 +314,7 @@ async function getGenres() {
 }
 
 module.exports = {
-  IGDB_ID_OFFSET,
   isConfigured,
-  toExternalId,
-  fromExternalId,
   searchGames,
   getGameDetail,
   getGenres,

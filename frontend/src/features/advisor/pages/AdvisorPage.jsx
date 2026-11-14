@@ -100,7 +100,8 @@ export default function AdvisorPage() {
         if (ignore) return;
         const nextMap = new Map();
         games.forEach((g) => {
-          if (g.rawgId) nextMap.set(Number(g.rawgId), g);
+          const id = g.igdbId || g.rawgId;
+          if (id) nextMap.set(Number(id), g);
         });
         setLibraryMap(nextMap);
       })
@@ -226,19 +227,21 @@ export default function AdvisorPage() {
   };
 
   const handleAddRecommendedGame = async (game) => {
-    if (!game?.rawgId || addingRawgId) return;
-    setAddingRawgId(game.rawgId);
+    const gameId = game?.igdbId || game?.rawgId;
+    if (!gameId || addingRawgId) return;
+    setAddingRawgId(gameId);
     setActionAlert(null);
     if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
 
     try {
       const created = await libraryService.addGame({
-        rawgId: game.rawgId,
+        igdbId: gameId,
+        rawgId: gameId,
         status: 'backlog',
       });
       setLibraryMap((prev) => {
         const next = new Map(prev);
-        next.set(Number(game.rawgId), created);
+        next.set(Number(gameId), created);
         return next;
       });
       setActionAlert({
@@ -361,19 +364,21 @@ export default function AdvisorPage() {
                   {!isUser && cards.length > 0 && (
                     <div className="mt-2.5 w-full max-w-[92%] sm:max-w-[85%] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {cards.map((game) => {
-                        const existingEntry = libraryMap.get(Number(game.rawgId));
-                        const isAddingThis = addingRawgId === game.rawgId;
+                        const gameId = game.igdbId || game.rawgId;
+                        const existingEntry = libraryMap.get(Number(gameId));
+                        const isAddingThis = addingRawgId === gameId;
                         const year = game.released ? new Date(game.released).getFullYear() : null;
 
                         return (
                           <div
-                            key={game.rawgId}
+                            key={gameId}
                             className="flex items-center gap-3 p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs hover:border-emerald-400/60 dark:hover:border-emerald-700/70 transition-colors"
                           >
                             <button
                               type="button"
                               onClick={() =>
                                 setDetailTarget({
+                                  igdbId: gameId,
                                   rawgId: game.rawgId,
                                   userGame: existingEntry || null,
                                 })
@@ -400,6 +405,7 @@ export default function AdvisorPage() {
                                 type="button"
                                 onClick={() =>
                                   setDetailTarget({
+                                    igdbId: gameId,
                                     rawgId: game.rawgId,
                                     userGame: existingEntry || null,
                                   })
@@ -428,6 +434,7 @@ export default function AdvisorPage() {
                                   type="button"
                                   onClick={() =>
                                     setDetailTarget({
+                                      igdbId: gameId,
                                       rawgId: game.rawgId,
                                       userGame: existingEntry || null,
                                     })
@@ -563,19 +570,22 @@ export default function AdvisorPage() {
         <GameDetailModal
           isOpen={!!detailTarget}
           onClose={() => setDetailTarget(null)}
+          igdbId={detailTarget.igdbId || detailTarget.rawgId}
           rawgId={detailTarget.rawgId}
           userGame={detailTarget.userGame}
           onAddedToLibrary={(created) => {
             setLibraryMap((prev) => {
               const next = new Map(prev);
-              next.set(Number(created.rawgId), created);
+              const id = created.igdbId || created.rawgId;
+              if (id) next.set(Number(id), created);
               return next;
             });
           }}
           onUserGameUpdated={(updated) => {
             setLibraryMap((prev) => {
               const next = new Map(prev);
-              next.set(Number(updated.rawgId), updated);
+              const id = updated.igdbId || updated.rawgId;
+              if (id) next.set(Number(id), updated);
               return next;
             });
           }}

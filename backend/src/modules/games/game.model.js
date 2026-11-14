@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
-// Bản cache thông tin game lấy từ RAWG. Library (userGame) tham chiếu tới đây bằng ObjectId
+// Bản cache thông tin game lấy từ IGDB API. Library (userGame) tham chiếu tới đây bằng ObjectId
 // để nhiều người dùng cùng 1 game không bị lặp dữ liệu (xem CLAUDE.md mục 6).
 const gameSchema = new mongoose.Schema(
   {
-    rawgId: { type: Number, required: true, unique: true, index: true },
     igdbId: { type: Number, index: { unique: true, sparse: true } },
-    steamAppId: { type: Number, index: { unique: true, sparse: true } },
-    source: { type: String, enum: ['rawg', 'igdb', 'steam'], default: 'rawg' },
+    rawgId: { type: Number, index: { sparse: true } }, // Giữ lại tương thích ngược với dữ liệu cũ
+    steamAppId: { type: Number, index: { sparse: true } },
+    source: { type: String, default: 'igdb' },
     name: { type: String, required: true, trim: true },
     slug: { type: String, default: null },
     backgroundImage: { type: String, default: null },
-    released: { type: String, default: null }, // RAWG trả dạng 'YYYY-MM-DD'
+    released: { type: String, default: null }, // 'YYYY-MM-DD'
     genres: { type: [String], default: [] },
     platforms: { type: [String], default: [] },
     developers: { type: [String], default: [] },
@@ -20,10 +20,10 @@ const gameSchema = new mongoose.Schema(
     playtimeAvg: { type: Number, default: null },
     esrbRating: { type: String, default: null },
     screenshots: { type: [String], default: [] },
-    rating: { type: Number, default: null }, // điểm cộng đồng RAWG (0-5)
-    metacritic: { type: Number, default: null },
+    rating: { type: Number, default: null }, // Điểm đánh giá (0-5)
+    metacritic: { type: Number, default: null }, // Điểm phê bình (0-100)
     description: { type: String, default: '' },
-    detailFetched: { type: Boolean, default: false }, // đã gọi API chi tiết (có description) chưa
+    detailFetched: { type: Boolean, default: false }, // Đã gọi API chi tiết chưa
     screenshotsFetched: { type: Boolean, default: false },
   },
   { timestamps: true }

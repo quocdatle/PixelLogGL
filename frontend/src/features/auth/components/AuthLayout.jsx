@@ -160,7 +160,7 @@ export default function AuthLayout({ activeTab, onTabChange, children }) {
               <div className="pt-4 flex items-center justify-between flex-wrap gap-4 text-xs text-zinc-600 dark:text-zinc-400 font-medium">
                 <div className="flex items-center gap-1.5">
                   <CheckIcon />
-                  Đồng bộ RAWG Games
+                  Đồng bộ IGDB Games
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckIcon />

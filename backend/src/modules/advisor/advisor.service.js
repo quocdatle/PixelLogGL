@@ -158,18 +158,22 @@ async function extractAndResolveGames(rawText) {
   const seenIds = new Set();
   const recommendedGames = [];
   resolvedResults.forEach((res) => {
-    if (res.status === 'fulfilled' && res.value && !seenIds.has(res.value.rawgId)) {
+    if (res.status === 'fulfilled' && res.value) {
       const g = res.value;
-      seenIds.add(g.rawgId);
-      recommendedGames.push({
-        rawgId: g.rawgId,
-        name: g.name,
-        backgroundImage: g.backgroundImage || null,
-        released: g.released || null,
-        genres: g.genres || [],
-        rating: g.rating ?? null,
-        metacritic: g.metacritic ?? null,
-      });
+      const gameId = g.igdbId || g.rawgId;
+      if (!seenIds.has(gameId)) {
+        seenIds.add(gameId);
+        recommendedGames.push({
+          igdbId: gameId,
+          rawgId: gameId,
+          name: g.name,
+          backgroundImage: g.backgroundImage || null,
+          released: g.released || null,
+          genres: g.genres || [],
+          rating: g.rating ?? null,
+          metacritic: g.metacritic ?? null,
+        });
+      }
     }
   });
 

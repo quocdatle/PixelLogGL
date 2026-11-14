@@ -290,6 +290,228 @@ Dùng để kiểm tra server có chạy không — trả `{ "success": true, "m
 
 ---
 
+## Module: Games (IGDB API)
+
+Dữ liệu trò chơi được tra cứu trực tiếp từ IGDB (qua Twitch Developer OAuth) và cache tự động vào MongoDB để tối ưu hiệu năng và tiết kiệm quota.
+
+### Tìm kiếm game
+```
+GET /api/games/search?search=witcher&page=1&pageSize=10
+```
+
+**Query params:**
+- `search` (bắt buộc): Từ khóa tìm kiếm tựa game.
+- `page`: Trang cần lấy (mặc định: `1`).
+- `pageSize`: Số game mỗi trang (mặc định: `10`, tối đa `50`).
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "count": 1,
+    "page": 1,
+    "pageSize": 10,
+    "results": [
+      {
+        "igdbId": 1942,
+        "rawgId": 1942,
+        "name": "The Witcher 3: Wild Hunt",
+        "slug": "the-witcher-3-wild-hunt",
+        "backgroundImage": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7f.jpg",
+        "rating": 9.2,
+        "metacritic": 92,
+        "released": "2015-05-19",
+        "genres": ["Role-playing (RPG)", "Adventure"]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Lấy danh sách thể loại game
+```
+GET /api/games/genres
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": [
+    { "id": 12, "name": "Role-playing (RPG)", "slug": "role-playing-rpg" },
+    { "id": 31, "name": "Adventure", "slug": "adventure" }
+  ]
+}
+```
+
+---
+
+### Lấy chi tiết game theo IGDB ID
+```
+GET /api/games/:id
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "igdbId": 1942,
+    "rawgId": 1942,
+    "name": "The Witcher 3: Wild Hunt",
+    "description": "Geralt of Rivia, a monster hunter...",
+    "backgroundImage": "https://images.igdb.com/igdb/image/upload/t_1080p/co1r7f.jpg",
+    "released": "2015-05-19",
+    "rating": 9.2,
+    "metacritic": 92,
+    "genres": ["Role-playing (RPG)", "Adventure"],
+    "platforms": ["PC", "PlayStation 4", "Xbox One", "Nintendo Switch"],
+    "developers": ["CD Projekt RED"],
+    "screenshots": [
+      "https://images.igdb.com/igdb/image/upload/t_1080p/sc6t8v.jpg"
+    ]
+  }
+}
+```
+
+---
+
+## Module: Library (Thư viện Game cá nhân)
+
+> Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`.
+
+### Lấy danh sách game trong thư viện
+```
+GET /api/user-games?status=playing&sort=recent&page=1&limit=20
+```
+
+**Query params:**
+- `status`: Lọc theo trạng thái (`backlog`, `playing`, `completed`, `dropped`, `wishlist`).
+- `sort`: Tiêu chí sắp xếp (`recent`, `name`, `rating`, `hours`).
+- `search`: Tìm kiếm theo tên game trong thư viện.
+- `page`: Số trang (mặc định: `1`).
+- `limit`: Số bản ghi mỗi trang (mặc định: `20`, tối đa `100`).
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "_id": "672b1234abcd5678ef901234",
+        "status": "playing",
+        "rating": 9,
+        "hoursPlayed": 45.5,
+        "note": "Game thế giới mở quá cuốn",
+        "game": {
+          "igdbId": 1942,
+          "rawgId": 1942,
+          "name": "The Witcher 3: Wild Hunt",
+          "backgroundImage": "https://images.igdb.com/igdb/image/upload/t_1080p/co1r7f.jpg",
+          "genres": ["Role-playing (RPG)", "Adventure"]
+        },
+        "playSessions": []
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 1,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+---
+
+### Thống kê nhanh thư viện
+```
+GET /api/user-games/summary
+```
+
+**Response 200 (thành công):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalGames": 12,
+    "totalHours": 142.5,
+    "statusCounts": {
+      "backlog": 5,
+      "playing": 3,
+      "completed": 3,
+      "dropped": 1
+    }
+  }
+}
+```
+
+---
+
+### Thêm game vào thư viện
+```
+POST /api/user-games
+```
+
+**Body:**
+```json
+{
+  "igdbId": 1942,
+  "status": "backlog"
+}
+```
+
+*(Chấp nhận `igdbId` hoặc `rawgId` để tương thích ngược).*
+
+**Response 201 (tạo thành công):** Trả về thông tin mục game vừa thêm.
+
+---
+
+### Cập nhật trạng thái, điểm hoặc ghi chú
+```
+PATCH /api/user-games/:id
+```
+
+**Body (chỉ truyền trường cần sửa):**
+```json
+{
+  "status": "completed",
+  "rating": 10,
+  "hoursPlayed": 50,
+  "note": "Đã hoàn thành toàn bộ cốt truyện chính"
+}
+```
+
+---
+
+### Thêm phiên chơi (Play Session)
+```
+POST /api/user-games/:id/play-sessions
+```
+
+**Body:**
+```json
+{
+  "minutes": 120,
+  "note": "Cày phó bản cùng bạn bè",
+  "playedAt": "2026-11-14T19:00:00.000Z"
+}
+```
+
+---
+
+### Xóa game khỏi thư viện
+```
+DELETE /api/user-games/:id
+```
+
+---
+
 ## Module: Analytics
 
 > Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`. Dữ liệu luôn là của người dùng đang đăng nhập.
@@ -443,7 +665,19 @@ Authorization: Bearer <token>
 {
   "success": true,
   "data": {
-    "reply": "Dưới đây là một số tựa game nhập vai thế giới mở với cốt truyện có chiều sâu tương tự The Witcher 3: 1. Cyberpunk 2077... 2. Baldur's Gate 3..."
+    "reply": "Dưới đây là một số tựa game nhập vai thế giới mở với cốt truyện có chiều sâu tương tự The Witcher 3: 1. Cyberpunk 2077... 2. Baldur's Gate 3...",
+    "recommendedGames": [
+      {
+        "igdbId": 1877,
+        "rawgId": 1877,
+        "name": "Cyberpunk 2077",
+        "backgroundImage": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r77.jpg",
+        "released": "2020-12-10",
+        "genres": ["Role-playing (RPG)", "Shooter"],
+        "rating": 8.6,
+        "metacritic": 86
+      }
+    ]
   }
 }
 ```

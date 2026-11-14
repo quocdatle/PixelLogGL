@@ -26,6 +26,7 @@ const advisorLogSchema = new mongoose.Schema(
       type: [
         new mongoose.Schema(
           {
+            igdbId: Number,
             rawgId: Number,
             name: String,
             backgroundImage: String,

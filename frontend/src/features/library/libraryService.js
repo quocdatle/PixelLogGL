@@ -4,10 +4,12 @@ import api from "../../services/api";
 function mapBackendToUi(entry) {
   if (!entry) return null;
   const game = entry.game || {};
+  const gameId = game.igdbId || game.rawgId;
   return {
     id: entry._id,
     userGameId: entry._id,
-    rawgId: game.rawgId,
+    igdbId: gameId,
+    rawgId: gameId,
     title: game.name || "Không rõ tên",
     developer: (game.developers && game.developers[0]) || (game.platforms && game.platforms[0]) || "Studio",
     platforms: game.platforms || [],
@@ -29,7 +31,7 @@ function mapBackendToUi(entry) {
 }
 
 export const libraryService = {
-  // Tìm kiếm game từ RAWG thông qua backend
+  // Tìm kiếm game từ IGDB thông qua backend
   async searchGames(query, options = {}) {
     if (!query || !query.trim()) return [];
     const res = await api.get("/games/search", {
@@ -87,35 +89,36 @@ export const libraryService = {
   },
 
   // Thêm game vào thư viện
-  // Chấp nhận: { rawgId, status } hoặc { title, status } (sẽ tự tìm kiếm trên RAWG)
+  // Chấp nhận: { igdbId, status } hoặc { rawgId, status } hoặc { title, status } (sẽ tự tìm kiếm trên IGDB)
   async addGame(gameData) {
-    let rawgId = gameData.rawgId;
-    if (!rawgId && gameData.title) {
-      // Tìm kiếm trên RAWG qua endpoint backend
+    let igdbId = gameData.igdbId || gameData.rawgId;
+    if (!igdbId && gameData.title) {
+      // Tìm kiếm trên IGDB qua endpoint backend
       const searchRes = await api.get("/games/search", {
         params: { search: gameData.title, pageSize: 1 },
       });
       const topGame = searchRes.data?.data?.results?.[0];
       if (!topGame) {
-        throw new Error(`Không tìm thấy game "${gameData.title}" trên RAWG`);
+        throw new Error(`Không tìm thấy game "${gameData.title}" trên IGDB`);
       }
-      rawgId = topGame.rawgId;
+      igdbId = topGame.igdbId || topGame.rawgId;
     }
 
-    if (!rawgId) {
-      throw new Error("Vui lòng cung cấp tên game hoặc rawgId");
+    if (!igdbId) {
+      throw new Error("Vui lòng cung cấp tên game hoặc igdbId");
     }
 
     const res = await api.post("/user-games", {
-      rawgId: Number(rawgId),
+      igdbId: Number(igdbId),
+      rawgId: Number(igdbId),
       status: gameData.status || "backlog",
     });
     return mapBackendToUi(res.data?.data);
   },
 
-  // Lấy chi tiết đầy đủ của 1 game từ RAWG (có description, screenshots, developers...)
-  async getGameDetail(rawgId) {
-    const res = await api.get(`/games/${rawgId}`);
+  // Lấy chi tiết đầy đủ của 1 game từ IGDB (có description, screenshots, developers...)
+  async getGameDetail(gameId) {
+    const res = await api.get(`/games/${gameId}`);
     return res.data?.data;
   },
 

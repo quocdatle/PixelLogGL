@@ -9,7 +9,7 @@ const FEATURES = [
   {
     title: 'Thư viện Game & Nhật ký Chơi',
     description:
-      'Quản lý toàn bộ game đang chơi, backlog và wishlist với dữ liệu từ RAWG. Lưu nhật ký từng phiên chơi, chấm điểm cá nhân và xem ảnh chụp màn hình HD.',
+      'Quản lý toàn bộ game đang chơi, backlog và wishlist với dữ liệu từ IGDB. Lưu nhật ký từng phiên chơi, chấm điểm cá nhân và xem ảnh chụp màn hình HD.',
     iconPath:
       'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
     accent: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
@@ -171,7 +171,7 @@ export default function LandingPage() {
                       500K+
                     </div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Tựa game từ RAWG
+                      Tựa game từ IGDB
                     </div>
                   </div>
                   <div>

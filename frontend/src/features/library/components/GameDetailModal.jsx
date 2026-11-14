@@ -14,6 +14,7 @@ const STATUS_OPTIONS = [
 export default function GameDetailModal({
   isOpen,
   onClose,
+  igdbId,
   rawgId,
   userGame: initialUserGame = null,
   onUserGameUpdated,
@@ -40,7 +41,7 @@ export default function GameDetailModal({
   const [adding, setAdding] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  const targetRawgId = rawgId || initialUserGame?.rawgId;
+  const targetGameId = igdbId || rawgId || initialUserGame?.igdbId || initialUserGame?.rawgId;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,7 +53,7 @@ export default function GameDetailModal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!isOpen || !targetRawgId) return;
+    if (!isOpen || !targetGameId) return;
     let cancelled = false;
 
     async function fetchAll() {
@@ -62,7 +63,7 @@ export default function GameDetailModal({
       setDescExpanded(false);
 
       try {
-        const requests = [libraryService.getGameDetail(targetRawgId)];
+        const requests = [libraryService.getGameDetail(targetGameId)];
         if (initialUserGame?.id) {
           requests.push(libraryService.getUserGameById(initialUserGame.id));
         }
@@ -99,7 +100,7 @@ export default function GameDetailModal({
     return () => {
       cancelled = true;
     };
-  }, [isOpen, targetRawgId, initialUserGame]);
+  }, [isOpen, targetGameId, initialUserGame]);
 
   if (!isOpen) return null;
 
@@ -197,12 +198,13 @@ export default function GameDetailModal({
   }
 
   async function handleAddToLibrary() {
-    if (!targetRawgId) return;
+    if (!targetGameId) return;
     setAdding(true);
     setFeedback(null);
     try {
       const created = await libraryService.addGame({
-        rawgId: targetRawgId,
+        igdbId: targetGameId,
+        rawgId: targetGameId,
         status: addStatus,
       });
       setUserGame(created);

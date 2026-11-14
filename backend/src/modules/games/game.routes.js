@@ -4,9 +4,9 @@ const requireAuth = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Bắt buộc đăng nhập để người lạ không "đốt" quota RAWG API của nhóm
+// Bắt buộc đăng nhập để người lạ không lạm dụng quota IGDB API của nhóm
 router.get('/search', requireAuth, gameController.searchGames);
 router.get('/genres', requireAuth, gameController.listGenres);
-router.get('/:rawgId', requireAuth, gameController.getGame);
+router.get('/:id', requireAuth, gameController.getGame);
 
 module.exports = router;

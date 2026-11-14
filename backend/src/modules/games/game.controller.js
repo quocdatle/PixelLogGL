@@ -22,7 +22,8 @@ async function listGenres(req, res, next) {
 
 async function getGame(req, res, next) {
   try {
-    const game = await gameService.getByRawgId(req.params.rawgId);
+    const id = req.params.id || req.params.rawgId;
+    const game = await gameService.getByIgdbId(id);
     return success(res, game);
   } catch (err) {
     next(err);

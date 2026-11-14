@@ -40,12 +40,13 @@ export default function AddGameModal({
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  // Map existing games by rawgId and title for quick check
+  // Map existing games by id (igdbId/rawgId) and title for quick check
   const existingMap = useMemo(() => {
     const map = new Map();
     existingGames.forEach((g) => {
-      if (g.rawgId) {
-        map.set(Number(g.rawgId), g.status || "backlog");
+      const id = g.igdbId || g.rawgId;
+      if (id) {
+        map.set(Number(id), g.status || "backlog");
       }
       if (g.title) {
         map.set(g.title.toLowerCase().trim(), g.status || "backlog");
@@ -152,8 +153,9 @@ export default function AddGameModal({
   }
 
   function isAlreadyInLibrary(game) {
-    if (justAddedIds.has(game.rawgId)) return true;
-    if (game.rawgId && existingMap.has(Number(game.rawgId))) {
+    const id = game.igdbId || game.rawgId;
+    if (id && justAddedIds.has(id)) return true;
+    if (id && existingMap.has(Number(id))) {
       return true;
     }
     if (game.name && existingMap.has(game.name.toLowerCase().trim())) {
@@ -163,11 +165,12 @@ export default function AddGameModal({
   }
 
   function getExistingStatus(game) {
-    if (justAddedIds.has(game.rawgId)) {
-      return selectedStatuses[game.rawgId] || "backlog";
+    const id = game.igdbId || game.rawgId;
+    if (id && justAddedIds.has(id)) {
+      return selectedStatuses[id] || "backlog";
     }
-    if (game.rawgId && existingMap.has(Number(game.rawgId))) {
-      return existingMap.get(Number(game.rawgId));
+    if (id && existingMap.has(Number(id))) {
+      return existingMap.get(Number(id));
     }
     if (game.name && existingMap.has(game.name.toLowerCase().trim())) {
       return existingMap.get(game.name.toLowerCase().trim());
@@ -176,17 +179,21 @@ export default function AddGameModal({
   }
 
   async function handleAdd(game) {
-    const status = selectedStatuses[game.rawgId] || "backlog";
-    setAddingId(game.rawgId);
+    const id = game.igdbId || game.rawgId;
+    const status = selectedStatuses[id] || "backlog";
+    setAddingId(id);
     setError(null);
 
     try {
       const addedGame = await libraryService.addGame({
-        rawgId: game.rawgId,
+        igdbId: id,
+        rawgId: id,
         status,
       });
 
-      setJustAddedIds((prev) => new Set(prev).add(game.rawgId));
+      if (id) {
+        setJustAddedIds((prev) => new Set(prev).add(id));
+      }
       if (onGameAdded) {
         onGameAdded(addedGame);
       }
@@ -199,10 +206,10 @@ export default function AddGameModal({
     }
   }
 
-  function handleStatusChange(rawgId, status) {
+  function handleStatusChange(gameId, status) {
     setSelectedStatuses((prev) => ({
       ...prev,
-      [rawgId]: status,
+      [gameId]: status,
     }));
   }
 
@@ -416,7 +423,7 @@ export default function AddGameModal({
                   </p>
                   <p>
                     Hệ thống sẽ tự động tìm kiếm trực tiếp trên kho dữ liệu
-                    Steam khi bạn gõ. Dùng phím{" "}
+                    IGDB khi bạn gõ. Dùng phím{" "}
                     <kbd className="px-1 py-0.5 bg-zinc-200 dark:bg-zinc-700 rounded text-[10px]">
                       ↑
                     </kbd>{" "}
@@ -502,10 +509,11 @@ export default function AddGameModal({
               </div>
 
               {results.map((game, index) => {
+                const gameId = game.igdbId || game.rawgId;
                 const inLibrary = isAlreadyInLibrary(game);
-                const isAdding = addingId === game.rawgId;
+                const isAdding = addingId === gameId;
                 const isSelected = selectedIndex === index;
-                const chosenStatus = selectedStatuses[game.rawgId] || "backlog";
+                const chosenStatus = selectedStatuses[gameId] || "backlog";
                 const existingStatus = inLibrary ? getExistingStatus(game) : null;
 
                 const releaseYear = game.released
@@ -514,7 +522,7 @@ export default function AddGameModal({
 
                 return (
                   <div
-                    key={game.rawgId}
+                    key={gameId || index}
                     data-suggestion-item
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={`group p-2.5 sm:p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
@@ -633,7 +641,7 @@ export default function AddGameModal({
                           <select
                             value={chosenStatus}
                             onChange={(e) =>
-                              handleStatusChange(game.rawgId, e.target.value)
+                              handleStatusChange(gameId, e.target.value)
                             }
                             disabled={isAdding}
                             className="py-1.5 px-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
@@ -707,7 +715,7 @@ export default function AddGameModal({
 
         {/* Footer info bar */}
         <div className="py-2.5 px-4 bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
-          <span>Dữ liệu trò chơi từ Steam Database</span>
+          <span>Dữ liệu trò chơi từ IGDB</span>
           <button
             type="button"
             onClick={onClose}

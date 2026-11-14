@@ -16,7 +16,7 @@
 | Backend | Node.js + Express |
 | Database | MongoDB + Mongoose (ODM) |
 | Auth | JWT |
-| API ngoài | RAWG API (dữ liệu game), Google Gemini API (chatbot AI) |
+| API ngoài | IGDB API (Twitch Developer, dữ liệu game), Google Gemini API (chatbot AI) |
 
 **Không tự ý đổi sang công nghệ khác** (vd: đổi MongoDB sang MySQL, đổi Express sang NestJS) dù có vẻ "tốt hơn" — mọi thay đổi tech stack phải được cả nhóm thống nhất trước.
 
@@ -51,7 +51,7 @@ Các module hiện có: `auth`, `users`, `games`, `library`, `advisor`, `analyti
 | Hằng số | UPPER_SNAKE_CASE | `MAX_COIN_PER_DAY` |
 | MongoDB collection | camelCase số nhiều | `userGames`, `caseOpenLogs` |
 | Route (URL) | kebab-case, số nhiều | `/api/user-games`, `/api/case-logs` |
-| Biến môi trường | UPPER_SNAKE_CASE | `JWT_SECRET`, `RAWG_API_KEY` |
+| Biến môi trường | UPPER_SNAKE_CASE | `JWT_SECRET`, `TWITCH_CLIENT_ID` |
 | Nhánh Git | `<module>/<mo-ta-ngan>` | `library/add-search-filter`, `economy/case-open-api` |
 
 ## 5. Quy ước API (REST)
@@ -102,7 +102,8 @@ PORT=5000
 MONGO_URI=
 JWT_SECRET=
 JWT_EXPIRES_IN=7d
-RAWG_API_KEY=
+TWITCH_CLIENT_ID=
+TWITCH_CLIENT_SECRET=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash
 
@@ -141,5 +142,5 @@ VITE_API_URL=
 ## 11. Những điều cần tránh
 
 - Không tự ý thêm tính năng ngoài phạm vi đã chốt trong Project Charter (vd: thêm chat realtime, social feed) — ý tưởng mới ghi vào "Backlog cho tương lai", không chèn giữa sprint.
-- Không gọi trực tiếp Google Gemini API / RAWG API từ Frontend — luôn đi qua Backend để giữ an toàn API key.
+- Không gọi trực tiếp Google Gemini API / IGDB API từ Frontend — luôn đi qua Backend để giữ an toàn API key.
 - Không để logic tính toán quan trọng (tỷ lệ mở hòm, random) chạy ở Frontend — phải tính ở Backend để tránh gian lận.

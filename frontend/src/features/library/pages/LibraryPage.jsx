@@ -306,6 +306,7 @@ export default function LibraryPage() {
         <GameDetailModal
           isOpen={!!detailGame}
           onClose={() => setDetailGame(null)}
+          igdbId={detailGame.igdbId || detailGame.rawgId}
           rawgId={detailGame.rawgId}
           userGame={detailGame}
           onUserGameUpdated={(updated) => {

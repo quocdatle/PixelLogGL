@@ -83,11 +83,20 @@ async function findOwned(userId, id) {
   return entry;
 }
 
-// Đổi tên gameId -> game cho Frontend dễ dùng
+// Đổi tên gameId -> game cho Frontend dễ dùng, đồng bộ igdbId & rawgId
 function toDto(entry) {
   const obj = entry.toObject ? entry.toObject() : entry;
   const { gameId, __v, ...rest } = obj;
-  return { ...rest, game: gameId };
+  const game = gameId ? (gameId.toObject ? gameId.toObject() : { ...gameId }) : {};
+  const effectiveId = game.igdbId || game.rawgId;
+  return {
+    ...rest,
+    game: {
+      ...game,
+      igdbId: effectiveId,
+      rawgId: effectiveId,
+    },
+  };
 }
 
 async function list(userId, { status, search, sort, page, limit }) {
@@ -155,16 +164,16 @@ async function summary(userId) {
   return { total, byStatus, totalHours: Math.round(totalHours * 100) / 100 };
 }
 
-async function add(userId, { rawgId, status }) {
-  const rawg = toPositiveInt(rawgId, null);
-  if (!rawg) {
-    throw validationError('rawgId phải là số nguyên dương');
+async function add(userId, { igdbId, rawgId, status }) {
+  const targetId = toPositiveInt(igdbId || rawgId, null);
+  if (!targetId) {
+    throw validationError('igdbId phải là số nguyên dương');
   }
   if (status !== undefined && !GAME_STATUSES.includes(status)) {
     throw validationError(`status phải là một trong: ${GAME_STATUSES.join(', ')}`);
   }
 
-  const game = await gameService.ensureCached(rawg);
+  const game = await gameService.ensureCached(targetId);
 
   const exists = await UserGame.exists({ userId, gameId: game._id });
   if (exists) {

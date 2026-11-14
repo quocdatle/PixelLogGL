@@ -1,7 +1,5 @@
 const Game = require('./game.model');
-const rawgApi = require('./rawgApi.service');
 const igdbApi = require('./igdbApi.service');
-const steamApi = require('./steamApi.service');
 
 const MAX_PAGE_SIZE = 40;
 
@@ -38,26 +36,18 @@ async function searchCachedGames({ search, page = 1, pageSize = 20 }) {
   };
 }
 
-async function search({ search, page, pageSize, genres, ordering }) {
+async function search(queryOrOptions = {}, maybeOptions = {}) {
+  const options =
+    typeof queryOrOptions === 'string'
+      ? { search: queryOrOptions, ...maybeOptions }
+      : queryOrOptions || {};
+
+  const { search, page, pageSize, genres, ordering } = options;
   const safePage = toPositiveInt(page, 1);
   const safePageSize = Math.min(toPositiveInt(pageSize, 20), MAX_PAGE_SIZE);
-  const cleanSearch = search?.trim();
+  const cleanSearch = typeof search === 'string' ? search.trim() : '';
 
-  // 1. Ưu tiên Steam API (không cần 2FA/Twitch key, hoạt động ngay)
-  try {
-    const steamResult = await steamApi.searchGames({
-      search: cleanSearch,
-      page: safePage,
-      pageSize: safePageSize,
-    });
-    if (steamResult.results.length > 0 || !cleanSearch) {
-      return steamResult;
-    }
-  } catch (steamErr) {
-    console.warn('[GAME_SERVICE] Steam search lỗi, thử nguồn dự phòng:', steamErr.message);
-  }
-
-  // 2. Fallback sang IGDB nếu đã cấu hình Twitch credentials
+  // 1. Tìm kiếm từ IGDB API
   if (igdbApi.isConfigured()) {
     try {
       return await igdbApi.searchGames({
@@ -68,70 +58,67 @@ async function search({ search, page, pageSize, genres, ordering }) {
         ordering,
       });
     } catch (igdbErr) {
-      console.warn('[GAME_SERVICE] IGDB search lỗi, thử fallback:', igdbErr.message);
+      console.warn('[GAME_SERVICE] IGDB search gặp lỗi, dùng cache MongoDB:', igdbErr.message);
     }
   }
 
-  // 3. Fallback sang RAWG API
-  try {
-    return await rawgApi.searchGames({
-      search: cleanSearch,
-      page: safePage,
-      pageSize: safePageSize,
-      genres,
-      ordering,
-    });
-  } catch (rawgErr) {
-    // 4. Fallback cuối cùng về MongoDB cache
-    const cachedResult = await searchCachedGames({
-      search: cleanSearch,
-      page: safePage,
-      pageSize: safePageSize,
-    });
-    if (cachedResult.results.length > 0 || !cleanSearch) {
-      return cachedResult;
-    }
-    return { count: 0, hasNext: false, page: safePage, results: [] };
-  }
+  // 2. Fallback về cache MongoDB
+  const cachedResult = await searchCachedGames({
+    search: cleanSearch,
+    page: safePage,
+    pageSize: safePageSize,
+  });
+
+  return cachedResult;
 }
 
 async function listGenres() {
-  return steamApi.getGenres();
+  if (igdbApi.isConfigured()) {
+    try {
+      return await igdbApi.getGenres();
+    } catch (err) {
+      console.warn('[GAME_SERVICE] Không lấy được genres từ IGDB, dùng cache:', err.message);
+    }
+  }
+
+  const distinctGenres = await Game.distinct('genres');
+  return distinctGenres.filter(Boolean).map((name, index) => ({
+    id: index + 1,
+    name,
+    slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+  }));
 }
 
-// Lấy game theo ID (hỗ trợ cả Steam ID >= 200M, IGDB ID >= 100M và RAWG ID < 100M)
-async function getByRawgId(rawgId) {
-  const id = toPositiveInt(rawgId, null);
+// Lấy thông tin game theo ID (ưu tiên cache MongoDB, nếu chưa có thì tải từ IGDB)
+async function getByIgdbId(gameId) {
+  const id = toPositiveInt(gameId, null);
   if (!id) {
-    const err = new Error('rawgId không hợp lệ');
+    const err = new Error('ID game không hợp lệ');
     err.statusCode = 400;
     err.code = 'INVALID_ID';
     throw err;
   }
 
-  const steamAppId = steamApi.fromExternalId(id);
-  const igdbDirectId = igdbApi.fromExternalId(id);
-
-  let queryFilter = { rawgId: id };
-  if (steamAppId) {
-    queryFilter = { $or: [{ rawgId: id }, { steamAppId }] };
-  } else if (igdbDirectId) {
-    queryFilter = { $or: [{ rawgId: id }, { igdbId: igdbDirectId }] };
-  }
-
+  const queryFilter = { $or: [{ igdbId: id }, { rawgId: id }] };
   const cached = await Game.findOne(queryFilter);
+
   if (cached?.detailFetched && cached?.screenshotsFetched) {
     return cached;
   }
 
-  // 1. Game từ Steam API
-  if (steamAppId || cached?.source === 'steam') {
-    const targetAppId = steamAppId || cached?.steamAppId;
+  if (igdbApi.isConfigured()) {
     try {
-      const detail = await steamApi.getGameDetail(targetAppId);
-      return Game.findOneAndUpdate(
-        { rawgId: detail.rawgId },
-        { $set: { ...detail, detailFetched: true, screenshotsFetched: true } },
+      const detail = await igdbApi.getGameDetail(id);
+      return await Game.findOneAndUpdate(
+        { $or: [{ igdbId: detail.igdbId }, { rawgId: detail.igdbId }] },
+        {
+          $set: {
+            ...detail,
+            source: 'igdb',
+            detailFetched: true,
+            screenshotsFetched: true,
+          },
+        },
         { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
       );
     } catch (err) {
@@ -140,39 +127,17 @@ async function getByRawgId(rawgId) {
     }
   }
 
-  // 2. Game từ IGDB API
-  if (igdbDirectId || cached?.source === 'igdb') {
-    const targetIgdbId = igdbDirectId || cached?.igdbId;
-    try {
-      const detail = await igdbApi.getGameDetail(targetIgdbId);
-      return Game.findOneAndUpdate(
-        { rawgId: detail.rawgId },
-        { $set: { ...detail, detailFetched: true, screenshotsFetched: true } },
-        { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
-      );
-    } catch (err) {
-      if (cached) return cached;
-      throw err;
-    }
+  if (cached) {
+    return cached;
   }
 
-  // 3. Game từ RAWG (hoặc cache cũ)
-  try {
-    const detail = await rawgApi.getGameDetail(id);
-    return Game.findOneAndUpdate(
-      { rawgId: id },
-      { $set: { ...detail, source: 'rawg', detailFetched: true, screenshotsFetched: true } },
-      { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
-    );
-  } catch (err) {
-    if (cached) {
-      return cached;
-    }
-    throw err;
-  }
+  const notFoundErr = new Error('Không tìm thấy thông tin game');
+  notFoundErr.statusCode = 404;
+  notFoundErr.code = 'GAME_NOT_FOUND';
+  throw notFoundErr;
 }
 
-// Tìm nhanh 1 tựa game theo tên cho Cố vấn AI (ưu tiên cache DB, sau đó Steam -> IGDB -> RAWG)
+// Tìm nhanh 1 tựa game theo tên cho Cố vấn AI
 async function resolveByTitle(title) {
   const cleanTitle = (title || '').trim();
   if (!cleanTitle) return null;
@@ -185,44 +150,34 @@ async function resolveByTitle(title) {
     return exactMatch;
   }
 
+  if (!igdbApi.isConfigured()) return null;
+
   let top = null;
   try {
-    const steamRes = await steamApi.searchGames({ search: cleanTitle, page: 1, pageSize: 1 });
-    top = steamRes?.results?.[0] || null;
+    const searchRes = await igdbApi.searchGames({ search: cleanTitle, page: 1, pageSize: 1 });
+    top = searchRes?.results?.[0] || null;
   } catch {
     top = null;
-  }
-
-  if (!top && igdbApi.isConfigured()) {
-    try {
-      const igdbRes = await igdbApi.searchGames({ search: cleanTitle, page: 1, pageSize: 1 });
-      top = igdbRes?.results?.[0] || null;
-    } catch {
-      top = null;
-    }
-  }
-
-  if (!top) {
-    try {
-      const searchRes = await rawgApi.searchGames({ search: cleanTitle, page: 1, pageSize: 1 });
-      top = searchRes?.results?.[0] || null;
-    } catch {
-      top = null;
-    }
   }
 
   if (!top) return null;
 
   return Game.findOneAndUpdate(
-    { rawgId: top.rawgId },
+    { $or: [{ igdbId: top.igdbId }, { rawgId: top.igdbId }] },
     { $setOnInsert: top },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   ).lean();
 }
 
-// Dùng khi thêm game vào thư viện: bảo đảm game đã có trong DB rồi trả về document.
-async function ensureCached(rawgId) {
-  return getByRawgId(rawgId);
+async function ensureCached(gameId) {
+  return getByIgdbId(gameId);
 }
 
-module.exports = { search, listGenres, getByRawgId, resolveByTitle, ensureCached };
+module.exports = {
+  search,
+  listGenres,
+  getByIgdbId,
+  getByRawgId: getByIgdbId, // Alias tương thích ngược
+  resolveByTitle,
+  ensureCached,
+};
