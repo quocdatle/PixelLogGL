@@ -1,0 +1,1290 @@
+{
+ "url": "http://localhost:4173/",
+ "at": "2026-11-16T15:04:15.096Z",
+ "allow": [
+  "still-page",
+  "gradient"
+ ],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.96,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 5,
+    "css": 5,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2067,
+     "screens": 2.3,
+     "words": 437,
+     "img": 64,
+     "video": 0,
+     "canvas": 0,
+     "svg": 12,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 60,
+     "videoCount": 0,
+     "uiPictures": 5,
+     "pictureSamples": [
+      "elden-ring-DUNdpRAy.jpg",
+      "cyberpunk-C-39r68A.jpg",
+      "witcher-CVMdTetf.jpg",
+      "baldur-8LD7g68R.jpg",
+      "god-of-war-cZVoxg7S.jpg",
+      "silksong-DgjOeFFZ.jpg",
+      "rdr2-t86zSQ-o.jpg",
+      "black-myth-wukong-DHHsI0lh.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "chars": 35,
+     "lines": 2,
+     "size": 54,
+     "vw": 3.8,
+     "font": "-apple-system",
+     "weight": 900,
+     "tracking": -0.025,
+     "leading": 1.12,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.48,
+     "top": 186,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "lines": 2,
+     "size": 54,
+     "font": "-apple-system"
+    },
+    "headings": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "words": 8,
+      "chars": 35,
+      "lines": 2,
+      "size": 54,
+      "vw": 3.8,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.12,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 186,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+      "words": 9,
+      "chars": 41,
+      "lines": 2,
+      "size": 36,
+      "vw": 2.5,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.47,
+      "top": 744,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 9,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "-apple-system",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      16,
+      18,
+      24,
+      36,
+      54
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "-apple-system",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 13.5
+     },
+     "measureChars": 64,
+     "max": {
+      "size": 54,
+      "vw": 3.8,
+      "font": "-apple-system",
+      "text": "Kho game của bạn.Quản lý trọn vẹn."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.09,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#09090b",
+       "top": 0,
+       "hsl": {
+        "h": 240,
+        "s": 0.1,
+        "l": 0.04
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d4d4d8",
+       "share": 0.37
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.26
+      },
+      {
+       "color": "#9f9fa9",
+       "share": 0.15
+      },
+      {
+       "color": "#e4e4e7",
+       "share": 0.11
+      },
+      {
+       "color": "#ffb900",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#007a55",
+      "hsl": {
+       "h": 162,
+       "s": 1,
+       "l": 0.24
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 12,
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Bắt đầu ngay",
+      "Tạo kho game ngay"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.absolute.inset-y-0 → linear-gradient(to right, oklch(0.141 0.005 285.823) 0%, oklab(0.141 0.00136333 -0.00481054 / 0.7) 50%, rgba(0",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)"
+     ],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 71,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 60,
+     "mediaRadius": 16,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 942
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 72,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": []
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2067,
+    "margins": {
+     "left": 112,
+     "right": 128
+    },
+    "sections": [
+     {
+      "sel": "section.relative.overflow-hidden",
+      "tag": "section",
+      "top": 72,
+      "height": 592,
+      "words": 98,
+      "media": 22,
+      "middle": 5747,
+      "heading": {
+       "text": "Kho game của bạn.",
+       "size": 54,
+       "tag": "h1"
+      },
+      "left": 112,
+      "right": 0,
+      "textLeft": 112,
+      "textRight": 137,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.max-w-7xl.mx-auto",
+      "tag": "section",
+      "top": 664,
+      "height": 1303,
+      "words": 301,
+      "media": 0,
+      "middle": 17,
+      "heading": {
+       "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 112,
+      "right": 156,
+      "textLeft": 112,
+      "textRight": 156,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "size": 54,
+      "top": 186,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 112,
+      "n": 5
+     },
+     {
+      "x": 144,
+      "n": 4
+     },
+     {
+      "x": 768,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 13,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.08,
+    "voidBox": {
+     "x": 780,
+     "y": 720,
+     "w": 540,
+     "h": 180
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.89,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 5,
+    "css": 5,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2643,
+     "screens": 2.6,
+     "words": 437,
+     "img": 64,
+     "video": 0,
+     "canvas": 0,
+     "svg": 12,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 60,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "elden-ring-DUNdpRAy.jpg",
+      "cyberpunk-C-39r68A.jpg",
+      "witcher-CVMdTetf.jpg",
+      "baldur-8LD7g68R.jpg",
+      "god-of-war-cZVoxg7S.jpg",
+      "silksong-DgjOeFFZ.jpg",
+      "rdr2-t86zSQ-o.jpg",
+      "black-myth-wukong-DHHsI0lh.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "chars": 35,
+     "lines": 2,
+     "size": 48,
+     "vw": 6.3,
+     "font": "-apple-system",
+     "weight": 900,
+     "tracking": -0.025,
+     "leading": 1.12,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.94,
+     "top": 136,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "lines": 2,
+     "size": 48,
+     "font": "-apple-system"
+    },
+    "headings": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "words": 8,
+      "chars": 35,
+      "lines": 2,
+      "size": 48,
+      "vw": 6.3,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.12,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.94,
+      "top": 136,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+      "words": 9,
+      "chars": 41,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1094,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 9,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "-apple-system",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      16,
+      18,
+      24,
+      36,
+      48
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "-apple-system",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 13.5
+     },
+     "measureChars": 64,
+     "max": {
+      "size": 48,
+      "vw": 6.3,
+      "font": "-apple-system",
+      "text": "Kho game của bạn.Quản lý trọn vẹn."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.09,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#09090b",
+       "top": 0,
+       "hsl": {
+        "h": 240,
+        "s": 0.1,
+        "l": 0.04
+       }
+      },
+      {
+       "color": "#18181b",
+       "top": 518,
+       "hsl": {
+        "h": 240,
+        "s": 0.06,
+        "l": 0.1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d4d4d8",
+       "share": 0.37
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.26
+      },
+      {
+       "color": "#9f9fa9",
+       "share": 0.15
+      },
+      {
+       "color": "#e4e4e7",
+       "share": 0.11
+      },
+      {
+       "color": "#ffb900",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#007a55",
+      "hsl": {
+       "h": 162,
+       "s": 1,
+       "l": 0.24
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 12,
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Bắt đầu ngay",
+      "Tạo kho game ngay"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.absolute.inset-y-0 → linear-gradient(to right, oklch(0.141 0.005 285.823) 0%, oklab(0.141 0.00136333 -0.00481054 / 0.7) 50%, rgba(0",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)"
+     ],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 78,
+     "boxRadius": 16,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 1292
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 72,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": []
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2643,
+    "margins": {
+     "left": 24,
+     "right": 57
+    },
+    "sections": [
+     {
+      "sel": "section.relative.overflow-hidden",
+      "tag": "section",
+      "top": 72,
+      "height": 942,
+      "words": 98,
+      "media": 52,
+      "middle": 4927,
+      "heading": {
+       "text": "Kho game của bạn.",
+       "size": 48,
+       "tag": "h1"
+      },
+      "left": 24,
+      "right": 0,
+      "textLeft": 24,
+      "textRight": 49,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.max-w-7xl.mx-auto",
+      "tag": "section",
+      "top": 1014,
+      "height": 1529,
+      "words": 301,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 57,
+      "textLeft": 24,
+      "textRight": 57,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "size": 48,
+      "top": 136,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 24,
+      "n": 5
+     },
+     {
+      "x": 56,
+      "n": 4
+     },
+     {
+      "x": 432,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 13,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.86,
+    1,
+    1,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 5,
+    "css": 5,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3548,
+     "screens": 4.2,
+     "words": 435,
+     "img": 64,
+     "video": 0,
+     "canvas": 0,
+     "svg": 12,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 60,
+     "videoCount": 0,
+     "uiPictures": 5,
+     "pictureSamples": [
+      "elden-ring-DUNdpRAy.jpg",
+      "cyberpunk-C-39r68A.jpg",
+      "witcher-CVMdTetf.jpg",
+      "baldur-8LD7g68R.jpg",
+      "god-of-war-cZVoxg7S.jpg",
+      "silksong-DgjOeFFZ.jpg",
+      "rdr2-t86zSQ-o.jpg",
+      "black-myth-wukong-DHHsI0lh.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "chars": 35,
+     "lines": 2,
+     "size": 30,
+     "vw": 7.7,
+     "font": "-apple-system",
+     "weight": 900,
+     "tracking": -0.025,
+     "leading": 1.12,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.92,
+     "top": 112,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Kho game của bạn. Quản lý trọn vẹn.",
+     "words": 8,
+     "lines": 2,
+     "size": 30,
+     "font": "-apple-system"
+    },
+    "headings": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "words": 8,
+      "chars": 35,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.12,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 112,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+      "words": 9,
+      "chars": 41,
+      "lines": 2,
+      "size": 24,
+      "vw": 6.2,
+      "font": "-apple-system",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 1097,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 9,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "-apple-system",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      12,
+      14,
+      16,
+      20,
+      24,
+      30
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "-apple-system",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 15.7
+     },
+     "measureChars": 45,
+     "max": {
+      "size": 30,
+      "vw": 7.7,
+      "font": "-apple-system",
+      "text": "Kho game của bạn.Quản lý trọn vẹn."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.09,
+     "smallText": 1
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#ffffff",
+     "bodyBgHsl": {
+      "h": 0,
+      "s": 0,
+      "l": 1
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#09090b",
+       "top": 0,
+       "hsl": {
+        "h": 240,
+        "s": 0.1,
+        "l": 0.04
+       }
+      },
+      {
+       "color": "#18181b",
+       "top": 553,
+       "hsl": {
+        "h": 240,
+        "s": 0.06,
+        "l": 0.1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d4d4d8",
+       "share": 0.37
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.26
+      },
+      {
+       "color": "#9f9fa9",
+       "share": 0.15
+      },
+      {
+       "color": "#e4e4e7",
+       "share": 0.11
+      },
+      {
+       "color": "#ffb900",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#007a55",
+      "hsl": {
+       "h": 162,
+       "s": 1,
+       "l": 0.24
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 12,
+     "height": 32,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Bắt đầu ngay",
+      "Tạo kho game ngay"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.absolute.inset-y-0 → linear-gradient(to right, oklch(0.141 0.005 285.823) 0%, oklab(0.141 0.00136333 -0.00481054 / 0.7) 50%, rgba(0",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)",
+      "div.absolute.inset-x-0 → linear-gradient(to top, oklch(0.141 0.005 285.823) 0%, rgba(0, 0, 0, 0) 100%)"
+     ],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 13,
+     "boxRadius": 24,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.1
+     },
+     {
+      "type": "img",
+      "ratio": 0.1
+     },
+     {
+      "type": "img",
+      "ratio": 0.1
+     },
+     {
+      "type": "img",
+      "ratio": 0.1
+     }
+    ],
+    "nav": {
+     "links": 2,
+     "fixed": true,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": []
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3548,
+    "margins": {
+     "left": 16,
+     "right": 23
+    },
+    "sections": [
+     {
+      "sel": "section.relative.overflow-hidden",
+      "tag": "section",
+      "top": 64,
+      "height": 969,
+      "words": 98,
+      "media": 50,
+      "middle": 3993,
+      "heading": {
+       "text": "Kho game của bạn.",
+       "size": 30,
+       "tag": "h1"
+      },
+      "left": 0,
+      "right": 0,
+      "textLeft": 16,
+      "textRight": 28,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.max-w-2xl.mb-12",
+      "tag": "div",
+      "top": 1097,
+      "height": 146,
+      "words": 30,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Trải nghiệm thực tế mọi tính năng cốt lõi",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 20,
+      "textLeft": 16,
+      "textRight": 20,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.grid.grid-cols-1",
+      "tag": "div",
+      "top": 1291,
+      "height": 2074,
+      "words": 271,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Kho game chuẩn hóa & Nhật ký chơi chi tiết",
+       "size": 20,
+       "tag": "h3"
+      },
+      "left": 40,
+      "right": 41,
+      "textLeft": 40,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.py-10.px-6",
+      "tag": "footer",
+      "top": 3428,
+      "height": 120,
+      "words": 15,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 31,
+      "right": 31,
+      "textLeft": 31,
+      "textRight": 31,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Kho game của bạn. Quản lý trọn vẹn.",
+      "size": 30,
+      "top": 112,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 8
+     },
+     {
+      "x": 16,
+      "n": 5
+     }
+    ],
+    "leftBlocks": 13,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The margins differ: 112px on the left, 128px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "small-text",
+   "width": 390,
+   "message": "1 text block(s) under 13px.",
+   "fix": "Nothing meant to be read goes below 13px."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Study\\PTDA\\PixelLogGL\\.taste-skill\\inspect\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

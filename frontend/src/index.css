@@ -18,8 +18,22 @@
   animation: frameSpinSlow 8s linear infinite;
 }
 
+@keyframes infiniteScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infiniteScroll 75s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-frame-spin {
+  .animate-frame-spin,
+  .animate-infinite-scroll {
     animation: none;
   }
 }
