@@ -1,23 +1,19 @@
-import logoBrand from "../../assets/logo-brand.png";
+import logoSvg from "../../assets/pixellog-logo.svg";
 
 export default function BrandLogo({ className = "", size = "md" }) {
   const heightClass =
     size === "sm"
-      ? "h-10 sm:h-12"
+      ? "h-9 sm:h-10"
       : size === "lg"
-      ? "h-12 sm:h-16"
-      : "h-10 sm:h-[52px]";
+      ? "h-12 sm:h-14"
+      : "h-10 sm:h-11";
 
   return (
-    <span
-      className={`inline-flex items-center rounded-xl overflow-hidden bg-[#0e1e2c] border border-zinc-200/80 dark:border-zinc-800/90 shrink-0 ${className}`}
-    >
-      <img
-        src={logoBrand}
-        alt="PixelLog Game Library"
-        className={`${heightClass} w-auto object-contain select-none block`}
-        loading="eager"
-      />
-    </span>
+    <img
+      src={logoSvg}
+      alt="PixelLog Game Library"
+      className={`${heightClass} w-auto object-contain select-none block shrink-0 ${className}`}
+      loading="eager"
+    />
   );
 }
