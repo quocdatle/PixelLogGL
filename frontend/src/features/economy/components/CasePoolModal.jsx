@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RARITY_THEME, TYPE_LABELS } from '../economyConstants';
+import { getItemImageUrl } from '../constants/itemImages';
 
 const RARITY_ORDER = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
 
@@ -50,6 +51,7 @@ export default function CasePoolModal({
     ).map((r) => ({
       key: r,
       label: RARITY_THEME[r]?.label || r,
+      star: RARITY_THEME[r]?.star || '',
       chanceDisplay: caseInfo?.displayChances?.[r] || `${((caseInfo?.chances?.[r] || 0) * 100).toFixed(1)}%`,
       count: counts[r] || 0,
     }));
@@ -64,36 +66,39 @@ export default function CasePoolModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-labelledby="case-pool-title"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl max-h-[88vh] rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-5xl max-h-[90vh] rounded-3xl bg-zinc-950 border-2 border-zinc-800 shadow-2xl overflow-hidden flex flex-col text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/90 flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-3xl shrink-0">
-              <span aria-hidden="true">{caseInfo.icon}</span>
+        {/* Header CS:GO Style */}
+        <div className="p-4 sm:p-6 border-b border-zinc-800 bg-zinc-900/90 flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-3xl shrink-0 shadow-inner">
+              <span aria-hidden="true">{caseInfo.icon || '📦'}</span>
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  CONTAINER SERIES
+                </span>
                 <h2
                   id="case-pool-title"
-                  className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white truncate"
+                  className="text-lg sm:text-xl font-black uppercase tracking-tight text-white truncate"
                 >
-                  Vật phẩm trong {caseInfo.name}
+                  {caseInfo.name}
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 tabular-nums">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-400/20 text-amber-300 border border-amber-400/40 tabular-nums">
                   {caseInfo.cost} Xu / lượt
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Tổng cộng {pool.length} vật phẩm có thể mở ra • Tỷ lệ hiển thị chính xác theo từng món
+              <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+                Gồm {pool.length} vật phẩm kinh điển từ các tựa game nổi tiếng • Tỷ lệ minh bạch 100%
               </p>
             </div>
           </div>
@@ -102,7 +107,7 @@ export default function CasePoolModal({
             type="button"
             onClick={onClose}
             aria-label="Đóng cửa sổ vật phẩm"
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -110,16 +115,16 @@ export default function CasePoolModal({
           </button>
         </div>
 
-        {/* Rarity Filter Chips */}
-        <div className="px-4 sm:px-6 py-3 border-b border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-wrap items-center gap-2">
+        {/* Rarity Filter Chips CS:GO */}
+        <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 bg-zinc-950/95 flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSelectedRarity('all')}
             aria-pressed={selectedRarity === 'all'}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer focus:outline-none ${
               selectedRarity === 'all'
-                ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800'
             }`}
           >
             Tất cả ({pool.length})
@@ -134,14 +139,15 @@ export default function CasePoolModal({
                 type="button"
                 onClick={() => setSelectedRarity(tier.key)}
                 aria-pressed={active}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer focus:outline-none flex items-center gap-1.5 ${
                   active
-                    ? `${theme.badge} ring-2 ring-offset-1 ring-emerald-500 dark:ring-offset-zinc-900`
-                    : 'bg-zinc-50 dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    ? `${theme.badge} ring-2 ring-amber-400/50 shadow-md`
+                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-850'
                 }`}
               >
-                <span>{tier.label}</span>{' '}
-                <span className="tabular-nums opacity-85">
+                {theme.star && <span className="text-amber-400">{theme.star}</span>}
+                <span>{tier.label}</span>
+                <span className="tabular-nums text-[11px] opacity-75">
                   ({tier.chanceDisplay} • {tier.count})
                 </span>
               </button>
@@ -149,57 +155,76 @@ export default function CasePoolModal({
           })}
         </div>
 
-        {/* Scrollable Pool Items Grid */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/* Scrollable Pool Items Grid CS:GO Cards */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-zinc-950/80">
           {filteredItems.length === 0 ? (
-            <p className="py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              Không có vật phẩm nào thuộc bậc độ hiếm này trong rương.
+            <p className="py-12 text-center text-sm text-zinc-400">
+              Không có vật phẩm nào thuộc phẩm cấp này trong rương.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
               {filteredItems.map((item) => {
                 const theme = RARITY_THEME[item.rarity] || RARITY_THEME.common;
-                const typeLabel = TYPE_LABELS[item.type] || 'Vật phẩm';
+                const typeLabel = TYPE_LABELS[item.type] || 'Vũ khí';
+                const imgUrl = getItemImageUrl(item);
 
                 return (
                   <div
                     key={item._id || item.name}
-                    className={`rounded-2xl border p-4 flex flex-col justify-between gap-3 ${theme.bg} ${theme.border}`}
+                    className={`group relative rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 to-zinc-950 p-3 flex flex-col justify-between overflow-hidden shadow-md hover:border-zinc-600 transition-all duration-150 hover:-translate-y-0.5`}
                   >
-                    <div>
-                      <div className="flex items-start justify-between gap-2 mb-2.5">
-                        <div className="w-11 h-11 rounded-xl bg-white/80 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-center text-2xl shrink-0">
-                          <span aria-hidden="true">{item.icon || '🎁'}</span>
-                        </div>
+                    {/* Top Rarity Highlight */}
+                    <div
+                      className={`absolute inset-x-0 top-0 h-12 bg-gradient-to-b ${theme.cardHighlight} pointer-events-none opacity-60`}
+                    />
 
-                        <div className="flex flex-col items-end gap-1">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${theme.badge}`}
-                          >
-                            {theme.label}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 tabular-nums">
-                            Tỷ lệ: {formatDropChance(item.exactChancePct)}
-                          </span>
-                        </div>
-                      </div>
+                    {/* Game badge & Chance */}
+                    <div className="relative z-10 flex items-center justify-between gap-1 mb-2">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-zinc-400 truncate max-w-[85px]">
+                        {item.game || 'PIXEL'}
+                      </span>
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 tabular-nums">
+                        {formatDropChance(item.exactChancePct)}
+                      </span>
+                    </div>
 
-                      <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white leading-snug">
+                    {/* Weapon Image Preview */}
+                    <div className="relative z-10 w-full h-28 my-1 flex items-center justify-center p-1">
+                      {imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt={item.name}
+                          className="h-full w-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)] [image-rendering:pixelated] group-hover:scale-110 transition-transform duration-200"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="text-4xl select-none filter drop-shadow">
+                          {item.icon || '🎁'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Name & Type */}
+                    <div className="relative z-10 mt-2 text-center">
+                      <h3
+                        className="text-xs font-black text-white truncate w-full"
+                        title={item.name}
+                      >
                         {item.name}
                       </h3>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
+                      <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${theme.text}`}>
+                          {theme.label}
+                        </span>
+                        <span className="text-zinc-600">•</span>
+                        <span className="text-[10px] text-zinc-400">
+                          {item.coinValue} Xu
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="pt-2.5 border-t border-zinc-200/70 dark:border-zinc-800/70 flex items-center justify-between text-xs">
-                      <span className="font-medium text-zinc-500 dark:text-zinc-400">
-                        {typeLabel}
-                      </span>
-                      <span className="font-bold text-amber-600 dark:text-amber-400 tabular-nums">
-                        Giá trị: {item.coinValue} Xu
-                      </span>
-                    </div>
+                    {/* CS:GO Colored Bottom Bar */}
+                    <div className={`absolute inset-x-0 bottom-0 h-1.5 ${theme.barColor}`} />
                   </div>
                 );
               })}
@@ -208,16 +233,16 @@ export default function CasePoolModal({
         </div>
 
         {/* Footer */}
-        <div className="px-4 sm:px-6 py-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/90 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
-            Tỷ lệ từng món = (Tỷ lệ bậc độ hiếm) × (Trọng số rơi nội bộ)
+        <div className="px-4 sm:px-6 py-4 border-t border-zinc-800 bg-zinc-900/90 flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs text-zinc-400">
+            Tỷ lệ rơi được tính toán theo thuật toán RNG an toàn phía máy chủ.
           </span>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-zinc-200/70 hover:bg-zinc-300/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 cursor-pointer transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white cursor-pointer transition-colors"
             >
               Đóng
             </button>
@@ -226,7 +251,7 @@ export default function CasePoolModal({
                 type="button"
                 disabled={!canBuyKey || isBuyingKey}
                 onClick={() => onBuyKey(caseInfo.id, 1)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-zinc-950 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-zinc-950 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-md shadow-amber-500/20"
               >
                 <span>{caseInfo.keyIcon || '🔑'}</span>
                 <span>
@@ -242,7 +267,7 @@ export default function CasePoolModal({
                   onClose();
                   onOpenCase(caseInfo.id);
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-emerald-600/20"
               >
                 {canOpen
                   ? `Mở ngay (-1 ${caseInfo.keyIcon || '🔑'} • còn ${keyCount})`

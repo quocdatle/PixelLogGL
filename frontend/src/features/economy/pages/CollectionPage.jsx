@@ -5,12 +5,12 @@ import ItemGridCard from '../components/ItemGridCard';
 import economyService from '../economyService';
 
 const RARITY_OPTIONS = [
-  { value: 'all', label: 'Tất cả độ hiếm' },
-  { value: 'common', label: 'Phổ biến (Xám)' },
-  { value: 'uncommon', label: 'Đặc biệt (Lục)' },
-  { value: 'rare', label: 'Hiếm (Lam)' },
-  { value: 'epic', label: 'Sử thi (Tím)' },
-  { value: 'legendary', label: 'Thần thoại (Vàng)' },
+  { value: 'all', label: 'Tất cả phẩm cấp' },
+  { value: 'common', label: 'Phổ biến (Tiêu chuẩn)' },
+  { value: 'uncommon', label: 'Đặc biệt' },
+  { value: 'rare', label: 'Hiếm (Bảo mật)' },
+  { value: 'epic', label: 'Sử thi (Tối mật)' },
+  { value: 'legendary', label: '★ Thần thoại' },
 ];
 
 const TYPE_OPTIONS = [

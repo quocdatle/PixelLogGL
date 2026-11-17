@@ -22,6 +22,8 @@ const itemSchema = new mongoose.Schema(
     },
     icon: { type: String, default: '🎁' },
     imageUrl: { type: String, default: null },
+    image: { type: String, default: null },
+    game: { type: String, default: '', trim: true },
     coinValue: { type: Number, required: true, min: 10, default: 20 },
     caseType: { type: String, default: 'all' }, // 'all' | 'standard' | 'cyber' | 'mythic'
     dropRate: { type: Number, default: 100 }, // Trọng số rơi trong cùng tier
