@@ -464,7 +464,7 @@ export default function AnalyticsPage() {
                   </PanelState>
                 </Panel>
 
-                {/* Library Status & Platform Distribution */}
+                {/* Library Status & Daily Playtime Distribution */}
                 <Panel
                   title="Phân bổ thư viện chi tiết"
                   action={
@@ -474,7 +474,7 @@ export default function AnalyticsPage() {
                       onChange={setGroupBy}
                       options={[
                         { value: 'status', label: 'Trạng thái' },
-                        { value: 'platform', label: 'Nền tảng' },
+                        { value: 'daily', label: 'Theo ngày' },
                         { value: 'rating', label: 'Đánh giá' },
                       ]}
                     />

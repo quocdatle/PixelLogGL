@@ -636,6 +636,32 @@ Chỉ trả về game có `hoursPlayed` lớn hơn 0, sắp xếp giảm dần.
 
 ---
 
+### Phân bổ thư viện chi tiết (Trạng thái / Theo ngày / Đánh giá)
+```
+GET /api/analytics/distribution?groupBy=daily
+```
+
+| Query | Mặc định | Giá trị |
+|---|---|---|
+| `groupBy` | `status` | `status` (Trạng thái), `daily` (Giờ chơi 7 ngày gần nhất), `rating` (Điểm đánh giá) |
+
+**Response 200 (thành công - khi groupBy=daily):**
+```json
+{
+  "success": true,
+  "data": {
+    "groupBy": "daily",
+    "items": [
+      { "key": "2026-11-17", "label": "17/11", "hours": 2.5, "minutes": 150, "games": 2, "sessions": 3 },
+      { "key": "2026-11-18", "label": "18/11", "hours": 0, "minutes": 0, "games": 0, "sessions": 0 },
+      { "key": "2026-11-23", "label": "23/11", "hours": 1.2, "minutes": 72, "games": 1, "sessions": 1 }
+    ]
+  }
+}
+```
+
+---
+
 ## Module: Advisor (Trợ lý AI Game)
 
 > Tất cả endpoint dưới đây **bắt buộc** header `Authorization: Bearer <token>`. Dữ liệu chat được cô lập tuyệt đối theo từng tài khoản.

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import AppNavbar from "../../../components/layout/AppNavbar";
 import LibraryKPIs from "../components/LibraryKPIs";
+import PlaytimeTracker from "../components/PlaytimeTracker";
 import LibraryFilters from "../components/LibraryFilters";
 import GameCard from "../components/GameCard";
 import LibraryItem from "../components/LibraryItem";
@@ -85,6 +86,12 @@ export default function LibraryPage() {
   function handleGameAdded(newGame) {
     if (newGame) {
       setGames((prev) => [newGame, ...prev]);
+    }
+  }
+
+  function handleSessionSaved(updatedGame) {
+    if (updatedGame?.id) {
+      setGames((prev) => prev.map((g) => (g.id === updatedGame.id ? updatedGame : g)));
     }
   }
 
@@ -181,8 +188,16 @@ export default function LibraryPage() {
             </button>
           </div>
 
-          {/* Quick Statistics (KPIs) */}
+          {/* Quick Statistics (KPIs - 4 Khung) */}
           <LibraryKPIs games={games} />
+
+          {/* General Playtime Tracker: Nút tính giờ ở dưới 4 cái khung và có 1 div đồng hồ tính giờ kế bên */}
+          <PlaytimeTracker
+            games={games}
+            onSessionSaved={handleSessionSaved}
+            toast={toast}
+            confirm={confirm}
+          />
 
           {/* Filter & View Mode Controls */}
           <LibraryFilters

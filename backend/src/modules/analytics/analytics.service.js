@@ -267,9 +267,9 @@ const getTopGames = async (userId, limit = 5) => {
 };
 
 // ---------------------------------------------------------------------------
-// 5. Phân bổ thư viện theo Trạng thái / Nền tảng / Điểm đánh giá
+// 5. Phân bổ thư viện theo Trạng thái / Giờ chơi theo ngày / Điểm đánh giá / Nền tảng
 // ---------------------------------------------------------------------------
-const DISTRIBUTION_GROUPS = ['status', 'platform', 'rating'];
+const DISTRIBUTION_GROUPS = ['status', 'daily', 'rating', 'platform'];
 const STATUS_LABELS = {
   playing: 'Đang chơi',
   completed: 'Đã xong',
@@ -277,6 +277,7 @@ const STATUS_LABELS = {
 };
 const PLAYED_STATUS_ORDER = ['playing', 'completed', 'dropped'];
 const MAX_PLATFORMS = 8;
+const DAILY_DAYS_COUNT = 7;
 
 const getDistributionStats = async (userId, groupBy = 'status') => {
   if (!DISTRIBUTION_GROUPS.includes(groupBy)) {
@@ -284,6 +285,59 @@ const getDistributionStats = async (userId, groupBy = 'status') => {
   }
 
   const uid = toObjectId(userId);
+
+  if (groupBy === 'daily') {
+    const now = nowInVietnam();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const firstDayUTC = new Date(todayUTC.getTime() - (DAILY_DAYS_COUNT - 1) * DAY_MS);
+    const rangeStart = new Date(firstDayUTC.getTime() - TZ_OFFSET_MS);
+
+    const buckets = Array.from({ length: DAILY_DAYS_COUNT }, (_, i) => {
+      const d = new Date(firstDayUTC.getTime() + i * DAY_MS);
+      return {
+        key: `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`,
+        label: `${pad2(d.getUTCDate())}/${pad2(d.getUTCMonth() + 1)}`,
+      };
+    });
+
+    const rows = await UserGame.aggregate([
+      { $match: { userId: uid } },
+      { $unwind: '$playSessions' },
+      { $match: { 'playSessions.playedAt': { $gte: rangeStart } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$playSessions.playedAt',
+              timezone: TIMEZONE,
+            },
+          },
+          totalMinutes: { $sum: '$playSessions.minutes' },
+          sessionsCount: { $sum: 1 },
+          distinctGames: { $addToSet: '$gameId' },
+        },
+      },
+    ]);
+
+    const byDate = new Map(rows.map((r) => [r._id, r]));
+
+    return {
+      groupBy,
+      items: buckets.map((b) => {
+        const row = byDate.get(b.key);
+        const mins = row ? row.totalMinutes : 0;
+        return {
+          key: b.key,
+          label: b.label,
+          hours: minutesToHours(mins),
+          minutes: mins,
+          games: row ? row.distinctGames.length : 0,
+          sessions: row ? row.sessionsCount : 0,
+        };
+      }),
+    };
+  }
 
   if (groupBy === 'status') {
     const rows = await UserGame.aggregate([
