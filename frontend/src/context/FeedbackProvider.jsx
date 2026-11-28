@@ -88,10 +88,10 @@ export function FeedbackProvider({ children }) {
           {toasts.map((item) => {
             const style =
               item.type === 'error'
-                ? 'bg-rose-950 text-rose-100 border-rose-800'
+                ? 'bg-rose-50 dark:bg-rose-950 text-rose-900 dark:text-rose-100 border-rose-300 dark:border-rose-800'
                 : item.type === 'success'
-                ? 'bg-emerald-950 text-emerald-100 border-emerald-800'
-                : 'bg-zinc-900 text-zinc-100 border-zinc-700';
+                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-100 border-emerald-300 dark:border-emerald-800'
+                : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-700 shadow-xl';
 
             return (
               <div

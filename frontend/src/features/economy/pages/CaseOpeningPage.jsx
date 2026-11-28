@@ -196,27 +196,27 @@ export default function CaseOpeningPage() {
   const selectedCase = cases.find((c) => c.id === selectedCaseId) || cases[0];
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 flex flex-col justify-between transition-colors duration-150">
+    <div className="min-h-[100dvh] bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between transition-colors duration-150">
       <div>
         <AppNavbar />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
           {/* Top Banner & Wallet Status */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 mb-8 border-b border-zinc-800">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 mb-8 border-b border-zinc-200 dark:border-zinc-800">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-amber-400/20 text-amber-700 dark:text-amber-300 border border-amber-400/30">
                   CS:GO Gacha Engine
                 </span>
-                <span className="text-xs text-zinc-400">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   • Tỷ lệ minh bạch 100%
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white flex items-center gap-2.5">
                 <span className="text-3xl">📦</span> RƯƠNG VẬT PHẨM PIXELLOG
               </h1>
-              <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl">
-                Trải nghiệm mở hòm phong cách Counter-Strike với 60 vũ khí và
+              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl">
+                Trải nghiệm mở hòm phong cách Counter-Strike với 40 vũ khí và
                 bảo vật kinh điển từ các tựa game/anime
               </p>
             </div>
@@ -224,15 +224,15 @@ export default function CaseOpeningPage() {
             {/* Wallet Panel & Actions */}
             <div className="flex flex-wrap items-center gap-3">
               {/* Wallet Pill */}
-              <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md">
+              <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs dark:shadow-md">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
                   🪙
                 </div>
                 <div>
-                  <div className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-black uppercase tracking-widest">
                     PixelCoins
                   </div>
-                  <div className="text-base sm:text-lg font-black text-amber-400 leading-tight tabular-nums">
+                  <div className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 leading-tight tabular-nums">
                     {wallet ? `${wallet.balance.toLocaleString()} Xu` : "..."}
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export default function CaseOpeningPage() {
                   className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md flex items-center gap-2 ${
                     wallet.canClaimDaily
                       ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black shadow-amber-900/30 active:scale-95"
-                      : "bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-800"
+                      : "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border border-zinc-200 dark:border-zinc-800"
                   }`}
                   title={
                     wallet.canClaimDaily
@@ -267,7 +267,7 @@ export default function CaseOpeningPage() {
               {/* Link to Collection Page */}
               <Link
                 to="/economy/collection"
-                className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 transition-colors flex items-center gap-2 border border-zinc-800"
+                className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 transition-colors flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 shadow-xs"
               >
                 <span>🎒</span>
                 <span>Kho đồ của tôi</span>
@@ -280,8 +280,8 @@ export default function CaseOpeningPage() {
             <div
               className={`mb-6 p-4 rounded-2xl border text-sm font-semibold flex items-center gap-3 animate-in fade-in duration-200 ${
                 actionMessage.type === "success"
-                  ? "bg-emerald-950/60 border-emerald-800 text-emerald-200"
-                  : "bg-rose-950/60 border-rose-800 text-rose-200"
+                  ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200"
+                  : "bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200"
               }`}
             >
               <span>{actionMessage.type === "success" ? "🎉" : "⚠️"}</span>
@@ -311,10 +311,10 @@ export default function CaseOpeningPage() {
           <div className="mb-12">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h2 className="text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
+                <h2 className="text-lg font-black uppercase tracking-tight text-zinc-900 dark:text-white flex items-center gap-2">
                   <span>1. CHỌN HÒM CONTAINER</span>
                 </h2>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Mỗi rương mang phong cách và tỷ lệ rơi vật phẩm cao cấp riêng
                   biệt.
                 </p>
@@ -322,10 +322,10 @@ export default function CaseOpeningPage() {
 
               {/* Keys Pouch Pill */}
               <div
-                className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md self-start sm:self-auto"
+                className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs self-start sm:self-auto"
                 title="Số lượng chìa khóa mở rương bạn đang sở hữu"
               >
-                <div className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">
+                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-black uppercase tracking-widest">
                   Chìa khóa có
                 </div>
                 <div className="flex items-center gap-2">
@@ -348,7 +348,7 @@ export default function CaseOpeningPage() {
                     <span
                       key={c.id}
                       title={`${c.keyName || c.name}: ${wallet?.keys?.[c.id] ?? 0}`}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-zinc-800 text-xs font-black text-zinc-200 tabular-nums border border-zinc-700/60"
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-black text-zinc-700 dark:text-zinc-200 tabular-nums border border-zinc-200 dark:border-zinc-700/60"
                     >
                       <span>{c.keyIcon || "🔑"}</span>
                       <span>{wallet ? (wallet.keys?.[c.id] ?? 0) : "-"}</span>
@@ -363,7 +363,7 @@ export default function CaseOpeningPage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-80 rounded-3xl bg-zinc-900 border border-zinc-800 animate-pulse"
+                    className="h-80 rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-pulse"
                   />
                 ))}
               </div>
@@ -383,21 +383,21 @@ export default function CaseOpeningPage() {
                       onClick={() => setSelectedCaseId(c.id)}
                       className={`relative rounded-3xl p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 ${
                         isSelected
-                          ? "border-amber-400 bg-gradient-to-b from-zinc-900 to-zinc-950 shadow-2xl shadow-amber-500/10 ring-2 ring-amber-400/40"
-                          : "border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 hover:bg-zinc-900"
+                          ? "border-amber-500 dark:border-amber-400 bg-gradient-to-b from-amber-50/50 to-white dark:from-zinc-900 dark:to-zinc-950 shadow-xl shadow-amber-500/10 ring-2 ring-amber-400/40"
+                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 shadow-xs dark:shadow-none"
                       }`}
                     >
                       {/* Top Case Badge */}
                       <div className="flex items-center justify-between gap-2 mb-4">
-                        <span className="text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+                        <span className="text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60">
                           {c.englishName}
                         </span>
 
                         <div
                           className={`flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full border tabular-nums ${
                             hasKey
-                              ? "text-emerald-300 bg-emerald-950/60 border-emerald-700"
-                              : "text-zinc-400 bg-zinc-800 border-zinc-700"
+                              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700"
+                              : "text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
                           }`}
                         >
                           <span>{c.keyIcon || "🔑"}</span>
@@ -407,62 +407,62 @@ export default function CaseOpeningPage() {
 
                       {/* Icon & Name */}
                       <div className="text-center py-4">
-                        <div className="w-24 h-24 mx-auto rounded-3xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-6xl shadow-inner mb-4 hover:scale-105 transition-transform">
+                        <div className="w-24 h-24 mx-auto rounded-3xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-6xl shadow-inner mb-4 hover:scale-105 transition-transform">
                           <span className="select-none filter drop-shadow">
                             {c.icon}
                           </span>
                         </div>
-                        <h3 className="text-lg font-black uppercase text-white tracking-tight">
+                        <h3 className="text-lg font-black uppercase text-zinc-900 dark:text-white tracking-tight">
                           {c.name}
                         </h3>
-                        <p className="text-xs text-zinc-400 mt-1 line-clamp-2 min-h-[32px]">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 min-h-[32px]">
                           {c.description}
                         </p>
                       </div>
 
                       {/* Probabilities preview */}
-                      <div className="pt-4 border-t border-zinc-800 mb-5">
-                        <div className="text-[11px] font-bold text-zinc-400 mb-2">
+                      <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 mb-5">
+                        <div className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mb-2">
                           Tỷ lệ phẩm cấp:
                         </div>
                         <div className="grid grid-cols-5 gap-1 text-center">
-                          <div className="bg-sky-950/40 rounded-lg p-1 border border-sky-500/30">
-                            <div className="text-[9px] text-sky-400 font-bold">
+                          <div className="bg-sky-50 dark:bg-sky-950/40 rounded-lg p-1 border border-sky-200 dark:border-sky-500/30">
+                            <div className="text-[9px] text-sky-700 dark:text-sky-400 font-bold">
                               Phổ biến
                             </div>
-                            <div className="text-[10px] font-black text-sky-300">
+                            <div className="text-[10px] font-black text-sky-800 dark:text-sky-300">
                               {c.displayChances?.common || "0%"}
                             </div>
                           </div>
-                          <div className="bg-purple-950/40 rounded-lg p-1 border border-purple-500/30">
-                            <div className="text-[9px] text-purple-400 font-bold">
+                          <div className="bg-purple-50 dark:bg-purple-950/40 rounded-lg p-1 border border-purple-200 dark:border-purple-500/30">
+                            <div className="text-[9px] text-purple-700 dark:text-purple-400 font-bold">
                               Đặc biệt
                             </div>
-                            <div className="text-[10px] font-black text-purple-300">
+                            <div className="text-[10px] font-black text-purple-800 dark:text-purple-300">
                               {c.displayChances?.uncommon || "0%"}
                             </div>
                           </div>
-                          <div className="bg-fuchsia-950/40 rounded-lg p-1 border border-fuchsia-500/30">
-                            <div className="text-[9px] text-fuchsia-400 font-bold">
+                          <div className="bg-fuchsia-50 dark:bg-fuchsia-950/40 rounded-lg p-1 border border-fuchsia-200 dark:border-fuchsia-500/30">
+                            <div className="text-[9px] text-fuchsia-700 dark:text-fuchsia-400 font-bold">
                               Hiếm
                             </div>
-                            <div className="text-[10px] font-black text-fuchsia-300">
+                            <div className="text-[10px] font-black text-fuchsia-800 dark:text-fuchsia-300">
                               {c.displayChances?.rare || "0%"}
                             </div>
                           </div>
-                          <div className="bg-rose-950/40 rounded-lg p-1 border border-rose-500/30">
-                            <div className="text-[9px] text-rose-400 font-bold">
+                          <div className="bg-rose-50 dark:bg-rose-950/40 rounded-lg p-1 border border-rose-200 dark:border-rose-500/30">
+                            <div className="text-[9px] text-rose-700 dark:text-rose-400 font-bold">
                               Sử thi
                             </div>
-                            <div className="text-[10px] font-black text-rose-300">
+                            <div className="text-[10px] font-black text-rose-800 dark:text-rose-300">
                               {c.displayChances?.epic || "0%"}
                             </div>
                           </div>
-                          <div className="bg-amber-950/40 rounded-lg p-1 border border-amber-500/40">
-                            <div className="text-[9px] text-amber-400 font-bold">
+                          <div className="bg-amber-50 dark:bg-amber-950/40 rounded-lg p-1 border border-amber-200 dark:border-amber-500/40">
+                            <div className="text-[9px] text-amber-700 dark:text-amber-400 font-bold">
                               Thần thoại
                             </div>
-                            <div className="text-[10px] font-black text-amber-300">
+                            <div className="text-[10px] font-black text-amber-800 dark:text-amber-300">
                               {c.displayChances?.legendary || "0%"}
                             </div>
                           </div>
@@ -477,10 +477,10 @@ export default function CaseOpeningPage() {
                             e.stopPropagation();
                             setInspectingCase(c);
                           }}
-                          className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                          className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                         >
                           <svg
-                            className="w-4 h-4 text-amber-400"
+                            className="w-4 h-4 text-amber-500 dark:text-amber-400"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -508,16 +508,16 @@ export default function CaseOpeningPage() {
                         {/* Buy Key Box */}
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="p-2.5 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2"
+                          className="p-2.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/20 border border-amber-300/60 dark:border-amber-500/30 space-y-2"
                         >
                           <div className="flex items-center justify-between text-[11px]">
-                            <span className="font-bold text-zinc-200 flex items-center gap-1 truncate">
+                            <span className="font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-1 truncate">
                               <span>{c.keyIcon || "🔑"}</span>
                               <span className="truncate">
                                 {c.keyName || "Chìa khóa"}
                               </span>
                             </span>
-                            <span className="font-black text-amber-400 shrink-0 tabular-nums">
+                            <span className="font-black text-amber-600 dark:text-amber-400 shrink-0 tabular-nums">
                               {c.cost} Xu/chìa
                             </span>
                           </div>
@@ -529,7 +529,7 @@ export default function CaseOpeningPage() {
                                 handleBuyKey(c.id, 1);
                               }}
                               disabled={!canBuy1 || isBuyingThisKey}
-                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 transition-colors cursor-pointer disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed tabular-nums shadow-sm"
+                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-zinc-950 transition-colors cursor-pointer disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:cursor-not-allowed tabular-nums shadow-xs"
                             >
                               {isBuyingThisKey
                                 ? "Đang mua..."
@@ -542,7 +542,7 @@ export default function CaseOpeningPage() {
                                 handleBuyKey(c.id, 5);
                               }}
                               disabled={!canBuy5 || isBuyingThisKey}
-                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed tabular-nums"
+                              className="py-1.5 px-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-500/15 hover:bg-amber-500/25 dark:bg-amber-500/20 dark:hover:bg-amber-500/30 text-amber-800 dark:text-amber-300 border border-amber-400/60 dark:border-amber-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed tabular-nums"
                             >
                               +5 Chìa ({(c.cost * 5).toLocaleString()})
                             </button>
@@ -559,7 +559,7 @@ export default function CaseOpeningPage() {
                           disabled={isOpening || !hasKey}
                           className={`w-full py-3 px-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-lg flex items-center justify-center gap-2 ${
                             !hasKey
-                              ? "bg-zinc-800 text-zinc-500 cursor-not-allowed shadow-none border border-zinc-700/60"
+                              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed shadow-none border border-zinc-200 dark:border-zinc-700/60"
                               : "bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-emerald-950/40 hover:scale-[1.02]"
                           }`}
                         >
@@ -590,25 +590,25 @@ export default function CaseOpeningPage() {
 
           {/* DEDICATED CS:GO CONTAINER CONTENTS PREVIEW SECTION */}
           {selectedCase && (
-            <div className="mb-12 rounded-3xl bg-zinc-900/80 border-2 border-zinc-800 p-6 sm:p-8 shadow-2xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-zinc-800">
+            <div className="mb-12 rounded-3xl bg-white dark:bg-zinc-900/80 border-2 border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-zinc-200 dark:border-zinc-800">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                       CONTAINER CONTENTS
                     </span>
-                    <span className="text-xs text-zinc-400 font-bold">
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold">
                       •{" "}
                       {selectedCase.itemCount ??
                         selectedCase.pool?.length ??
-                        60}{" "}
+                        40}{" "}
                       VẬT PHẨM
                     </span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white mt-1">
+                  <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-zinc-900 dark:text-white mt-1">
                     VẬT PHẨM TRONG {selectedCase.name}
                   </h2>
-                  <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
+                  <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                     Tất cả các bảo vật, vũ khí có cơ hội mở ra theo tỷ lệ rơi
                     chuẩn CS:GO.
                   </p>
@@ -653,7 +653,7 @@ export default function CaseOpeningPage() {
                     <div
                       key={item._id || item.name}
                       onClick={() => setInspectingCase(selectedCase)}
-                      className={`group relative rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950 p-3 flex flex-col justify-between overflow-hidden shadow-md hover:border-zinc-600 transition-all duration-150 hover:-translate-y-1 cursor-pointer`}
+                      className={`group relative rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-gradient-to-b dark:from-zinc-900 dark:to-zinc-950 p-3 flex flex-col justify-between overflow-hidden shadow-xs dark:shadow-md hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-150 hover:-translate-y-1 cursor-pointer`}
                     >
                       {/* Top Rarity Highlight */}
                       <div
@@ -662,11 +662,11 @@ export default function CaseOpeningPage() {
 
                       {/* Header: Game tag & chance */}
                       <div className="relative z-10 flex items-center justify-between gap-1 mb-1.5">
-                        <span className="text-[9px] font-black uppercase tracking-wider text-zinc-400 truncate max-w-[80px]">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400 truncate max-w-[80px]">
                           {item.game || "PIXEL"}
                         </span>
                         {item.exactChancePct ? (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 tabular-nums">
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 tabular-nums">
                             {item.exactChancePct}%
                           </span>
                         ) : null}
@@ -691,7 +691,7 @@ export default function CaseOpeningPage() {
                       {/* Name & Rarity */}
                       <div className="relative z-10 mt-1 text-center">
                         <h4
-                          className="text-xs font-black text-white truncate w-full"
+                          className="text-xs font-black text-zinc-900 dark:text-white truncate w-full"
                           title={item.name}
                         >
                           {item.name}
@@ -716,15 +716,15 @@ export default function CaseOpeningPage() {
 
           {/* RECENT DROPS LIVE FEED */}
           {recentDrops.length > 0 && (
-            <div className="mt-8 rounded-3xl bg-zinc-900/80 border-2 border-zinc-800 p-6 shadow-xl">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+            <div className="mt-8 rounded-3xl bg-white dark:bg-zinc-900/80 border-2 border-zinc-200 dark:border-zinc-800 p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <h3 className="text-sm font-black uppercase tracking-wider text-white">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-white">
                     Bảng tin mở hòm thời gian thực
                   </h3>
                 </div>
-                <span className="text-xs text-zinc-400">Cập nhật liên tục</span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">Cập nhật liên tục</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -737,9 +737,9 @@ export default function CaseOpeningPage() {
                   return (
                     <div
                       key={drop.id || i}
-                      className="p-3 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex items-center gap-3 relative overflow-hidden"
+                      className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 flex items-center gap-3 relative overflow-hidden"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 p-1">
+                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0 p-1">
                         {dropImg ? (
                           <img
                             src={dropImg}
@@ -753,10 +753,10 @@ export default function CaseOpeningPage() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate">
+                        <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                           {dropItem.name}
                         </div>
-                        <div className="text-[10px] text-zinc-400 truncate">
+                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
                           {drop.user?.username || "Ẩn danh"}
                         </div>
                       </div>
@@ -773,7 +773,7 @@ export default function CaseOpeningPage() {
       </div>
 
       {/* Footer */}
-      <footer className="py-8 px-6 text-center text-xs text-zinc-500 border-t border-zinc-900">
+      <footer className="py-8 px-6 text-center text-xs text-zinc-500 dark:text-zinc-400 border-t border-zinc-200 dark:border-zinc-900">
         PixelLog GL CS:GO Minigame Engine © 2026. Tỷ lệ mở hòm được quản lý an
         toàn tại Backend.
       </footer>

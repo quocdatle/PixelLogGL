@@ -194,27 +194,27 @@ export default function CaseAnimation({
   const wonImageUrl = getItemImageUrl(wonItem);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl bg-zinc-950 border-2 border-zinc-800 p-4 sm:p-7 shadow-2xl">
-      {/* Background CS:GO tactical dark texture */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-800/20 via-zinc-950 to-zinc-950 pointer-events-none" />
+    <div className="relative w-full overflow-hidden rounded-3xl bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 p-4 sm:p-7 shadow-2xl">
+      {/* Background CS:GO tactical dark texture (only active in dark) */}
+      <div className="absolute inset-0 dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-zinc-800/20 dark:via-zinc-950 dark:to-zinc-950 pointer-events-none" />
 
       {/* Header bar CS:GO container header */}
-      <div className="relative z-10 flex items-center justify-between pb-4 mb-4 border-b border-zinc-800">
+      <div className="relative z-10 flex items-center justify-between pb-4 mb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-3xl shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/80 flex items-center justify-center text-3xl shadow-inner">
             {caseInfo?.icon || '📦'}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                 CONTAINER
               </span>
-              <h2 className="text-base sm:text-lg font-black uppercase tracking-tight text-white">
+              <h2 className="text-base sm:text-lg font-black uppercase tracking-tight text-zinc-900 dark:text-white">
                 {caseInfo?.name || 'Rương vật phẩm'}
               </h2>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Đang quay roulette... Chúc bạn mở ra bảo vật <span className="text-amber-400 font-bold">Thần Thoại ★</span>!
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Đang quay roulette... Chúc bạn mở ra bảo vật <span className="text-amber-600 dark:text-amber-400 font-bold">Thần Thoại ★</span>!
             </p>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function CaseAnimation({
           <button
             type="button"
             onClick={handleSkip}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700 transition cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700 transition cursor-pointer flex items-center gap-1.5"
           >
             <span>Bỏ qua</span>
             <span>⏩</span>
@@ -247,13 +247,13 @@ export default function CaseAnimation({
         </div>
 
         {/* Gradient mờ 2 bên mép thanh roulette */}
-        <div className="absolute inset-y-0 left-0 w-20 sm:w-36 bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-transparent z-20 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-20 sm:w-36 bg-gradient-to-l from-zinc-950 via-zinc-950/90 to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-20 sm:w-36 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent dark:from-zinc-950 dark:via-zinc-950/90 z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-20 sm:w-36 bg-gradient-to-l from-zinc-100 via-zinc-100/90 to-transparent dark:from-zinc-950 dark:via-zinc-950/90 z-20 pointer-events-none" />
 
         {/* Khung chứa các thẻ item cuộn ngang */}
         <div
           ref={containerRef}
-          className="relative w-full h-[225px] overflow-hidden rounded-2xl bg-zinc-950 border-2 border-zinc-800 shadow-[inset_0_4px_25px_rgba(0,0,0,0.8)] flex items-center"
+          className="relative w-full h-[225px] overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 shadow-[inset_0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_4px_25px_rgba(0,0,0,0.8)] flex items-center"
         >
           <div
             className="flex items-center absolute left-0"
@@ -276,8 +276,10 @@ export default function CaseAnimation({
                   key={`${item._id || item.id || idx}-${idx}`}
                   style={{ width: `${CARD_WIDTH}px` }}
                   className={`h-[205px] shrink-0 rounded-xl border ${
-                    isTargetCard && !isSpinning ? 'border-amber-400 shadow-xl shadow-amber-400/25' : 'border-zinc-800/90'
-                  } bg-gradient-to-b from-zinc-900/95 to-zinc-950 p-2.5 flex flex-col justify-between items-center relative overflow-hidden transition-all`}
+                    isTargetCard && !isSpinning
+                      ? 'border-amber-400 shadow-xl shadow-amber-400/25 ring-2 ring-amber-400/50'
+                      : 'border-zinc-200 dark:border-zinc-800/90'
+                  } bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-900/95 dark:to-zinc-950 p-2.5 flex flex-col justify-between items-center relative overflow-hidden transition-all shadow-xs`}
                 >
                   {/* Highlight theo độ hiếm phía trên */}
                   <div
@@ -286,11 +288,11 @@ export default function CaseAnimation({
 
                   {/* Header thẻ: Tên Game & Star nếu là Thần Thoại */}
                   <div className="relative z-10 w-full flex items-center justify-between px-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 truncate max-w-[120px]">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400 truncate max-w-[120px]">
                       {item.game || 'PIXEL'}
                     </span>
                     {item.rarity === 'legendary' && (
-                      <span className="text-amber-400 text-xs font-black animate-pulse">★</span>
+                      <span className="text-amber-500 dark:text-amber-400 text-xs font-black animate-pulse">★</span>
                     )}
                   </div>
 
@@ -311,7 +313,7 @@ export default function CaseAnimation({
                   {/* Tên vật phẩm & cấp bậc */}
                   <div className="relative z-10 w-full text-center px-1">
                     <div
-                      className="text-xs font-black text-white truncate w-full"
+                      className="text-xs font-black text-zinc-900 dark:text-white truncate w-full"
                       title={item.name}
                     >
                       {item.name}
@@ -334,7 +336,7 @@ export default function CaseAnimation({
       {showRevealModal && wonItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
           <div
-            className={`relative max-w-lg w-full rounded-3xl border-2 ${wonTheme.border} bg-zinc-950 p-6 sm:p-8 text-center text-white shadow-2xl ${wonTheme.glow} animate-in zoom-in-95 duration-300 overflow-hidden`}
+            className={`relative max-w-lg w-full rounded-3xl border-2 ${wonTheme.border} bg-white dark:bg-zinc-950 p-6 sm:p-8 text-center text-zinc-900 dark:text-white shadow-2xl ${wonTheme.glow} animate-in zoom-in-95 duration-300 overflow-hidden`}
           >
             {/* Background radiant aura tỏa sáng theo phẩm cấp */}
             <div
@@ -349,7 +351,7 @@ export default function CaseAnimation({
 
             {/* Sparkle banner CS:GO */}
             <div className="relative z-10 mb-2">
-              <span className="text-xs uppercase tracking-widest font-black text-amber-400 flex items-center justify-center gap-1.5">
+              <span className="text-xs uppercase tracking-widest font-black text-amber-500 dark:text-amber-400 flex items-center justify-center gap-1.5">
                 <span>★</span>
                 <span>CHÚC MỪNG BẠN ĐÃ MỞ ĐƯỢC</span>
                 <span>★</span>
@@ -358,7 +360,7 @@ export default function CaseAnimation({
 
             {/* Item Showcase Card */}
             <div
-              className={`relative z-10 my-4 mx-auto w-full max-w-[340px] rounded-2xl border-2 ${wonTheme.border} bg-zinc-900/90 p-6 flex flex-col items-center shadow-2xl relative overflow-hidden`}
+              className={`relative z-10 my-4 mx-auto w-full max-w-[340px] rounded-2xl border-2 ${wonTheme.border} bg-zinc-50 dark:bg-zinc-900/90 p-6 flex flex-col items-center shadow-lg dark:shadow-2xl relative overflow-hidden`}
             >
               {/* CS:GO Colored Top & Bottom Bar */}
               <div className={`absolute inset-x-0 top-0 h-1.5 ${wonTheme.barColor}`} />
@@ -372,7 +374,7 @@ export default function CaseAnimation({
               )}
 
               {/* Tag Nguồn Game */}
-              <div className="text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-3">
+              <div className="text-[11px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
                 {wonItem.game || 'PixelLog Universe'}
               </div>
 
@@ -402,23 +404,23 @@ export default function CaseAnimation({
               </div>
 
               {/* Tên vật phẩm */}
-              <h3 className="font-black text-xl text-white mt-2 tracking-tight">
+              <h3 className="font-black text-xl text-zinc-900 dark:text-white mt-2 tracking-tight">
                 {wonItem.name}
               </h3>
 
-              <span className="text-xs text-zinc-400 mt-0.5 uppercase tracking-wide">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 uppercase tracking-wide">
                 {TYPE_LABELS[wonItem.type] || wonItem.type || 'Vũ khí'}
               </span>
 
               {/* Mô tả vật phẩm */}
-              <p className="text-xs text-zinc-300 mt-2.5 px-2 line-clamp-3 leading-relaxed">
+              <p className="text-xs text-zinc-600 dark:text-zinc-300 mt-2.5 px-2 line-clamp-3 leading-relaxed">
                 {wonItem.description}
               </p>
 
               {/* Giá trị quy đổi Xu */}
-              <div className="mt-4 pt-3 border-t border-zinc-800 w-full flex items-center justify-between text-xs text-zinc-300">
+              <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800 w-full flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-300">
                 <span>Giá trị quy đổi:</span>
-                <span className="font-extrabold text-amber-400 flex items-center gap-1 text-sm">
+                <span className="font-extrabold text-amber-600 dark:text-amber-400 flex items-center gap-1 text-sm">
                   <span>🪙</span>
                   <span>+{wonItem.coinValue || 20} Xu</span>
                 </span>
@@ -431,7 +433,7 @@ export default function CaseAnimation({
                 type="button"
                 onClick={onReset}
                 disabled={remainingKeys < 1}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-black uppercase tracking-wide bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed text-zinc-950 transition cursor-pointer shadow-lg shadow-amber-500/20 disabled:shadow-none flex items-center justify-center gap-2"
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-black uppercase tracking-wide bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-500 disabled:cursor-not-allowed text-zinc-950 transition cursor-pointer shadow-lg shadow-amber-500/20 disabled:shadow-none flex items-center justify-center gap-2"
               >
                 <span>
                   {remainingKeys >= 1
@@ -443,7 +445,7 @@ export default function CaseAnimation({
 
               <Link
                 to="/economy/collection"
-                className="w-full sm:w-auto py-3 px-5 rounded-xl text-sm font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white transition cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto py-3 px-5 rounded-xl text-sm font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition cursor-pointer flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-zinc-700"
               >
                 <span>🎒</span>
                 <span>Xem kho đồ</span>
@@ -452,7 +454,7 @@ export default function CaseAnimation({
               <button
                 type="button"
                 onClick={() => setShowRevealModal(false)}
-                className="w-full sm:w-auto py-3 px-4 rounded-xl text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition cursor-pointer border border-zinc-800"
+                className="w-full sm:w-auto py-3 px-4 rounded-xl text-sm font-semibold bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition cursor-pointer border border-zinc-300 dark:border-zinc-800"
               >
                 Đóng
               </button>

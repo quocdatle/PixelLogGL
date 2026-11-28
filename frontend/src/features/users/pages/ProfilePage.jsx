@@ -304,14 +304,14 @@ export default function ProfilePage() {
               {/* GAMER PASSPORT / THẺ CĂN CƯỚC GAME THỦ */}
               <section
                 data-ui="gamer-passport"
-                className="relative overflow-hidden rounded-3xl bg-zinc-900 text-white p-6 sm:p-8"
+                className="relative overflow-hidden rounded-3xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white p-6 sm:p-8 border border-zinc-200 dark:border-zinc-800 shadow-xs transition-colors duration-150"
               >
                 {/* Top Passport Header: Chip, ID & Status */}
-                <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 pb-6">
+                <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-zinc-100 dark:border-zinc-800/80">
                   <div className="flex items-center gap-3">
                     {/* Simulated Smart Chip */}
                     <div
-                      className="w-11 h-8 rounded-lg bg-amber-500 p-1 shrink-0 flex items-center justify-center"
+                      className="w-11 h-8 rounded-lg bg-amber-500 p-1 shrink-0 flex items-center justify-center shadow-xs"
                       title="Microchip căn cước PixelLog"
                       aria-hidden="true"
                     >
@@ -324,28 +324,28 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <div className="text-xs font-semibold text-zinc-400">
+                      <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                         Căn cước game thủ chính thức
                       </div>
-                      <div className="text-sm font-bold text-amber-400 tabular-nums">
+                      <div className="text-sm font-bold text-amber-600 dark:text-amber-400 tabular-nums">
                         ID: PLG-{gamerId}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-950 text-emerald-300">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
                       Đã xác thực
                     </span>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60">
                       Bản bảo mật v3.4
                     </span>
                   </div>
                 </div>
 
                 {/* Main Identity Block */}
-                <div className="relative z-10 pt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
+                <div className="relative z-10 pt-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
                   {/* Left: Avatar & Gamer Dossier */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 min-w-0">
                     <div className="shrink-0 flex justify-center">
@@ -354,33 +354,33 @@ export default function ProfilePage() {
 
                     <div className="space-y-2 min-w-0">
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white truncate">
+                        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white truncate">
                           {profile?.username}
                         </h1>
-                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60">
                           {profile?.authProvider || 'local'}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950 text-emerald-300">
-                          <GamepadIcon className="w-3.5 h-3.5 text-emerald-300" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                          <GamepadIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
                           <span>{profile?.favoritePlatform || 'PC'}</span>
                         </span>
                       </div>
 
-                      <div className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
-                        <span className="text-zinc-400 font-normal">Danh hiệu:</span>
-                        <span className="text-zinc-100">{gamerTitle}</span>
+                      <div className="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <span className="text-zinc-500 dark:text-zinc-400 font-normal">Danh hiệu:</span>
+                        <span className="text-zinc-900 dark:text-zinc-100">{gamerTitle}</span>
                       </div>
 
-                      <p className="text-xs text-zinc-400">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
                         {profile?.email}
                       </p>
 
                       {profile?.bio ? (
-                        <p className="text-sm text-zinc-300 italic pt-1 max-w-xl leading-relaxed">
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 italic pt-1 max-w-xl leading-relaxed">
                           "{profile.bio}"
                         </p>
                       ) : (
-                        <p className="text-xs text-zinc-500 italic pt-1">
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500 italic pt-1">
                           Chưa cập nhật phương châm game thủ. Vào tab Cài đặt để thêm lời giới thiệu.
                         </p>
                       )}
@@ -393,13 +393,13 @@ export default function ProfilePage() {
                       type="button"
                       onClick={handleCheckIn}
                       disabled={!profile?.canCheckInToday || checkingIn}
-                      className={`inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl text-sm font-bold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                      className={`inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl text-sm font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                         profile?.canCheckInToday
-                          ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 active:scale-[0.98]'
-                          : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                          ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 active:scale-[0.98] shadow-md shadow-amber-500/20 cursor-pointer'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700/60 cursor-not-allowed'
                       }`}
                     >
-                      <ShieldCheckIcon className="w-5 h-5 shrink-0 text-zinc-950" />
+                      <ShieldCheckIcon className={`w-5 h-5 shrink-0 ${profile?.canCheckInToday ? 'text-zinc-950' : 'text-zinc-400 dark:text-zinc-500'}`} />
                       <span>
                         {checkingIn
                           ? 'Đang xác thực...'
@@ -410,7 +410,7 @@ export default function ProfilePage() {
                     </button>
 
                     {!profile?.canCheckInToday && profile?.nextCheckInAt && (
-                      <p className="text-xs text-zinc-400">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
                         Lượt kế: {new Date(profile.nextCheckInAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(profile.nextCheckInAt).toLocaleDateString('vi-VN')}
                       </p>
                     )}
@@ -418,19 +418,19 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Level EXP Progress Bar */}
-                <div className="relative z-10 mt-8 pt-6">
+                <div className="relative z-10 mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800/80">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-white">
+                      <span className="text-sm font-bold text-zinc-900 dark:text-white">
                         Cấp độ {level} / {maxLevel}
                       </span>
                       {level < maxLevel && (
-                        <span className="text-xs text-zinc-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           (Mốc mở khung kế tiếp: Cấp {nextMilestone})
                         </span>
                       )}
                     </div>
-                    <span className="text-xs sm:text-sm font-semibold text-emerald-400 tabular-nums">
+                    <span className="text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
                       {level >= maxLevel
                         ? 'Đã đạt cấp độ tối đa'
                         : `${progress} / ${required} lần điểm danh để lên Cấp ${level + 1}`}
@@ -438,7 +438,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div
-                    className="w-full h-3 rounded-full bg-zinc-800 overflow-hidden"
+                    className="w-full h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200/80 dark:border-zinc-700/50"
                     role="progressbar"
                     aria-valuenow={progressPercent}
                     aria-valuemin={0}
@@ -454,54 +454,54 @@ export default function ProfilePage() {
 
                 {/* 4 Bottom KPI Metric Strips */}
                 <dl className="relative z-10 mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                  <div className="p-3.5 rounded-2xl bg-zinc-800/80 flex flex-col justify-between">
-                    <dt className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/60 flex flex-col justify-between">
+                    <dt className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                       <FlameIcon className="w-4 h-4 text-amber-500" />
                       <span>Chuỗi điểm danh</span>
                     </dt>
-                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-amber-400">
-                      {profile?.checkInStreak || 0} <span className="text-sm font-medium text-zinc-400">ngày</span>
+                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-amber-600 dark:text-amber-400">
+                      {profile?.checkInStreak || 0} <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">ngày</span>
                     </dd>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-zinc-800/80 flex flex-col justify-between">
-                    <dt className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
-                      <CalendarIcon className="w-4 h-4 text-zinc-400" />
+                  <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/60 flex flex-col justify-between">
+                    <dt className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                      <CalendarIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-400" />
                       <span>Tổng ngày điểm danh</span>
                     </dt>
-                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-white">
-                      {profile?.totalCheckIns || 0} <span className="text-sm font-medium text-zinc-400">lần</span>
+                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-zinc-900 dark:text-white">
+                      {profile?.totalCheckIns || 0} <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">lần</span>
                     </dd>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-zinc-800/80 flex flex-col justify-between">
-                    <dt className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
-                      <CoinIcon className="w-4 h-4 text-amber-400" />
+                  <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/60 flex flex-col justify-between">
+                    <dt className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                      <CoinIcon className="w-4 h-4 text-amber-500" />
                       <span>Ví PixelCoins</span>
                     </dt>
-                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-amber-400">
-                      {(profile?.coinBalance ?? 0).toLocaleString()} <span className="text-sm font-medium text-zinc-400">Xu</span>
+                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-amber-600 dark:text-amber-400">
+                      {(profile?.coinBalance ?? 0).toLocaleString()} <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Xu</span>
                     </dd>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-zinc-800/80 flex flex-col justify-between">
-                    <dt className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
-                      <CrownIcon className="w-4 h-4 text-emerald-400" />
+                  <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/60 flex flex-col justify-between">
+                    <dt className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                      <CrownIcon className="w-4 h-4 text-emerald-500" />
                       <span>Khung Avatar</span>
                     </dt>
-                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-emerald-400">
-                      {unlockedCount} / 10 <span className="text-sm font-medium text-zinc-400">mở</span>
+                    <dd className="mt-1 text-xl sm:text-2xl font-black tabular-nums text-emerald-600 dark:text-emerald-400">
+                      {unlockedCount} / 10 <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">mở</span>
                     </dd>
                   </div>
                 </dl>
               </section>
 
               {/* TABBED NAVIGATION HEADER */}
-              <div className="flex items-center gap-2 pb-2">
+              <div className="flex items-center gap-2 pb-2 overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => setActiveTab('overview')}
                   className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                     activeTab === 'overview'
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                      ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   <ShieldCheckIcon className="w-4 h-4" />
@@ -513,8 +513,8 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('frames')}
                   className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                     activeTab === 'frames'
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                      ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   <CrownIcon className="w-4 h-4" />
@@ -526,8 +526,8 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('settings')}
                   className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
                     activeTab === 'settings'
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                      ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -544,7 +544,7 @@ export default function ProfilePage() {
                   {/* Library Snapshot & Completion Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Library Overview Card */}
-                    <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between">
+                    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs p-6 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
@@ -560,19 +560,19 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="grid grid-cols-3 gap-3 mb-5">
-                          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                          <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/60">
                             <div className="text-xs text-zinc-500 dark:text-zinc-400">Tổng game</div>
                             <div className="text-2xl font-black tabular-nums text-zinc-900 dark:text-white mt-0.5">
                               {totalGames}
                             </div>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                          <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/60">
                             <div className="text-xs text-zinc-500 dark:text-zinc-400">Giờ chơi</div>
                             <div className="text-2xl font-black tabular-nums text-zinc-900 dark:text-white mt-0.5">
                               {totalHours}h
                             </div>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                          <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/60">
                             <div className="text-xs text-zinc-500 dark:text-zinc-400">Hoàn thành</div>
                             <div className="text-2xl font-black tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5">
                               {completedGames}
@@ -606,7 +606,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Gamer Dossier & Milestone Badges */}
-                    <div className="rounded-2xl bg-white dark:bg-zinc-900 p-6 flex flex-col justify-between">
+                    <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs p-6 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
@@ -623,10 +623,10 @@ export default function ProfilePage() {
 
                         <div className="space-y-3">
                           {/* Badge 1 */}
-                          <div className={`p-3 rounded-xl flex items-center gap-3.5 ${
+                          <div className={`p-3 rounded-xl flex items-center gap-3.5 border ${
                             (profile?.totalCheckIns || 0) >= 1
-                              ? 'bg-amber-100/70 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200'
-                              : 'bg-zinc-100 dark:bg-zinc-800 opacity-60'
+                              ? 'bg-amber-100/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/60 text-amber-950 dark:text-amber-200'
+                              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/60 opacity-60'
                           }`}>
                             <div className="w-8 h-8 rounded-lg bg-amber-500 text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0">
                               L1
@@ -642,10 +642,10 @@ export default function ProfilePage() {
                           </div>
 
                           {/* Badge 2 */}
-                          <div className={`p-3 rounded-xl flex items-center gap-3.5 ${
+                          <div className={`p-3 rounded-xl flex items-center gap-3.5 border ${
                             (profile?.checkInStreak || 0) >= 7
-                              ? 'bg-amber-100/70 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200'
-                              : 'bg-zinc-100 dark:bg-zinc-800 opacity-60'
+                              ? 'bg-amber-100/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/60 text-amber-950 dark:text-amber-200'
+                              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/60 opacity-60'
                           }`}>
                             <div className="w-8 h-8 rounded-lg bg-amber-500 text-zinc-950 flex items-center justify-center shrink-0">
                               <FlameIcon className="w-4 h-4 text-zinc-950" />
@@ -661,10 +661,10 @@ export default function ProfilePage() {
                           </div>
 
                           {/* Badge 3 */}
-                          <div className={`p-3 rounded-xl flex items-center gap-3.5 ${
+                          <div className={`p-3 rounded-xl flex items-center gap-3.5 border ${
                             totalGames >= 5
-                              ? 'bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200'
-                              : 'bg-zinc-100 dark:bg-zinc-800 opacity-60'
+                              ? 'bg-emerald-100/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800/60 text-emerald-950 dark:text-emerald-200'
+                              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/60 opacity-60'
                           }`}>
                             <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
                               <GamepadIcon className="w-4 h-4 text-white" />
@@ -680,10 +680,10 @@ export default function ProfilePage() {
                           </div>
 
                           {/* Badge 4 */}
-                          <div className={`p-3 rounded-xl flex items-center gap-3.5 ${
+                          <div className={`p-3 rounded-xl flex items-center gap-3.5 border ${
                             level >= 10
-                              ? 'bg-sky-100/70 dark:bg-sky-950/40 text-sky-950 dark:text-sky-200'
-                              : 'bg-zinc-100 dark:bg-zinc-800 opacity-60'
+                              ? 'bg-sky-100/70 dark:bg-sky-950/40 border-sky-300 dark:border-sky-800/60 text-sky-950 dark:text-sky-200'
+                              : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/60 opacity-60'
                           }`}>
                             <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center shrink-0">
                               <CrownIcon className="w-4 h-4 text-white" />
@@ -710,7 +710,7 @@ export default function ProfilePage() {
 
               {/* TAB 2: AVATAR FRAMES VAULT */}
               {activeTab === 'frames' && (
-                <section className="rounded-2xl bg-white dark:bg-zinc-900 p-6 sm:p-8">
+                <section className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs p-6 sm:p-8">
                   <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
                       <h2 className="text-xl font-extrabold text-zinc-900 dark:text-white">
@@ -741,10 +741,10 @@ export default function ProfilePage() {
                           key={frame.id}
                           className={`rounded-2xl p-6 flex flex-col items-center text-center justify-between gap-4 transition-colors ${
                             frame.equipped
-                              ? 'bg-emerald-50 dark:bg-emerald-950/50'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/50 border-2 border-emerald-500 shadow-xs'
                               : frame.unlocked
-                              ? 'bg-zinc-50 dark:bg-zinc-800/60'
-                              : 'bg-zinc-100/60 dark:bg-zinc-900/60 opacity-75'
+                              ? 'bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60'
+                              : 'bg-zinc-100/60 dark:bg-zinc-900/60 border border-dashed border-zinc-300 dark:border-zinc-800 opacity-75'
                           }`}
                         >
                           <div className="flex flex-col items-center gap-3 w-full">
@@ -810,7 +810,7 @@ export default function ProfilePage() {
               {activeTab === 'settings' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Edit Profile Form */}
-                  <section className="rounded-2xl bg-white dark:bg-zinc-900 p-6 sm:p-8 space-y-5">
+                  <section className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs p-6 sm:p-8 space-y-5">
                     <div className="pb-3">
                       <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white">
                         Chỉnh sửa thông tin game thủ
@@ -846,7 +846,7 @@ export default function ProfilePage() {
                                 setEditForm((prev) => ({ ...prev, avatarUrl: e.target.value }))
                               }
                               placeholder="Dán link ảnh (.png, .jpg, .webp)"
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             />
                             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                               Xem trước trực tiếp cùng khung avatar đang sử dụng.
@@ -897,7 +897,7 @@ export default function ProfilePage() {
                             setEditForm((prev) => ({ ...prev, bio: e.target.value }))
                           }
                           placeholder="Chia sẻ gu game, tựa game yêu thích hoặc phương châm của bạn..."
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                         />
                       </div>
 
@@ -914,7 +914,7 @@ export default function ProfilePage() {
                   {/* Security: Change Password */}
                   <div className="space-y-6">
                     {profile?.authProvider === 'local' ? (
-                      <section className="rounded-2xl bg-white dark:bg-zinc-900 p-6 sm:p-8 space-y-4">
+                      <section className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs p-6 sm:p-8 space-y-4">
                         <div className="pb-3">
                           <h2 className="text-lg font-extrabold text-zinc-900 dark:text-white">
                             Bảo mật và đổi mật khẩu
@@ -937,7 +937,7 @@ export default function ProfilePage() {
                                 setPwForm((prev) => ({ ...prev, oldPassword: e.target.value }))
                               }
                               placeholder="Nhập mật khẩu hiện tại"
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             />
                           </div>
 
@@ -955,7 +955,7 @@ export default function ProfilePage() {
                                   setPwForm((prev) => ({ ...prev, newPassword: e.target.value }))
                                 }
                                 placeholder="Ít nhất 6 ký tự"
-                                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                               />
                             </div>
                             <div>
@@ -974,7 +974,7 @@ export default function ProfilePage() {
                                   }))
                                 }
                                 placeholder="Nhập lại mật khẩu"
-                                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                               />
                             </div>
                           </div>
@@ -989,7 +989,7 @@ export default function ProfilePage() {
                         </form>
                       </section>
                     ) : (
-                      <div className="rounded-2xl bg-zinc-100 dark:bg-zinc-900 p-6 text-center">
+                      <div className="rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 text-center">
                         <div className="w-10 h-10 mx-auto rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 mb-2">
                           <ShieldCheckIcon className="w-5 h-5 text-emerald-500" />
                         </div>
